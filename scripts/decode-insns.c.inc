@@ -34,7 +34,22 @@ typedef struct {
 } arg_cv;
 
 typedef struct {
+    int rd;
+    int imm;
+} arg_d_ui4;
+
+typedef struct {
+    int rd;
+    int imm;
+} arg_d_ui8;
+
+typedef struct {
 } arg_empty;
+
+typedef struct {
+    int fd;
+    int imm;
+} arg_f_i;
 
 typedef struct {
     int fd;
@@ -70,6 +85,26 @@ typedef struct {
     int fk;
     int fa;
 } arg_ffff;
+
+typedef struct {
+    int offs;
+} arg_fmt_offs21;
+
+typedef struct {
+    int ptr;
+} arg_fmt_ptr;
+
+typedef struct {
+    int rd;
+    int rj;
+    int si5;
+} arg_fmt_rdrjsi5;
+
+typedef struct {
+    int rd;
+    int op;
+    int imm;
+} arg_fmt_rdui8;
 
 typedef struct {
     int fd;
@@ -116,6 +151,26 @@ typedef struct {
 } arg_j_i;
 
 typedef struct {
+    int rj;
+    int imm;
+} arg_j_ui3;
+
+typedef struct {
+    int rj;
+    int imm;
+} arg_j_ui4;
+
+typedef struct {
+    int rj;
+    int imm;
+} arg_j_ui5;
+
+typedef struct {
+    int rj;
+    int imm;
+} arg_j_ui6;
+
+typedef struct {
     int offs;
 } arg_offs;
 
@@ -123,6 +178,10 @@ typedef struct {
     int rd;
     int csr;
 } arg_r_csr;
+
+typedef struct {
+    int rd;
+} arg_r_d;
 
 typedef struct {
     int rd;
@@ -136,8 +195,17 @@ typedef struct {
 
 typedef struct {
     int rj;
+} arg_r_j;
+
+typedef struct {
+    int rj;
     int offs;
 } arg_r_offs;
+
+typedef struct {
+    int rd;
+    int sj;
+} arg_r_s;
 
 typedef struct {
     int rd;
@@ -202,6 +270,11 @@ typedef struct {
     int vj;
     int imm;
 } arg_rv_i;
+
+typedef struct {
+    int sd;
+    int rj;
+} arg_s_r;
 
 typedef struct {
     int vd;
@@ -335,6 +408,8 @@ typedef arg_rrr_sa arg_alsl_wu;
 static bool trans_alsl_wu(DisasContext *ctx, arg_alsl_wu *a);
 typedef arg_rrr_sa arg_alsl_d;
 static bool trans_alsl_d(DisasContext *ctx, arg_alsl_d *a);
+typedef arg_rrr_sa arg_alsl_uw;
+static bool trans_alsl_uw(DisasContext *ctx, arg_alsl_uw *a);
 typedef arg_r_i arg_lu12i_w;
 static bool trans_lu12i_w(DisasContext *ctx, arg_lu12i_w *a);
 typedef arg_r_i arg_lu32i_d;
@@ -377,8 +452,30 @@ typedef arg_rrr arg_rotr_w;
 static bool trans_rotr_w(DisasContext *ctx, arg_rotr_w *a);
 typedef arg_rrr arg_rotr_d;
 static bool trans_rotr_d(DisasContext *ctx, arg_rotr_d *a);
+typedef arg_rrr arg_add_wu;
+static bool trans_add_wu(DisasContext *ctx, arg_add_wu *a);
+typedef arg_rrr arg_max;
+static bool trans_max(DisasContext *ctx, arg_max *a);
+typedef arg_rrr arg_maxu;
+static bool trans_maxu(DisasContext *ctx, arg_maxu *a);
+typedef arg_rrr arg_maxwu;
+static bool trans_maxwu(DisasContext *ctx, arg_maxwu *a);
+typedef arg_rrr arg_xnor;
+static bool trans_xnor(DisasContext *ctx, arg_xnor *a);
+typedef arg_rrr arg_bitinv;
+static bool trans_bitinv(DisasContext *ctx, arg_bitinv *a);
+typedef arg_rr_i arg_bitinvi;
+static bool trans_bitinvi(DisasContext *ctx, arg_bitinvi *a);
+typedef arg_rrr arg_min;
+static bool trans_min(DisasContext *ctx, arg_min *a);
+typedef arg_rrr arg_minu;
+static bool trans_minu(DisasContext *ctx, arg_minu *a);
+typedef arg_rrr arg_minwu;
+static bool trans_minwu(DisasContext *ctx, arg_minwu *a);
 typedef arg_rr_i arg_slli_w;
 static bool trans_slli_w(DisasContext *ctx, arg_slli_w *a);
+typedef arg_rr_i arg_slli_wu;
+static bool trans_slli_wu(DisasContext *ctx, arg_slli_wu *a);
 typedef arg_rr_i arg_slli_d;
 static bool trans_slli_d(DisasContext *ctx, arg_slli_d *a);
 typedef arg_rr_i arg_srli_w;
@@ -433,6 +530,12 @@ typedef arg_rr arg_bitrev_w;
 static bool trans_bitrev_w(DisasContext *ctx, arg_bitrev_w *a);
 typedef arg_rr arg_bitrev_d;
 static bool trans_bitrev_d(DisasContext *ctx, arg_bitrev_d *a);
+typedef arg_rr arg_pcnt_w;
+static bool trans_pcnt_w(DisasContext *ctx, arg_pcnt_w *a);
+typedef arg_rr arg_pcnt_d;
+static bool trans_pcnt_d(DisasContext *ctx, arg_pcnt_d *a);
+typedef arg_rr arg_orc_b;
+static bool trans_orc_b(DisasContext *ctx, arg_orc_b *a);
 typedef arg_rrr_sa arg_bytepick_w;
 static bool trans_bytepick_w(DisasContext *ctx, arg_bytepick_w *a);
 typedef arg_rrr_sa arg_bytepick_d;
@@ -549,6 +652,46 @@ typedef arg_rr_i arg_ll_d;
 static bool trans_ll_d(DisasContext *ctx, arg_ll_d *a);
 typedef arg_rr_i arg_sc_d;
 static bool trans_sc_d(DisasContext *ctx, arg_sc_d *a);
+typedef arg_rr arg_llacq_w;
+static bool trans_llacq_w(DisasContext *ctx, arg_llacq_w *a);
+typedef arg_rr arg_screl_w;
+static bool trans_screl_w(DisasContext *ctx, arg_screl_w *a);
+typedef arg_rr arg_llacq_d;
+static bool trans_llacq_d(DisasContext *ctx, arg_llacq_d *a);
+typedef arg_rr arg_screl_d;
+static bool trans_screl_d(DisasContext *ctx, arg_screl_d *a);
+typedef arg_rrr arg_amcas_b;
+static bool trans_amcas_b(DisasContext *ctx, arg_amcas_b *a);
+typedef arg_rrr arg_amcas_h;
+static bool trans_amcas_h(DisasContext *ctx, arg_amcas_h *a);
+typedef arg_rrr arg_amcas_w;
+static bool trans_amcas_w(DisasContext *ctx, arg_amcas_w *a);
+typedef arg_rrr arg_amcas_d;
+static bool trans_amcas_d(DisasContext *ctx, arg_amcas_d *a);
+typedef arg_rrr arg_amcas_db_b;
+static bool trans_amcas_db_b(DisasContext *ctx, arg_amcas_db_b *a);
+typedef arg_rrr arg_amcas_db_h;
+static bool trans_amcas_db_h(DisasContext *ctx, arg_amcas_db_h *a);
+typedef arg_rrr arg_amcas_db_w;
+static bool trans_amcas_db_w(DisasContext *ctx, arg_amcas_db_w *a);
+typedef arg_rrr arg_amcas_db_d;
+static bool trans_amcas_db_d(DisasContext *ctx, arg_amcas_db_d *a);
+typedef arg_rrr arg_amswap_b;
+static bool trans_amswap_b(DisasContext *ctx, arg_amswap_b *a);
+typedef arg_rrr arg_amswap_h;
+static bool trans_amswap_h(DisasContext *ctx, arg_amswap_h *a);
+typedef arg_rrr arg_amadd_b;
+static bool trans_amadd_b(DisasContext *ctx, arg_amadd_b *a);
+typedef arg_rrr arg_amadd_h;
+static bool trans_amadd_h(DisasContext *ctx, arg_amadd_h *a);
+typedef arg_rrr arg_amswap_db_b;
+static bool trans_amswap_db_b(DisasContext *ctx, arg_amswap_db_b *a);
+typedef arg_rrr arg_amswap_db_h;
+static bool trans_amswap_db_h(DisasContext *ctx, arg_amswap_db_h *a);
+typedef arg_rrr arg_amadd_db_b;
+static bool trans_amadd_db_b(DisasContext *ctx, arg_amadd_db_b *a);
+typedef arg_rrr arg_amadd_db_h;
+static bool trans_amadd_db_h(DisasContext *ctx, arg_amadd_db_h *a);
 typedef arg_rrr arg_amswap_w;
 static bool trans_amswap_w(DisasContext *ctx, arg_amswap_w *a);
 typedef arg_rrr arg_amswap_d;
@@ -621,6 +764,8 @@ typedef arg_rrr arg_ammin_db_wu;
 static bool trans_ammin_db_wu(DisasContext *ctx, arg_ammin_db_wu *a);
 typedef arg_rrr arg_ammin_db_du;
 static bool trans_ammin_db_du(DisasContext *ctx, arg_ammin_db_du *a);
+typedef arg_rrr arg_sc_q;
+static bool trans_sc_q(DisasContext *ctx, arg_sc_q *a);
 typedef arg_rrr arg_crc_w_b_w;
 static bool trans_crc_w_b_w(DisasContext *ctx, arg_crc_w_b_w *a);
 typedef arg_rrr arg_crc_w_h_w;
@@ -701,6 +846,14 @@ typedef arg_fff arg_fmina_s;
 static bool trans_fmina_s(DisasContext *ctx, arg_fmina_s *a);
 typedef arg_fff arg_fmina_d;
 static bool trans_fmina_d(DisasContext *ctx, arg_fmina_d *a);
+typedef arg_ff arg_fmaxn_s;
+static bool trans_fmaxn_s(DisasContext *ctx, arg_fmaxn_s *a);
+typedef arg_ff arg_fmaxn_d;
+static bool trans_fmaxn_d(DisasContext *ctx, arg_fmaxn_d *a);
+typedef arg_ff arg_fminn_s;
+static bool trans_fminn_s(DisasContext *ctx, arg_fminn_s *a);
+typedef arg_ff arg_fminn_d;
+static bool trans_fminn_d(DisasContext *ctx, arg_fminn_d *a);
 typedef arg_ff arg_fabs_s;
 static bool trans_fabs_s(DisasContext *ctx, arg_fabs_s *a);
 typedef arg_ff arg_fabs_d;
@@ -721,6 +874,14 @@ typedef arg_ff arg_frsqrt_s;
 static bool trans_frsqrt_s(DisasContext *ctx, arg_frsqrt_s *a);
 typedef arg_ff arg_frsqrt_d;
 static bool trans_frsqrt_d(DisasContext *ctx, arg_frsqrt_d *a);
+typedef arg_ff arg_frecipe_s;
+static bool trans_frecipe_s(DisasContext *ctx, arg_frecipe_s *a);
+typedef arg_ff arg_frecipe_d;
+static bool trans_frecipe_d(DisasContext *ctx, arg_frecipe_d *a);
+typedef arg_ff arg_frsqrte_s;
+static bool trans_frsqrte_s(DisasContext *ctx, arg_frsqrte_s *a);
+typedef arg_ff arg_frsqrte_d;
+static bool trans_frsqrte_d(DisasContext *ctx, arg_frsqrte_d *a);
 typedef arg_fff arg_fscaleb_s;
 static bool trans_fscaleb_s(DisasContext *ctx, arg_fscaleb_s *a);
 typedef arg_fff arg_fscaleb_d;
@@ -793,10 +954,30 @@ typedef arg_ff arg_ffint_d_w;
 static bool trans_ffint_d_w(DisasContext *ctx, arg_ffint_d_w *a);
 typedef arg_ff arg_ffint_d_l;
 static bool trans_ffint_d_l(DisasContext *ctx, arg_ffint_d_l *a);
+typedef arg_ff arg_frintirm_s;
+static bool trans_frintirm_s(DisasContext *ctx, arg_frintirm_s *a);
+typedef arg_ff arg_frintirm_d;
+static bool trans_frintirm_d(DisasContext *ctx, arg_frintirm_d *a);
+typedef arg_ff arg_frintirp_s;
+static bool trans_frintirp_s(DisasContext *ctx, arg_frintirp_s *a);
+typedef arg_ff arg_frintirp_d;
+static bool trans_frintirp_d(DisasContext *ctx, arg_frintirp_d *a);
+typedef arg_ff arg_frintirz_s;
+static bool trans_frintirz_s(DisasContext *ctx, arg_frintirz_s *a);
+typedef arg_ff arg_frintirz_d;
+static bool trans_frintirz_d(DisasContext *ctx, arg_frintirz_d *a);
+typedef arg_ff arg_frintirne_s;
+static bool trans_frintirne_s(DisasContext *ctx, arg_frintirne_s *a);
+typedef arg_ff arg_frintirne_d;
+static bool trans_frintirne_d(DisasContext *ctx, arg_frintirne_d *a);
 typedef arg_ff arg_frint_s;
 static bool trans_frint_s(DisasContext *ctx, arg_frint_s *a);
 typedef arg_ff arg_frint_d;
 static bool trans_frint_d(DisasContext *ctx, arg_frint_d *a);
+typedef arg_f_i arg_fldi_s;
+static bool trans_fldi_s(DisasContext *ctx, arg_fldi_s *a);
+typedef arg_f_i arg_fldi_d;
+static bool trans_fldi_d(DisasContext *ctx, arg_fldi_d *a);
 typedef arg_ff arg_fmov_s;
 static bool trans_fmov_s(DisasContext *ctx, arg_fmov_s *a);
 typedef arg_ff arg_fmov_d;
@@ -1883,6 +2064,14 @@ typedef arg_vvv arg_vfmin_s;
 static bool trans_vfmin_s(DisasContext *ctx, arg_vfmin_s *a);
 typedef arg_vvv arg_vfmin_d;
 static bool trans_vfmin_d(DisasContext *ctx, arg_vfmin_d *a);
+typedef arg_vv arg_vfmaxn_s;
+static bool trans_vfmaxn_s(DisasContext *ctx, arg_vfmaxn_s *a);
+typedef arg_vv arg_vfmaxn_d;
+static bool trans_vfmaxn_d(DisasContext *ctx, arg_vfmaxn_d *a);
+typedef arg_vv arg_vfminn_s;
+static bool trans_vfminn_s(DisasContext *ctx, arg_vfminn_s *a);
+typedef arg_vv arg_vfminn_d;
+static bool trans_vfminn_d(DisasContext *ctx, arg_vfminn_d *a);
 typedef arg_vvv arg_vfmaxa_s;
 static bool trans_vfmaxa_s(DisasContext *ctx, arg_vfmaxa_s *a);
 typedef arg_vvv arg_vfmaxa_d;
@@ -1911,6 +2100,14 @@ typedef arg_vv arg_vfrsqrt_s;
 static bool trans_vfrsqrt_s(DisasContext *ctx, arg_vfrsqrt_s *a);
 typedef arg_vv arg_vfrsqrt_d;
 static bool trans_vfrsqrt_d(DisasContext *ctx, arg_vfrsqrt_d *a);
+typedef arg_vv arg_vfrecipe_s;
+static bool trans_vfrecipe_s(DisasContext *ctx, arg_vfrecipe_s *a);
+typedef arg_vv arg_vfrecipe_d;
+static bool trans_vfrecipe_d(DisasContext *ctx, arg_vfrecipe_d *a);
+typedef arg_vv arg_vfrsqrte_s;
+static bool trans_vfrsqrte_s(DisasContext *ctx, arg_vfrsqrte_s *a);
+typedef arg_vv arg_vfrsqrte_d;
+static bool trans_vfrsqrte_d(DisasContext *ctx, arg_vfrsqrte_d *a);
 typedef arg_vv arg_vfcvtl_s_h;
 static bool trans_vfcvtl_s_h(DisasContext *ctx, arg_vfcvtl_s_h *a);
 typedef arg_vv arg_vfcvth_s_h;
@@ -1943,6 +2140,22 @@ typedef arg_vv arg_vfrintrne_s;
 static bool trans_vfrintrne_s(DisasContext *ctx, arg_vfrintrne_s *a);
 typedef arg_vv arg_vfrintrne_d;
 static bool trans_vfrintrne_d(DisasContext *ctx, arg_vfrintrne_d *a);
+typedef arg_vv arg_vfrintirm_s;
+static bool trans_vfrintirm_s(DisasContext *ctx, arg_vfrintirm_s *a);
+typedef arg_vv arg_vfrintirm_d;
+static bool trans_vfrintirm_d(DisasContext *ctx, arg_vfrintirm_d *a);
+typedef arg_vv arg_vfrintirp_s;
+static bool trans_vfrintirp_s(DisasContext *ctx, arg_vfrintirp_s *a);
+typedef arg_vv arg_vfrintirp_d;
+static bool trans_vfrintirp_d(DisasContext *ctx, arg_vfrintirp_d *a);
+typedef arg_vv arg_vfrintirz_s;
+static bool trans_vfrintirz_s(DisasContext *ctx, arg_vfrintirz_s *a);
+typedef arg_vv arg_vfrintirz_d;
+static bool trans_vfrintirz_d(DisasContext *ctx, arg_vfrintirz_d *a);
+typedef arg_vv arg_vfrintirne_s;
+static bool trans_vfrintirne_s(DisasContext *ctx, arg_vfrintirne_s *a);
+typedef arg_vv arg_vfrintirne_d;
+static bool trans_vfrintirne_d(DisasContext *ctx, arg_vfrintirne_d *a);
 typedef arg_vv arg_vftint_w_s;
 static bool trans_vftint_w_s(DisasContext *ctx, arg_vftint_w_s *a);
 typedef arg_vv arg_vftint_l_d;
@@ -3247,6 +3460,14 @@ typedef arg_vvv arg_xvfmin_s;
 static bool trans_xvfmin_s(DisasContext *ctx, arg_xvfmin_s *a);
 typedef arg_vvv arg_xvfmin_d;
 static bool trans_xvfmin_d(DisasContext *ctx, arg_xvfmin_d *a);
+typedef arg_vv arg_xvfmaxn_s;
+static bool trans_xvfmaxn_s(DisasContext *ctx, arg_xvfmaxn_s *a);
+typedef arg_vv arg_xvfmaxn_d;
+static bool trans_xvfmaxn_d(DisasContext *ctx, arg_xvfmaxn_d *a);
+typedef arg_vv arg_xvfminn_s;
+static bool trans_xvfminn_s(DisasContext *ctx, arg_xvfminn_s *a);
+typedef arg_vv arg_xvfminn_d;
+static bool trans_xvfminn_d(DisasContext *ctx, arg_xvfminn_d *a);
 typedef arg_vvv arg_xvfmaxa_s;
 static bool trans_xvfmaxa_s(DisasContext *ctx, arg_xvfmaxa_s *a);
 typedef arg_vvv arg_xvfmaxa_d;
@@ -3275,6 +3496,14 @@ typedef arg_vv arg_xvfrsqrt_s;
 static bool trans_xvfrsqrt_s(DisasContext *ctx, arg_xvfrsqrt_s *a);
 typedef arg_vv arg_xvfrsqrt_d;
 static bool trans_xvfrsqrt_d(DisasContext *ctx, arg_xvfrsqrt_d *a);
+typedef arg_vv arg_xvfrecipe_s;
+static bool trans_xvfrecipe_s(DisasContext *ctx, arg_xvfrecipe_s *a);
+typedef arg_vv arg_xvfrecipe_d;
+static bool trans_xvfrecipe_d(DisasContext *ctx, arg_xvfrecipe_d *a);
+typedef arg_vv arg_xvfrsqrte_s;
+static bool trans_xvfrsqrte_s(DisasContext *ctx, arg_xvfrsqrte_s *a);
+typedef arg_vv arg_xvfrsqrte_d;
+static bool trans_xvfrsqrte_d(DisasContext *ctx, arg_xvfrsqrte_d *a);
 typedef arg_vv arg_xvfcvtl_s_h;
 static bool trans_xvfcvtl_s_h(DisasContext *ctx, arg_xvfcvtl_s_h *a);
 typedef arg_vv arg_xvfcvth_s_h;
@@ -3307,6 +3536,22 @@ typedef arg_vv arg_xvfrint_s;
 static bool trans_xvfrint_s(DisasContext *ctx, arg_xvfrint_s *a);
 typedef arg_vv arg_xvfrint_d;
 static bool trans_xvfrint_d(DisasContext *ctx, arg_xvfrint_d *a);
+typedef arg_vv arg_xvfrintirm_s;
+static bool trans_xvfrintirm_s(DisasContext *ctx, arg_xvfrintirm_s *a);
+typedef arg_vv arg_xvfrintirm_d;
+static bool trans_xvfrintirm_d(DisasContext *ctx, arg_xvfrintirm_d *a);
+typedef arg_vv arg_xvfrintirp_s;
+static bool trans_xvfrintirp_s(DisasContext *ctx, arg_xvfrintirp_s *a);
+typedef arg_vv arg_xvfrintirp_d;
+static bool trans_xvfrintirp_d(DisasContext *ctx, arg_xvfrintirp_d *a);
+typedef arg_vv arg_xvfrintirz_s;
+static bool trans_xvfrintirz_s(DisasContext *ctx, arg_xvfrintirz_s *a);
+typedef arg_vv arg_xvfrintirz_d;
+static bool trans_xvfrintirz_d(DisasContext *ctx, arg_xvfrintirz_d *a);
+typedef arg_vv arg_xvfrintirne_s;
+static bool trans_xvfrintirne_s(DisasContext *ctx, arg_xvfrintirne_s *a);
+typedef arg_vv arg_xvfrintirne_d;
+static bool trans_xvfrintirne_d(DisasContext *ctx, arg_xvfrintirne_d *a);
 typedef arg_vv arg_xvftintrne_w_s;
 static bool trans_xvftintrne_w_s(DisasContext *ctx, arg_xvftintrne_w_s *a);
 typedef arg_vv arg_xvftintrne_l_d;
@@ -3649,6 +3894,298 @@ typedef arg_vr_ii arg_xvstelm_h;
 static bool trans_xvstelm_h(DisasContext *ctx, arg_xvstelm_h *a);
 typedef arg_vr_ii arg_xvstelm_b;
 static bool trans_xvstelm_b(DisasContext *ctx, arg_xvstelm_b *a);
+typedef arg_ff arg_fcvt_ld_d;
+static bool trans_fcvt_ld_d(DisasContext *ctx, arg_fcvt_ld_d *a);
+typedef arg_ff arg_fcvt_ud_d;
+static bool trans_fcvt_ud_d(DisasContext *ctx, arg_fcvt_ud_d *a);
+typedef arg_fff arg_fcvt_d_ld;
+static bool trans_fcvt_d_ld(DisasContext *ctx, arg_fcvt_d_ld *a);
+typedef arg_rr_i arg_rotri_b;
+static bool trans_rotri_b(DisasContext *ctx, arg_rotri_b *a);
+typedef arg_rr_i arg_rotri_h;
+static bool trans_rotri_h(DisasContext *ctx, arg_rotri_h *a);
+typedef arg_fmt_ptr arg_x86mttop;
+static bool trans_x86mttop(DisasContext *ctx, arg_x86mttop *a);
+typedef arg_r_d arg_x86mftop;
+static bool trans_x86mftop(DisasContext *ctx, arg_x86mftop *a);
+typedef arg_rr arg_x86loope;
+static bool trans_x86loope(DisasContext *ctx, arg_x86loope *a);
+typedef arg_rr arg_x86loopne;
+static bool trans_x86loopne(DisasContext *ctx, arg_x86loopne *a);
+typedef arg_r_j arg_x86inc_b;
+static bool trans_x86inc_b(DisasContext *ctx, arg_x86inc_b *a);
+typedef arg_r_j arg_x86inc_h;
+static bool trans_x86inc_h(DisasContext *ctx, arg_x86inc_h *a);
+typedef arg_r_j arg_x86inc_w;
+static bool trans_x86inc_w(DisasContext *ctx, arg_x86inc_w *a);
+typedef arg_r_j arg_x86inc_d;
+static bool trans_x86inc_d(DisasContext *ctx, arg_x86inc_d *a);
+typedef arg_r_j arg_x86dec_b;
+static bool trans_x86dec_b(DisasContext *ctx, arg_x86dec_b *a);
+typedef arg_r_j arg_x86dec_h;
+static bool trans_x86dec_h(DisasContext *ctx, arg_x86dec_h *a);
+typedef arg_r_j arg_x86dec_w;
+static bool trans_x86dec_w(DisasContext *ctx, arg_x86dec_w *a);
+typedef arg_r_j arg_x86dec_d;
+static bool trans_x86dec_d(DisasContext *ctx, arg_x86dec_d *a);
+typedef arg_empty arg_x86settm;
+static bool trans_x86settm(DisasContext *ctx, arg_x86settm *a);
+typedef arg_empty arg_x86clrtm;
+static bool trans_x86clrtm(DisasContext *ctx, arg_x86clrtm *a);
+typedef arg_empty arg_x86inctop;
+static bool trans_x86inctop(DisasContext *ctx, arg_x86inctop *a);
+typedef arg_empty arg_x86dectop;
+static bool trans_x86dectop(DisasContext *ctx, arg_x86dectop *a);
+typedef arg_rrr arg_rotr_b;
+static bool trans_rotr_b(DisasContext *ctx, arg_rotr_b *a);
+typedef arg_rrr arg_rotr_h;
+static bool trans_rotr_h(DisasContext *ctx, arg_rotr_h *a);
+typedef arg_fmt_rdrjsi5 arg_addu12i_w;
+static bool trans_addu12i_w(DisasContext *ctx, arg_addu12i_w *a);
+typedef arg_fmt_rdrjsi5 arg_addu12i_d;
+static bool trans_addu12i_d(DisasContext *ctx, arg_addu12i_d *a);
+typedef arg_rrr arg_adc_b;
+static bool trans_adc_b(DisasContext *ctx, arg_adc_b *a);
+typedef arg_rrr arg_adc_d;
+static bool trans_adc_d(DisasContext *ctx, arg_adc_d *a);
+typedef arg_rrr arg_adc_h;
+static bool trans_adc_h(DisasContext *ctx, arg_adc_h *a);
+typedef arg_rrr arg_adc_w;
+static bool trans_adc_w(DisasContext *ctx, arg_adc_w *a);
+typedef arg_rrr arg_sbc_b;
+static bool trans_sbc_b(DisasContext *ctx, arg_sbc_b *a);
+typedef arg_rrr arg_sbc_d;
+static bool trans_sbc_d(DisasContext *ctx, arg_sbc_d *a);
+typedef arg_rrr arg_sbc_h;
+static bool trans_sbc_h(DisasContext *ctx, arg_sbc_h *a);
+typedef arg_rrr arg_sbc_w;
+static bool trans_sbc_w(DisasContext *ctx, arg_sbc_w *a);
+typedef arg_rrr arg_rcr_b;
+static bool trans_rcr_b(DisasContext *ctx, arg_rcr_b *a);
+typedef arg_rrr arg_rcr_d;
+static bool trans_rcr_d(DisasContext *ctx, arg_rcr_d *a);
+typedef arg_rrr arg_rcr_h;
+static bool trans_rcr_h(DisasContext *ctx, arg_rcr_h *a);
+typedef arg_rrr arg_rcr_w;
+static bool trans_rcr_w(DisasContext *ctx, arg_rcr_w *a);
+typedef arg_d_ui4 arg_setx86j;
+static bool trans_setx86j(DisasContext *ctx, arg_setx86j *a);
+typedef arg_rr_jk arg_x86mul_b;
+static bool trans_x86mul_b(DisasContext *ctx, arg_x86mul_b *a);
+typedef arg_rr_jk arg_x86mul_bu;
+static bool trans_x86mul_bu(DisasContext *ctx, arg_x86mul_bu *a);
+typedef arg_rr_jk arg_x86mul_d;
+static bool trans_x86mul_d(DisasContext *ctx, arg_x86mul_d *a);
+typedef arg_rr_jk arg_x86mul_du;
+static bool trans_x86mul_du(DisasContext *ctx, arg_x86mul_du *a);
+typedef arg_rr_jk arg_x86mul_h;
+static bool trans_x86mul_h(DisasContext *ctx, arg_x86mul_h *a);
+typedef arg_rr_jk arg_x86mul_hu;
+static bool trans_x86mul_hu(DisasContext *ctx, arg_x86mul_hu *a);
+typedef arg_rr_jk arg_x86mul_w;
+static bool trans_x86mul_w(DisasContext *ctx, arg_x86mul_w *a);
+typedef arg_rr_jk arg_x86mul_wu;
+static bool trans_x86mul_wu(DisasContext *ctx, arg_x86mul_wu *a);
+typedef arg_rr_jk arg_x86add_b;
+static bool trans_x86add_b(DisasContext *ctx, arg_x86add_b *a);
+typedef arg_rr_jk arg_x86add_d;
+static bool trans_x86add_d(DisasContext *ctx, arg_x86add_d *a);
+typedef arg_rr_jk arg_x86add_du;
+static bool trans_x86add_du(DisasContext *ctx, arg_x86add_du *a);
+typedef arg_rr_jk arg_x86add_h;
+static bool trans_x86add_h(DisasContext *ctx, arg_x86add_h *a);
+typedef arg_rr_jk arg_x86add_w;
+static bool trans_x86add_w(DisasContext *ctx, arg_x86add_w *a);
+typedef arg_rr_jk arg_x86add_wu;
+static bool trans_x86add_wu(DisasContext *ctx, arg_x86add_wu *a);
+typedef arg_rr_jk arg_x86sub_b;
+static bool trans_x86sub_b(DisasContext *ctx, arg_x86sub_b *a);
+typedef arg_rr_jk arg_x86sub_d;
+static bool trans_x86sub_d(DisasContext *ctx, arg_x86sub_d *a);
+typedef arg_rr_jk arg_x86sub_du;
+static bool trans_x86sub_du(DisasContext *ctx, arg_x86sub_du *a);
+typedef arg_rr_jk arg_x86sub_h;
+static bool trans_x86sub_h(DisasContext *ctx, arg_x86sub_h *a);
+typedef arg_rr_jk arg_x86sub_w;
+static bool trans_x86sub_w(DisasContext *ctx, arg_x86sub_w *a);
+typedef arg_rr_jk arg_x86sub_wu;
+static bool trans_x86sub_wu(DisasContext *ctx, arg_x86sub_wu *a);
+typedef arg_rr_jk arg_x86adc_b;
+static bool trans_x86adc_b(DisasContext *ctx, arg_x86adc_b *a);
+typedef arg_rr_jk arg_x86adc_d;
+static bool trans_x86adc_d(DisasContext *ctx, arg_x86adc_d *a);
+typedef arg_rr_jk arg_x86adc_h;
+static bool trans_x86adc_h(DisasContext *ctx, arg_x86adc_h *a);
+typedef arg_rr_jk arg_x86adc_w;
+static bool trans_x86adc_w(DisasContext *ctx, arg_x86adc_w *a);
+typedef arg_rr_jk arg_x86sbc_b;
+static bool trans_x86sbc_b(DisasContext *ctx, arg_x86sbc_b *a);
+typedef arg_rr_jk arg_x86sbc_d;
+static bool trans_x86sbc_d(DisasContext *ctx, arg_x86sbc_d *a);
+typedef arg_rr_jk arg_x86sbc_h;
+static bool trans_x86sbc_h(DisasContext *ctx, arg_x86sbc_h *a);
+typedef arg_rr_jk arg_x86sbc_w;
+static bool trans_x86sbc_w(DisasContext *ctx, arg_x86sbc_w *a);
+typedef arg_rr_jk arg_x86sll_b;
+static bool trans_x86sll_b(DisasContext *ctx, arg_x86sll_b *a);
+typedef arg_rr_jk arg_x86sll_d;
+static bool trans_x86sll_d(DisasContext *ctx, arg_x86sll_d *a);
+typedef arg_rr_jk arg_x86sll_h;
+static bool trans_x86sll_h(DisasContext *ctx, arg_x86sll_h *a);
+typedef arg_rr_jk arg_x86sll_w;
+static bool trans_x86sll_w(DisasContext *ctx, arg_x86sll_w *a);
+typedef arg_rr_jk arg_x86srl_b;
+static bool trans_x86srl_b(DisasContext *ctx, arg_x86srl_b *a);
+typedef arg_rr_jk arg_x86srl_d;
+static bool trans_x86srl_d(DisasContext *ctx, arg_x86srl_d *a);
+typedef arg_rr_jk arg_x86srl_h;
+static bool trans_x86srl_h(DisasContext *ctx, arg_x86srl_h *a);
+typedef arg_rr_jk arg_x86srl_w;
+static bool trans_x86srl_w(DisasContext *ctx, arg_x86srl_w *a);
+typedef arg_rr_jk arg_x86sra_b;
+static bool trans_x86sra_b(DisasContext *ctx, arg_x86sra_b *a);
+typedef arg_rr_jk arg_x86sra_d;
+static bool trans_x86sra_d(DisasContext *ctx, arg_x86sra_d *a);
+typedef arg_rr_jk arg_x86sra_h;
+static bool trans_x86sra_h(DisasContext *ctx, arg_x86sra_h *a);
+typedef arg_rr_jk arg_x86sra_w;
+static bool trans_x86sra_w(DisasContext *ctx, arg_x86sra_w *a);
+typedef arg_rr_jk arg_x86rotr_b;
+static bool trans_x86rotr_b(DisasContext *ctx, arg_x86rotr_b *a);
+typedef arg_rr_jk arg_x86rotr_d;
+static bool trans_x86rotr_d(DisasContext *ctx, arg_x86rotr_d *a);
+typedef arg_rr_jk arg_x86rotr_h;
+static bool trans_x86rotr_h(DisasContext *ctx, arg_x86rotr_h *a);
+typedef arg_rr_jk arg_x86rotr_w;
+static bool trans_x86rotr_w(DisasContext *ctx, arg_x86rotr_w *a);
+typedef arg_rr_jk arg_x86rotl_b;
+static bool trans_x86rotl_b(DisasContext *ctx, arg_x86rotl_b *a);
+typedef arg_rr_jk arg_x86rotl_d;
+static bool trans_x86rotl_d(DisasContext *ctx, arg_x86rotl_d *a);
+typedef arg_rr_jk arg_x86rotl_h;
+static bool trans_x86rotl_h(DisasContext *ctx, arg_x86rotl_h *a);
+typedef arg_rr_jk arg_x86rotl_w;
+static bool trans_x86rotl_w(DisasContext *ctx, arg_x86rotl_w *a);
+typedef arg_rr_jk arg_x86rcr_b;
+static bool trans_x86rcr_b(DisasContext *ctx, arg_x86rcr_b *a);
+typedef arg_rr_jk arg_x86rcr_d;
+static bool trans_x86rcr_d(DisasContext *ctx, arg_x86rcr_d *a);
+typedef arg_rr_jk arg_x86rcr_h;
+static bool trans_x86rcr_h(DisasContext *ctx, arg_x86rcr_h *a);
+typedef arg_rr_jk arg_x86rcr_w;
+static bool trans_x86rcr_w(DisasContext *ctx, arg_x86rcr_w *a);
+typedef arg_rr_jk arg_x86rcl_b;
+static bool trans_x86rcl_b(DisasContext *ctx, arg_x86rcl_b *a);
+typedef arg_rr_jk arg_x86rcl_d;
+static bool trans_x86rcl_d(DisasContext *ctx, arg_x86rcl_d *a);
+typedef arg_rr_jk arg_x86rcl_h;
+static bool trans_x86rcl_h(DisasContext *ctx, arg_x86rcl_h *a);
+typedef arg_rr_jk arg_x86rcl_w;
+static bool trans_x86rcl_w(DisasContext *ctx, arg_x86rcl_w *a);
+typedef arg_rr_jk arg_x86and_b;
+static bool trans_x86and_b(DisasContext *ctx, arg_x86and_b *a);
+typedef arg_rr_jk arg_x86and_d;
+static bool trans_x86and_d(DisasContext *ctx, arg_x86and_d *a);
+typedef arg_rr_jk arg_x86and_h;
+static bool trans_x86and_h(DisasContext *ctx, arg_x86and_h *a);
+typedef arg_rr_jk arg_x86and_w;
+static bool trans_x86and_w(DisasContext *ctx, arg_x86and_w *a);
+typedef arg_rr_jk arg_x86or_b;
+static bool trans_x86or_b(DisasContext *ctx, arg_x86or_b *a);
+typedef arg_rr_jk arg_x86or_d;
+static bool trans_x86or_d(DisasContext *ctx, arg_x86or_d *a);
+typedef arg_rr_jk arg_x86or_h;
+static bool trans_x86or_h(DisasContext *ctx, arg_x86or_h *a);
+typedef arg_rr_jk arg_x86or_w;
+static bool trans_x86or_w(DisasContext *ctx, arg_x86or_w *a);
+typedef arg_rr_jk arg_x86xor_b;
+static bool trans_x86xor_b(DisasContext *ctx, arg_x86xor_b *a);
+typedef arg_rr_jk arg_x86xor_d;
+static bool trans_x86xor_d(DisasContext *ctx, arg_x86xor_d *a);
+typedef arg_rr_jk arg_x86xor_h;
+static bool trans_x86xor_h(DisasContext *ctx, arg_x86xor_h *a);
+typedef arg_rr_jk arg_x86xor_w;
+static bool trans_x86xor_w(DisasContext *ctx, arg_x86xor_w *a);
+typedef arg_rr_i arg_rcri_b;
+static bool trans_rcri_b(DisasContext *ctx, arg_rcri_b *a);
+typedef arg_rr_i arg_rcri_h;
+static bool trans_rcri_h(DisasContext *ctx, arg_rcri_h *a);
+typedef arg_rr_i arg_rcri_w;
+static bool trans_rcri_w(DisasContext *ctx, arg_rcri_w *a);
+typedef arg_rr_i arg_rcri_d;
+static bool trans_rcri_d(DisasContext *ctx, arg_rcri_d *a);
+typedef arg_j_ui3 arg_x86slli_b;
+static bool trans_x86slli_b(DisasContext *ctx, arg_x86slli_b *a);
+typedef arg_j_ui4 arg_x86slli_h;
+static bool trans_x86slli_h(DisasContext *ctx, arg_x86slli_h *a);
+typedef arg_j_ui5 arg_x86slli_w;
+static bool trans_x86slli_w(DisasContext *ctx, arg_x86slli_w *a);
+typedef arg_j_ui6 arg_x86slli_d;
+static bool trans_x86slli_d(DisasContext *ctx, arg_x86slli_d *a);
+typedef arg_j_ui3 arg_x86srli_b;
+static bool trans_x86srli_b(DisasContext *ctx, arg_x86srli_b *a);
+typedef arg_j_ui4 arg_x86srli_h;
+static bool trans_x86srli_h(DisasContext *ctx, arg_x86srli_h *a);
+typedef arg_j_ui5 arg_x86srli_w;
+static bool trans_x86srli_w(DisasContext *ctx, arg_x86srli_w *a);
+typedef arg_j_ui6 arg_x86srli_d;
+static bool trans_x86srli_d(DisasContext *ctx, arg_x86srli_d *a);
+typedef arg_j_ui3 arg_x86srai_b;
+static bool trans_x86srai_b(DisasContext *ctx, arg_x86srai_b *a);
+typedef arg_j_ui4 arg_x86srai_h;
+static bool trans_x86srai_h(DisasContext *ctx, arg_x86srai_h *a);
+typedef arg_j_ui5 arg_x86srai_w;
+static bool trans_x86srai_w(DisasContext *ctx, arg_x86srai_w *a);
+typedef arg_j_ui6 arg_x86srai_d;
+static bool trans_x86srai_d(DisasContext *ctx, arg_x86srai_d *a);
+typedef arg_j_ui3 arg_x86rotri_b;
+static bool trans_x86rotri_b(DisasContext *ctx, arg_x86rotri_b *a);
+typedef arg_j_ui4 arg_x86rotri_h;
+static bool trans_x86rotri_h(DisasContext *ctx, arg_x86rotri_h *a);
+typedef arg_j_ui5 arg_x86rotri_w;
+static bool trans_x86rotri_w(DisasContext *ctx, arg_x86rotri_w *a);
+typedef arg_j_ui6 arg_x86rotri_d;
+static bool trans_x86rotri_d(DisasContext *ctx, arg_x86rotri_d *a);
+typedef arg_j_ui3 arg_x86rcri_b;
+static bool trans_x86rcri_b(DisasContext *ctx, arg_x86rcri_b *a);
+typedef arg_j_ui4 arg_x86rcri_h;
+static bool trans_x86rcri_h(DisasContext *ctx, arg_x86rcri_h *a);
+typedef arg_j_ui5 arg_x86rcri_w;
+static bool trans_x86rcri_w(DisasContext *ctx, arg_x86rcri_w *a);
+typedef arg_j_ui6 arg_x86rcri_d;
+static bool trans_x86rcri_d(DisasContext *ctx, arg_x86rcri_d *a);
+typedef arg_j_ui3 arg_x86rotli_b;
+static bool trans_x86rotli_b(DisasContext *ctx, arg_x86rotli_b *a);
+typedef arg_j_ui4 arg_x86rotli_h;
+static bool trans_x86rotli_h(DisasContext *ctx, arg_x86rotli_h *a);
+typedef arg_j_ui5 arg_x86rotli_w;
+static bool trans_x86rotli_w(DisasContext *ctx, arg_x86rotli_w *a);
+typedef arg_j_ui6 arg_x86rotli_d;
+static bool trans_x86rotli_d(DisasContext *ctx, arg_x86rotli_d *a);
+typedef arg_j_ui3 arg_x86rcli_b;
+static bool trans_x86rcli_b(DisasContext *ctx, arg_x86rcli_b *a);
+typedef arg_j_ui4 arg_x86rcli_h;
+static bool trans_x86rcli_h(DisasContext *ctx, arg_x86rcli_h *a);
+typedef arg_j_ui5 arg_x86rcli_w;
+static bool trans_x86rcli_w(DisasContext *ctx, arg_x86rcli_w *a);
+typedef arg_j_ui6 arg_x86rcli_d;
+static bool trans_x86rcli_d(DisasContext *ctx, arg_x86rcli_d *a);
+typedef arg_d_ui8 arg_x86mfflag;
+static bool trans_x86mfflag(DisasContext *ctx, arg_x86mfflag *a);
+typedef arg_d_ui8 arg_x86mtflag;
+static bool trans_x86mtflag(DisasContext *ctx, arg_x86mtflag *a);
+typedef arg_fmt_offs21 arg_jiscr0;
+static bool trans_jiscr0(DisasContext *ctx, arg_jiscr0 *a);
+typedef arg_fmt_offs21 arg_jiscr1;
+static bool trans_jiscr1(DisasContext *ctx, arg_jiscr1 *a);
+typedef arg_s_r arg_gr2scr;
+static bool trans_gr2scr(DisasContext *ctx, arg_gr2scr *a);
+typedef arg_r_s arg_scr2gr;
+static bool trans_scr2gr(DisasContext *ctx, arg_scr2gr *a);
+typedef arg_rr_i arg_grsel;
+static bool trans_grsel(DisasContext *ctx, arg_grsel *a);
+typedef arg_fmt_rdui8 arg_x86settag;
+static bool trans_x86settag(DisasContext *ctx, arg_x86settag *a);
 
 static void decode_extract_c_offs21(DisasContext *ctx, arg_c_offs *a, uint32_t insn)
 {
@@ -3664,23 +4201,23 @@ static void decode_extract_cf(DisasContext *ctx, arg_cf *a, uint32_t insn)
 
 static void decode_extract_cff_fcond(DisasContext *ctx, arg_cff_fcond *a, uint32_t insn)
 {
+    a->fcond = extract32(insn, 15, 5);
+    a->fk = extract32(insn, 10, 5);
     a->fj = extract32(insn, 5, 5);
     a->cd = extract32(insn, 0, 3);
-    a->fk = extract32(insn, 10, 5);
-    a->fcond = extract32(insn, 15, 5);
 }
 
 static void decode_extract_cop_r_i(DisasContext *ctx, arg_cop_r_i *a, uint32_t insn)
 {
-    a->cop = extract32(insn, 0, 5);
     a->imm = sextract32(insn, 10, 12);
     a->rj = extract32(insn, 5, 5);
+    a->cop = extract32(insn, 0, 5);
 }
 
 static void decode_extract_cr(DisasContext *ctx, arg_cr *a, uint32_t insn)
 {
-    a->cd = extract32(insn, 0, 3);
     a->rj = extract32(insn, 5, 5);
+    a->cd = extract32(insn, 0, 3);
 }
 
 static void decode_extract_cv(DisasContext *ctx, arg_cv *a, uint32_t insn)
@@ -3689,8 +4226,26 @@ static void decode_extract_cv(DisasContext *ctx, arg_cv *a, uint32_t insn)
     a->cd = extract32(insn, 0, 3);
 }
 
+static void decode_extract_d_ui4(DisasContext *ctx, arg_d_ui4 *a, uint32_t insn)
+{
+    a->imm = extract32(insn, 10, 4);
+    a->rd = extract32(insn, 0, 5);
+}
+
+static void decode_extract_d_ui8(DisasContext *ctx, arg_d_ui8 *a, uint32_t insn)
+{
+    a->imm = extract32(insn, 10, 8);
+    a->rd = extract32(insn, 0, 5);
+}
+
 static void decode_extract_empty(DisasContext *ctx, arg_empty *a, uint32_t insn)
 {
+}
+
+static void decode_extract_f_i8(DisasContext *ctx, arg_f_i *a, uint32_t insn)
+{
+    a->imm = extract32(insn, 5, 8);
+    a->fd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_fc(DisasContext *ctx, arg_fc *a, uint32_t insn)
@@ -3701,8 +4256,8 @@ static void decode_extract_fc(DisasContext *ctx, arg_fc *a, uint32_t insn)
 
 static void decode_extract_fcsrd_r(DisasContext *ctx, arg_fcsrd_r *a, uint32_t insn)
 {
-    a->fcsrd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
+    a->fcsrd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_ff(DisasContext *ctx, arg_ff *a, uint32_t insn)
@@ -3713,25 +4268,54 @@ static void decode_extract_ff(DisasContext *ctx, arg_ff *a, uint32_t insn)
 
 static void decode_extract_fff(DisasContext *ctx, arg_fff *a, uint32_t insn)
 {
+    a->fk = extract32(insn, 10, 5);
     a->fd = extract32(insn, 0, 5);
     a->fj = extract32(insn, 5, 5);
-    a->fk = extract32(insn, 10, 5);
 }
 
 static void decode_extract_fffc(DisasContext *ctx, arg_fffc *a, uint32_t insn)
 {
-    a->fd = extract32(insn, 0, 5);
-    a->fj = extract32(insn, 5, 5);
     a->fk = extract32(insn, 10, 5);
     a->ca = extract32(insn, 15, 3);
+    a->fd = extract32(insn, 0, 5);
+    a->fj = extract32(insn, 5, 5);
 }
 
 static void decode_extract_ffff(DisasContext *ctx, arg_ffff *a, uint32_t insn)
 {
-    a->fd = extract32(insn, 0, 5);
     a->fa = extract32(insn, 15, 5);
     a->fk = extract32(insn, 10, 5);
+    a->fd = extract32(insn, 0, 5);
     a->fj = extract32(insn, 5, 5);
+}
+
+static void decode_extract_fmt_offs21(DisasContext *ctx, arg_fmt_offs21 *a, uint32_t insn)
+{
+    a->offs = shl_2(ctx, deposit32(extract32(insn, 10, 16), 16, 16, sextract32(insn, 0, 5)));
+}
+
+static void decode_extract_fmt_ptr(DisasContext *ctx, arg_fmt_ptr *a, uint32_t insn)
+{
+    a->ptr = extract32(insn, 5, 3);
+}
+
+static void decode_extract_fmt_rd(DisasContext *ctx, arg_r_d *a, uint32_t insn)
+{
+    a->rd = extract32(insn, 0, 5);
+}
+
+static void decode_extract_fmt_rdrjsi5(DisasContext *ctx, arg_fmt_rdrjsi5 *a, uint32_t insn)
+{
+    a->si5 = extract32(insn, 10, 5);
+    a->rj = extract32(insn, 5, 5);
+    a->rd = extract32(insn, 0, 5);
+}
+
+static void decode_extract_fmt_rdui8(DisasContext *ctx, arg_fmt_rdui8 *a, uint32_t insn)
+{
+    a->imm = extract32(insn, 10, 8);
+    a->op = extract32(insn, 5, 5);
+    a->rd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_fr(DisasContext *ctx, arg_fr *a, uint32_t insn)
@@ -3742,30 +4326,30 @@ static void decode_extract_fr(DisasContext *ctx, arg_fr *a, uint32_t insn)
 
 static void decode_extract_fr_i12(DisasContext *ctx, arg_fr_i *a, uint32_t insn)
 {
-    a->fd = extract32(insn, 0, 5);
     a->imm = sextract32(insn, 10, 12);
+    a->fd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
 }
 
 static void decode_extract_frr(DisasContext *ctx, arg_frr *a, uint32_t insn)
 {
-    a->rk = extract32(insn, 10, 5);
     a->fd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
+    a->rk = extract32(insn, 10, 5);
 }
 
 static void decode_extract_hint_r_i12(DisasContext *ctx, arg_hint_r_i *a, uint32_t insn)
 {
-    a->hint = extract32(insn, 0, 5);
     a->imm = sextract32(insn, 10, 12);
     a->rj = extract32(insn, 5, 5);
+    a->hint = extract32(insn, 0, 5);
 }
 
 static void decode_extract_hint_rr(DisasContext *ctx, arg_hint_rr *a, uint32_t insn)
 {
+    a->rj = extract32(insn, 5, 5);
     a->rk = extract32(insn, 10, 5);
     a->hint = extract32(insn, 0, 5);
-    a->rj = extract32(insn, 5, 5);
 }
 
 static void decode_extract_i15(DisasContext *ctx, arg_i *a, uint32_t insn)
@@ -3775,14 +4359,38 @@ static void decode_extract_i15(DisasContext *ctx, arg_i *a, uint32_t insn)
 
 static void decode_extract_i_rr(DisasContext *ctx, arg_i_rr *a, uint32_t insn)
 {
-    a->rk = extract32(insn, 10, 5);
     a->imm = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
+    a->rk = extract32(insn, 10, 5);
 }
 
 static void decode_extract_j_i(DisasContext *ctx, arg_j_i *a, uint32_t insn)
 {
     a->imm = extract32(insn, 10, 8);
+    a->rj = extract32(insn, 5, 5);
+}
+
+static void decode_extract_j_ui3(DisasContext *ctx, arg_j_ui3 *a, uint32_t insn)
+{
+    a->imm = extract32(insn, 10, 3);
+    a->rj = extract32(insn, 5, 5);
+}
+
+static void decode_extract_j_ui4(DisasContext *ctx, arg_j_ui4 *a, uint32_t insn)
+{
+    a->imm = extract32(insn, 10, 4);
+    a->rj = extract32(insn, 5, 5);
+}
+
+static void decode_extract_j_ui5(DisasContext *ctx, arg_j_ui5 *a, uint32_t insn)
+{
+    a->imm = extract32(insn, 10, 5);
+    a->rj = extract32(insn, 5, 5);
+}
+
+static void decode_extract_j_ui6(DisasContext *ctx, arg_j_ui6 *a, uint32_t insn)
+{
+    a->imm = extract32(insn, 10, 6);
     a->rj = extract32(insn, 5, 5);
 }
 
@@ -3793,14 +4401,14 @@ static void decode_extract_offs26(DisasContext *ctx, arg_offs *a, uint32_t insn)
 
 static void decode_extract_r_csr(DisasContext *ctx, arg_r_csr *a, uint32_t insn)
 {
-    a->csr = extract32(insn, 10, 14);
     a->rd = extract32(insn, 0, 5);
+    a->csr = extract32(insn, 10, 14);
 }
 
 static void decode_extract_r_fcsrs(DisasContext *ctx, arg_r_fcsrs *a, uint32_t insn)
 {
-    a->fcsrs = extract32(insn, 5, 5);
     a->rd = extract32(insn, 0, 5);
+    a->fcsrs = extract32(insn, 5, 5);
 }
 
 static void decode_extract_r_i20(DisasContext *ctx, arg_r_i *a, uint32_t insn)
@@ -3809,22 +4417,33 @@ static void decode_extract_r_i20(DisasContext *ctx, arg_r_i *a, uint32_t insn)
     a->rd = extract32(insn, 0, 5);
 }
 
+static void decode_extract_r_j(DisasContext *ctx, arg_r_j *a, uint32_t insn)
+{
+    a->rj = extract32(insn, 5, 5);
+}
+
 static void decode_extract_r_offs21(DisasContext *ctx, arg_r_offs *a, uint32_t insn)
 {
-    a->offs = shl_2(ctx, deposit32(extract32(insn, 10, 16), 16, 16, sextract32(insn, 0, 5)));
     a->rj = extract32(insn, 5, 5);
+    a->offs = shl_2(ctx, deposit32(extract32(insn, 10, 16), 16, 16, sextract32(insn, 0, 5)));
+}
+
+static void decode_extract_r_s(DisasContext *ctx, arg_r_s *a, uint32_t insn)
+{
+    a->rd = extract32(insn, 0, 5);
+    a->sj = extract32(insn, 5, 2);
 }
 
 static void decode_extract_rc(DisasContext *ctx, arg_rc *a, uint32_t insn)
 {
-    a->cj = extract32(insn, 5, 3);
     a->rd = extract32(insn, 0, 5);
+    a->cj = extract32(insn, 5, 3);
 }
 
 static void decode_extract_rf(DisasContext *ctx, arg_rf *a, uint32_t insn)
 {
-    a->fj = extract32(insn, 5, 5);
     a->rd = extract32(insn, 0, 5);
+    a->fj = extract32(insn, 5, 5);
 }
 
 static void decode_extract_rr(DisasContext *ctx, arg_rr *a, uint32_t insn)
@@ -3835,292 +4454,312 @@ static void decode_extract_rr(DisasContext *ctx, arg_rr *a, uint32_t insn)
 
 static void decode_extract_rr_2bd(DisasContext *ctx, arg_rr_ms_ls *a, uint32_t insn)
 {
-    a->ls = extract32(insn, 10, 6);
     a->rd = extract32(insn, 0, 5);
+    a->ls = extract32(insn, 10, 6);
     a->rj = extract32(insn, 5, 5);
     a->ms = extract32(insn, 16, 6);
 }
 
 static void decode_extract_rr_2bw(DisasContext *ctx, arg_rr_ms_ls *a, uint32_t insn)
 {
-    a->ls = extract32(insn, 10, 5);
     a->rd = extract32(insn, 0, 5);
+    a->ls = extract32(insn, 10, 5);
     a->rj = extract32(insn, 5, 5);
     a->ms = extract32(insn, 16, 5);
 }
 
 static void decode_extract_rr_csr(DisasContext *ctx, arg_rr_csr *a, uint32_t insn)
 {
-    a->csr = extract32(insn, 10, 14);
     a->rd = extract32(insn, 0, 5);
+    a->csr = extract32(insn, 10, 14);
     a->rj = extract32(insn, 5, 5);
 }
 
 static void decode_extract_rr_i12(DisasContext *ctx, arg_rr_i *a, uint32_t insn)
 {
     a->imm = sextract32(insn, 10, 12);
-    a->rd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
+    a->rd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_rr_i14s2(DisasContext *ctx, arg_rr_i *a, uint32_t insn)
 {
-    a->imm = shl_2(ctx, sextract32(insn, 10, 14));
     a->rd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
+    a->imm = shl_2(ctx, sextract32(insn, 10, 14));
 }
 
 static void decode_extract_rr_i16(DisasContext *ctx, arg_rr_i *a, uint32_t insn)
 {
     a->imm = sextract32(insn, 10, 16);
-    a->rd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
+    a->rd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_rr_i16s2(DisasContext *ctx, arg_rr_i *a, uint32_t insn)
 {
-    a->imm = shl_2(ctx, sextract32(insn, 10, 16));
     a->rd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
+    a->imm = shl_2(ctx, sextract32(insn, 10, 16));
 }
 
 static void decode_extract_rr_jk(DisasContext *ctx, arg_rr_jk *a, uint32_t insn)
 {
-    a->rk = extract32(insn, 10, 5);
     a->rj = extract32(insn, 5, 5);
+    a->rk = extract32(insn, 10, 5);
 }
 
 static void decode_extract_rr_offs16(DisasContext *ctx, arg_rr_offs *a, uint32_t insn)
 {
-    a->offs = shl_2(ctx, sextract32(insn, 10, 16));
     a->rd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
+    a->offs = shl_2(ctx, sextract32(insn, 10, 16));
 }
 
 static void decode_extract_rr_ui12(DisasContext *ctx, arg_rr_i *a, uint32_t insn)
 {
     a->imm = extract32(insn, 10, 12);
-    a->rd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
+    a->rd = extract32(insn, 0, 5);
+}
+
+static void decode_extract_rr_ui3(DisasContext *ctx, arg_rr_i *a, uint32_t insn)
+{
+    a->imm = extract32(insn, 10, 3);
+    a->rj = extract32(insn, 5, 5);
+    a->rd = extract32(insn, 0, 5);
+}
+
+static void decode_extract_rr_ui4(DisasContext *ctx, arg_rr_i *a, uint32_t insn)
+{
+    a->imm = extract32(insn, 10, 4);
+    a->rj = extract32(insn, 5, 5);
+    a->rd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_rr_ui5(DisasContext *ctx, arg_rr_i *a, uint32_t insn)
 {
     a->imm = extract32(insn, 10, 5);
-    a->rd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
+    a->rd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_rr_ui6(DisasContext *ctx, arg_rr_i *a, uint32_t insn)
 {
     a->imm = extract32(insn, 10, 6);
-    a->rd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
+    a->rd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_rr_ui8(DisasContext *ctx, arg_rr_i *a, uint32_t insn)
 {
     a->imm = extract32(insn, 10, 8);
-    a->rd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
+    a->rd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_rrr(DisasContext *ctx, arg_rrr *a, uint32_t insn)
 {
-    a->rk = extract32(insn, 10, 5);
     a->rd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
+    a->rk = extract32(insn, 10, 5);
 }
 
 static void decode_extract_rrr_sa2(DisasContext *ctx, arg_rrr_sa *a, uint32_t insn)
 {
-    a->rk = extract32(insn, 10, 5);
     a->rd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
     a->sa = extract32(insn, 15, 2);
+    a->rk = extract32(insn, 10, 5);
 }
 
 static void decode_extract_rrr_sa2p1(DisasContext *ctx, arg_rrr_sa *a, uint32_t insn)
 {
-    a->rk = extract32(insn, 10, 5);
-    a->sa = plus_1(ctx, extract32(insn, 15, 2));
     a->rd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
+    a->sa = plus_1(ctx, extract32(insn, 15, 2));
+    a->rk = extract32(insn, 10, 5);
 }
 
 static void decode_extract_rrr_sa3(DisasContext *ctx, arg_rrr_sa *a, uint32_t insn)
 {
-    a->rk = extract32(insn, 10, 5);
     a->rd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
     a->sa = extract32(insn, 15, 3);
+    a->rk = extract32(insn, 10, 5);
 }
 
 static void decode_extract_rv_ui1(DisasContext *ctx, arg_rv_i *a, uint32_t insn)
 {
-    a->vj = extract32(insn, 5, 5);
     a->imm = extract32(insn, 10, 1);
+    a->vj = extract32(insn, 5, 5);
     a->rd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_rv_ui2(DisasContext *ctx, arg_rv_i *a, uint32_t insn)
 {
-    a->vj = extract32(insn, 5, 5);
     a->imm = extract32(insn, 10, 2);
+    a->vj = extract32(insn, 5, 5);
     a->rd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_rv_ui3(DisasContext *ctx, arg_rv_i *a, uint32_t insn)
 {
-    a->vj = extract32(insn, 5, 5);
     a->imm = extract32(insn, 10, 3);
+    a->vj = extract32(insn, 5, 5);
     a->rd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_rv_ui4(DisasContext *ctx, arg_rv_i *a, uint32_t insn)
 {
-    a->vj = extract32(insn, 5, 5);
     a->imm = extract32(insn, 10, 4);
+    a->vj = extract32(insn, 5, 5);
     a->rd = extract32(insn, 0, 5);
+}
+
+static void decode_extract_s_r(DisasContext *ctx, arg_s_r *a, uint32_t insn)
+{
+    a->sd = extract32(insn, 0, 2);
+    a->rj = extract32(insn, 5, 5);
 }
 
 static void decode_extract_v_i13(DisasContext *ctx, arg_v_i *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
     a->imm = extract32(insn, 5, 13);
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr(DisasContext *ctx, arg_vr *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
     a->rj = extract32(insn, 5, 5);
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr_i10(DisasContext *ctx, arg_vr_i *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
     a->imm = shl_2(ctx, sextract32(insn, 10, 10));
     a->rj = extract32(insn, 5, 5);
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr_i11(DisasContext *ctx, arg_vr_i *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
     a->imm = shl_1(ctx, sextract32(insn, 10, 11));
     a->rj = extract32(insn, 5, 5);
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr_i12(DisasContext *ctx, arg_vr_i *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
     a->imm = sextract32(insn, 10, 12);
     a->rj = extract32(insn, 5, 5);
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr_i8i1(DisasContext *ctx, arg_vr_ii *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
-    a->imm = shl_3(ctx, sextract32(insn, 10, 8));
-    a->rj = extract32(insn, 5, 5);
     a->imm2 = extract32(insn, 18, 1);
+    a->rj = extract32(insn, 5, 5);
+    a->imm = shl_3(ctx, sextract32(insn, 10, 8));
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr_i8i2(DisasContext *ctx, arg_vr_ii *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
-    a->imm = shl_2(ctx, sextract32(insn, 10, 8));
-    a->rj = extract32(insn, 5, 5);
     a->imm2 = extract32(insn, 18, 2);
+    a->rj = extract32(insn, 5, 5);
+    a->imm = shl_2(ctx, sextract32(insn, 10, 8));
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr_i8i2x(DisasContext *ctx, arg_vr_ii *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
-    a->imm = shl_3(ctx, sextract32(insn, 10, 8));
-    a->rj = extract32(insn, 5, 5);
     a->imm2 = extract32(insn, 18, 2);
+    a->rj = extract32(insn, 5, 5);
+    a->imm = shl_3(ctx, sextract32(insn, 10, 8));
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr_i8i3(DisasContext *ctx, arg_vr_ii *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
-    a->imm = shl_1(ctx, sextract32(insn, 10, 8));
-    a->rj = extract32(insn, 5, 5);
     a->imm2 = extract32(insn, 18, 3);
+    a->rj = extract32(insn, 5, 5);
+    a->imm = shl_1(ctx, sextract32(insn, 10, 8));
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr_i8i3x(DisasContext *ctx, arg_vr_ii *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
-    a->imm = shl_2(ctx, sextract32(insn, 10, 8));
-    a->rj = extract32(insn, 5, 5);
     a->imm2 = extract32(insn, 18, 3);
+    a->rj = extract32(insn, 5, 5);
+    a->imm = shl_2(ctx, sextract32(insn, 10, 8));
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr_i8i4(DisasContext *ctx, arg_vr_ii *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
+    a->imm2 = extract32(insn, 18, 4);
     a->imm = sextract32(insn, 10, 8);
     a->rj = extract32(insn, 5, 5);
-    a->imm2 = extract32(insn, 18, 4);
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr_i8i4x(DisasContext *ctx, arg_vr_ii *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
-    a->imm = shl_1(ctx, sextract32(insn, 10, 8));
-    a->rj = extract32(insn, 5, 5);
     a->imm2 = extract32(insn, 18, 4);
+    a->rj = extract32(insn, 5, 5);
+    a->imm = shl_1(ctx, sextract32(insn, 10, 8));
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr_i8i5x(DisasContext *ctx, arg_vr_ii *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
+    a->imm2 = extract32(insn, 18, 5);
     a->imm = sextract32(insn, 10, 8);
     a->rj = extract32(insn, 5, 5);
-    a->imm2 = extract32(insn, 18, 5);
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr_i9(DisasContext *ctx, arg_vr_i *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
     a->imm = shl_3(ctx, sextract32(insn, 10, 9));
     a->rj = extract32(insn, 5, 5);
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr_ui1(DisasContext *ctx, arg_vr_i *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
     a->imm = extract32(insn, 10, 1);
     a->rj = extract32(insn, 5, 5);
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr_ui2(DisasContext *ctx, arg_vr_i *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
     a->imm = extract32(insn, 10, 2);
     a->rj = extract32(insn, 5, 5);
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr_ui3(DisasContext *ctx, arg_vr_i *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
     a->imm = extract32(insn, 10, 3);
     a->rj = extract32(insn, 5, 5);
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vr_ui4(DisasContext *ctx, arg_vr_i *a, uint32_t insn)
 {
-    a->vd = extract32(insn, 0, 5);
     a->imm = extract32(insn, 10, 4);
     a->rj = extract32(insn, 5, 5);
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vrr(DisasContext *ctx, arg_vrr *a, uint32_t insn)
 {
+    a->rj = extract32(insn, 5, 5);
     a->rk = extract32(insn, 10, 5);
     a->vd = extract32(insn, 0, 5);
-    a->rj = extract32(insn, 5, 5);
 }
 
 static void decode_extract_vv(DisasContext *ctx, arg_vv *a, uint32_t insn)
@@ -4131,95 +4770,95 @@ static void decode_extract_vv(DisasContext *ctx, arg_vv *a, uint32_t insn)
 
 static void decode_extract_vv_i5(DisasContext *ctx, arg_vv_i *a, uint32_t insn)
 {
+    a->imm = sextract32(insn, 10, 5);
     a->vj = extract32(insn, 5, 5);
     a->vd = extract32(insn, 0, 5);
-    a->imm = sextract32(insn, 10, 5);
 }
 
 static void decode_extract_vv_ui1(DisasContext *ctx, arg_vv_i *a, uint32_t insn)
 {
+    a->imm = extract32(insn, 10, 1);
     a->vj = extract32(insn, 5, 5);
     a->vd = extract32(insn, 0, 5);
-    a->imm = extract32(insn, 10, 1);
 }
 
 static void decode_extract_vv_ui2(DisasContext *ctx, arg_vv_i *a, uint32_t insn)
 {
+    a->imm = extract32(insn, 10, 2);
     a->vj = extract32(insn, 5, 5);
     a->vd = extract32(insn, 0, 5);
-    a->imm = extract32(insn, 10, 2);
 }
 
 static void decode_extract_vv_ui3(DisasContext *ctx, arg_vv_i *a, uint32_t insn)
 {
+    a->imm = extract32(insn, 10, 3);
     a->vj = extract32(insn, 5, 5);
     a->vd = extract32(insn, 0, 5);
-    a->imm = extract32(insn, 10, 3);
 }
 
 static void decode_extract_vv_ui4(DisasContext *ctx, arg_vv_i *a, uint32_t insn)
 {
+    a->imm = extract32(insn, 10, 4);
     a->vj = extract32(insn, 5, 5);
     a->vd = extract32(insn, 0, 5);
-    a->imm = extract32(insn, 10, 4);
 }
 
 static void decode_extract_vv_ui5(DisasContext *ctx, arg_vv_i *a, uint32_t insn)
 {
+    a->imm = extract32(insn, 10, 5);
     a->vj = extract32(insn, 5, 5);
     a->vd = extract32(insn, 0, 5);
-    a->imm = extract32(insn, 10, 5);
 }
 
 static void decode_extract_vv_ui6(DisasContext *ctx, arg_vv_i *a, uint32_t insn)
 {
+    a->imm = extract32(insn, 10, 6);
     a->vj = extract32(insn, 5, 5);
     a->vd = extract32(insn, 0, 5);
-    a->imm = extract32(insn, 10, 6);
 }
 
 static void decode_extract_vv_ui7(DisasContext *ctx, arg_vv_i *a, uint32_t insn)
 {
+    a->imm = extract32(insn, 10, 7);
     a->vj = extract32(insn, 5, 5);
     a->vd = extract32(insn, 0, 5);
-    a->imm = extract32(insn, 10, 7);
 }
 
 static void decode_extract_vv_ui8(DisasContext *ctx, arg_vv_i *a, uint32_t insn)
 {
+    a->imm = extract32(insn, 10, 8);
     a->vj = extract32(insn, 5, 5);
     a->vd = extract32(insn, 0, 5);
-    a->imm = extract32(insn, 10, 8);
 }
 
 static void decode_extract_vvr(DisasContext *ctx, arg_vvr *a, uint32_t insn)
 {
+    a->vj = extract32(insn, 5, 5);
     a->rk = extract32(insn, 10, 5);
     a->vd = extract32(insn, 0, 5);
-    a->vj = extract32(insn, 5, 5);
 }
 
 static void decode_extract_vvv(DisasContext *ctx, arg_vvv *a, uint32_t insn)
 {
     a->vk = extract32(insn, 10, 5);
-    a->vd = extract32(insn, 0, 5);
     a->vj = extract32(insn, 5, 5);
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vvv_fcond(DisasContext *ctx, arg_vvv_fcond *a, uint32_t insn)
 {
-    a->vk = extract32(insn, 10, 5);
-    a->vd = extract32(insn, 0, 5);
-    a->vj = extract32(insn, 5, 5);
     a->fcond = extract32(insn, 15, 5);
+    a->vk = extract32(insn, 10, 5);
+    a->vj = extract32(insn, 5, 5);
+    a->vd = extract32(insn, 0, 5);
 }
 
 static void decode_extract_vvvv(DisasContext *ctx, arg_vvvv *a, uint32_t insn)
 {
     a->vk = extract32(insn, 10, 5);
-    a->vd = extract32(insn, 0, 5);
     a->vj = extract32(insn, 5, 5);
     a->va = extract32(insn, 15, 5);
+    a->vd = extract32(insn, 0, 5);
 }
 
 static bool decode(DisasContext *ctx, uint32_t insn)
@@ -4231,13 +4870,20 @@ static bool decode(DisasContext *ctx, uint32_t insn)
         arg_cop_r_i f_cop_r_i;
         arg_cr f_cr;
         arg_cv f_cv;
+        arg_d_ui4 f_d_ui4;
+        arg_d_ui8 f_d_ui8;
         arg_empty f_empty;
+        arg_f_i f_f_i;
         arg_fc f_fc;
         arg_fcsrd_r f_fcsrd_r;
         arg_ff f_ff;
         arg_fff f_fff;
         arg_fffc f_fffc;
         arg_ffff f_ffff;
+        arg_fmt_offs21 f_fmt_offs21;
+        arg_fmt_ptr f_fmt_ptr;
+        arg_fmt_rdrjsi5 f_fmt_rdrjsi5;
+        arg_fmt_rdui8 f_fmt_rdui8;
         arg_fr f_fr;
         arg_fr_i f_fr_i;
         arg_frr f_frr;
@@ -4246,11 +4892,18 @@ static bool decode(DisasContext *ctx, uint32_t insn)
         arg_i f_i;
         arg_i_rr f_i_rr;
         arg_j_i f_j_i;
+        arg_j_ui3 f_j_ui3;
+        arg_j_ui4 f_j_ui4;
+        arg_j_ui5 f_j_ui5;
+        arg_j_ui6 f_j_ui6;
         arg_offs f_offs;
         arg_r_csr f_r_csr;
+        arg_r_d f_r_d;
         arg_r_fcsrs f_r_fcsrs;
         arg_r_i f_r_i;
+        arg_r_j f_r_j;
         arg_r_offs f_r_offs;
+        arg_r_s f_r_s;
         arg_rc f_rc;
         arg_rf f_rf;
         arg_rr f_rr;
@@ -4262,6 +4915,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
         arg_rrr f_rrr;
         arg_rrr_sa f_rrr_sa;
         arg_rv_i f_rv_i;
+        arg_s_r f_s_r;
         arg_v_i f_v_i;
         arg_vr f_vr;
         arg_vr_i f_vr_i;
@@ -4287,127 +4941,314 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 15) & 0x7) {
                 case 0x0:
                     /* 00000000 00000000 0....... ........ */
-                    decode_extract_rr(ctx, &u.f_rr, insn);
                     switch ((insn >> 10) & 0x1f) {
+                    case 0x2:
+                        /* 00000000 00000000 000010.. ........ */
+                        decode_extract_s_r(ctx, &u.f_s_r, insn);
+                        switch ((insn >> 2) & 0x7) {
+                        case 0x0:
+                            /* 00000000 00000000 000010.. ...000.. */
+                            /* ./insns.decode:2346 */
+                            if (trans_gr2scr(ctx, &u.f_s_r)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x3:
+                        /* 00000000 00000000 000011.. ........ */
+                        decode_extract_r_s(ctx, &u.f_r_s, insn);
+                        switch ((insn >> 7) & 0x7) {
+                        case 0x0:
+                            /* 00000000 00000000 00001100 0....... */
+                            /* ./insns.decode:2347 */
+                            if (trans_scr2gr(ctx, &u.f_r_s)) return true;
+                            break;
+                        }
+                        break;
                     case 0x4:
                         /* 00000000 00000000 000100.. ........ */
-                        /* ../target/loongarch/insns.decode:180 */
+                        /* ./insns.decode:224 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_clo_w(ctx, &u.f_rr)) return true;
                         break;
                     case 0x5:
                         /* 00000000 00000000 000101.. ........ */
-                        /* ../target/loongarch/insns.decode:181 */
+                        /* ./insns.decode:225 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_clz_w(ctx, &u.f_rr)) return true;
                         break;
                     case 0x6:
                         /* 00000000 00000000 000110.. ........ */
-                        /* ../target/loongarch/insns.decode:182 */
+                        /* ./insns.decode:226 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_cto_w(ctx, &u.f_rr)) return true;
                         break;
                     case 0x7:
                         /* 00000000 00000000 000111.. ........ */
-                        /* ../target/loongarch/insns.decode:183 */
+                        /* ./insns.decode:227 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_ctz_w(ctx, &u.f_rr)) return true;
                         break;
                     case 0x8:
                         /* 00000000 00000000 001000.. ........ */
-                        /* ../target/loongarch/insns.decode:184 */
+                        /* ./insns.decode:228 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_clo_d(ctx, &u.f_rr)) return true;
                         break;
                     case 0x9:
                         /* 00000000 00000000 001001.. ........ */
-                        /* ../target/loongarch/insns.decode:185 */
+                        /* ./insns.decode:229 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_clz_d(ctx, &u.f_rr)) return true;
                         break;
                     case 0xa:
                         /* 00000000 00000000 001010.. ........ */
-                        /* ../target/loongarch/insns.decode:186 */
+                        /* ./insns.decode:230 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_cto_d(ctx, &u.f_rr)) return true;
                         break;
                     case 0xb:
                         /* 00000000 00000000 001011.. ........ */
-                        /* ../target/loongarch/insns.decode:187 */
+                        /* ./insns.decode:231 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_ctz_d(ctx, &u.f_rr)) return true;
                         break;
                     case 0xc:
                         /* 00000000 00000000 001100.. ........ */
-                        /* ../target/loongarch/insns.decode:188 */
+                        /* ./insns.decode:232 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_revb_2h(ctx, &u.f_rr)) return true;
                         break;
                     case 0xd:
                         /* 00000000 00000000 001101.. ........ */
-                        /* ../target/loongarch/insns.decode:189 */
+                        /* ./insns.decode:233 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_revb_4h(ctx, &u.f_rr)) return true;
                         break;
                     case 0xe:
                         /* 00000000 00000000 001110.. ........ */
-                        /* ../target/loongarch/insns.decode:190 */
+                        /* ./insns.decode:234 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_revb_2w(ctx, &u.f_rr)) return true;
                         break;
                     case 0xf:
                         /* 00000000 00000000 001111.. ........ */
-                        /* ../target/loongarch/insns.decode:191 */
+                        /* ./insns.decode:235 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_revb_d(ctx, &u.f_rr)) return true;
                         break;
                     case 0x10:
                         /* 00000000 00000000 010000.. ........ */
-                        /* ../target/loongarch/insns.decode:192 */
+                        /* ./insns.decode:236 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_revh_2w(ctx, &u.f_rr)) return true;
                         break;
                     case 0x11:
                         /* 00000000 00000000 010001.. ........ */
-                        /* ../target/loongarch/insns.decode:193 */
+                        /* ./insns.decode:237 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_revh_d(ctx, &u.f_rr)) return true;
                         break;
                     case 0x12:
                         /* 00000000 00000000 010010.. ........ */
-                        /* ../target/loongarch/insns.decode:194 */
+                        /* ./insns.decode:238 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_bitrev_4b(ctx, &u.f_rr)) return true;
                         break;
                     case 0x13:
                         /* 00000000 00000000 010011.. ........ */
-                        /* ../target/loongarch/insns.decode:195 */
+                        /* ./insns.decode:239 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_bitrev_8b(ctx, &u.f_rr)) return true;
                         break;
                     case 0x14:
                         /* 00000000 00000000 010100.. ........ */
-                        /* ../target/loongarch/insns.decode:196 */
+                        /* ./insns.decode:240 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_bitrev_w(ctx, &u.f_rr)) return true;
                         break;
                     case 0x15:
                         /* 00000000 00000000 010101.. ........ */
-                        /* ../target/loongarch/insns.decode:197 */
+                        /* ./insns.decode:241 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_bitrev_d(ctx, &u.f_rr)) return true;
                         break;
                     case 0x16:
                         /* 00000000 00000000 010110.. ........ */
-                        /* ../target/loongarch/insns.decode:178 */
+                        /* ./insns.decode:222 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_ext_w_h(ctx, &u.f_rr)) return true;
                         break;
                     case 0x17:
                         /* 00000000 00000000 010111.. ........ */
-                        /* ../target/loongarch/insns.decode:179 */
+                        /* ./insns.decode:223 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_ext_w_b(ctx, &u.f_rr)) return true;
                         break;
                     case 0x18:
                         /* 00000000 00000000 011000.. ........ */
-                        /* ../target/loongarch/insns.decode:316 */
+                        /* ./insns.decode:384 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_rdtimel_w(ctx, &u.f_rr)) return true;
                         break;
                     case 0x19:
                         /* 00000000 00000000 011001.. ........ */
-                        /* ../target/loongarch/insns.decode:317 */
+                        /* ./insns.decode:385 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_rdtimeh_w(ctx, &u.f_rr)) return true;
                         break;
                     case 0x1a:
                         /* 00000000 00000000 011010.. ........ */
-                        /* ../target/loongarch/insns.decode:318 */
+                        /* ./insns.decode:386 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_rdtime_d(ctx, &u.f_rr)) return true;
                         break;
                     case 0x1b:
                         /* 00000000 00000000 011011.. ........ */
-                        /* ../target/loongarch/insns.decode:319 */
+                        /* ./insns.decode:387 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
                         if (trans_cpucfg(ctx, &u.f_rr)) return true;
+                        break;
+                    case 0x1c:
+                        /* 00000000 00000000 011100.. ........ */
+                        decode_extract_fmt_ptr(ctx, &u.f_fmt_ptr, insn);
+                        switch (insn & 0x0000031f) {
+                        case 0x00000000:
+                            /* 00000000 00000000 01110000 ...00000 */
+                            /* ./insns.decode:2209 */
+                            if (trans_x86mttop(ctx, &u.f_fmt_ptr)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x1d:
+                        /* 00000000 00000000 011101.. ........ */
+                        decode_extract_fmt_rd(ctx, &u.f_r_d, insn);
+                        switch ((insn >> 5) & 0x1f) {
+                        case 0x0:
+                            /* 00000000 00000000 01110100 000..... */
+                            /* ./insns.decode:2210 */
+                            if (trans_x86mftop(ctx, &u.f_r_d)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x1e:
+                        /* 00000000 00000000 011110.. ........ */
+                        /* ./insns.decode:2211 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
+                        if (trans_x86loope(ctx, &u.f_rr)) return true;
+                        break;
+                    case 0x1f:
+                        /* 00000000 00000000 011111.. ........ */
+                        /* ./insns.decode:2212 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
+                        if (trans_x86loopne(ctx, &u.f_rr)) return true;
+                        break;
+                    }
+                    break;
+                case 0x1:
+                    /* 00000000 00000000 1....... ........ */
+                    switch ((insn >> 10) & 0x1f) {
+                    case 0x0:
+                        /* 00000000 00000000 100000.. ........ */
+                        switch (insn & 0x0000001f) {
+                        case 0x00000000:
+                            /* 00000000 00000000 100000.. ...00000 */
+                            /* ./insns.decode:2213 */
+                            decode_extract_r_j(ctx, &u.f_r_j, insn);
+                            if (trans_x86inc_b(ctx, &u.f_r_j)) return true;
+                            break;
+                        case 0x00000001:
+                            /* 00000000 00000000 100000.. ...00001 */
+                            /* ./insns.decode:2214 */
+                            decode_extract_r_j(ctx, &u.f_r_j, insn);
+                            if (trans_x86inc_h(ctx, &u.f_r_j)) return true;
+                            break;
+                        case 0x00000002:
+                            /* 00000000 00000000 100000.. ...00010 */
+                            /* ./insns.decode:2215 */
+                            decode_extract_r_j(ctx, &u.f_r_j, insn);
+                            if (trans_x86inc_w(ctx, &u.f_r_j)) return true;
+                            break;
+                        case 0x00000003:
+                            /* 00000000 00000000 100000.. ...00011 */
+                            /* ./insns.decode:2216 */
+                            decode_extract_r_j(ctx, &u.f_r_j, insn);
+                            if (trans_x86inc_d(ctx, &u.f_r_j)) return true;
+                            break;
+                        case 0x00000004:
+                            /* 00000000 00000000 100000.. ...00100 */
+                            /* ./insns.decode:2217 */
+                            decode_extract_r_j(ctx, &u.f_r_j, insn);
+                            if (trans_x86dec_b(ctx, &u.f_r_j)) return true;
+                            break;
+                        case 0x00000005:
+                            /* 00000000 00000000 100000.. ...00101 */
+                            /* ./insns.decode:2218 */
+                            decode_extract_r_j(ctx, &u.f_r_j, insn);
+                            if (trans_x86dec_h(ctx, &u.f_r_j)) return true;
+                            break;
+                        case 0x00000006:
+                            /* 00000000 00000000 100000.. ...00110 */
+                            /* ./insns.decode:2219 */
+                            decode_extract_r_j(ctx, &u.f_r_j, insn);
+                            if (trans_x86dec_w(ctx, &u.f_r_j)) return true;
+                            break;
+                        case 0x00000007:
+                            /* 00000000 00000000 100000.. ...00111 */
+                            /* ./insns.decode:2220 */
+                            decode_extract_r_j(ctx, &u.f_r_j, insn);
+                            if (trans_x86dec_d(ctx, &u.f_r_j)) return true;
+                            break;
+                        case 0x00000008:
+                            /* 00000000 00000000 100000.. ...01000 */
+                            decode_extract_empty(ctx, &u.f_empty, insn);
+                            switch ((insn >> 5) & 0x1f) {
+                            case 0x0:
+                                /* 00000000 00000000 10000000 00001000 */
+                                /* ./insns.decode:2221 */
+                                if (trans_x86settm(ctx, &u.f_empty)) return true;
+                                break;
+                            case 0x1:
+                                /* 00000000 00000000 10000000 00101000 */
+                                /* ./insns.decode:2222 */
+                                if (trans_x86clrtm(ctx, &u.f_empty)) return true;
+                                break;
+                            }
+                            break;
+                        case 0x00000009:
+                            /* 00000000 00000000 100000.. ...01001 */
+                            decode_extract_empty(ctx, &u.f_empty, insn);
+                            switch ((insn >> 5) & 0x1f) {
+                            case 0x0:
+                                /* 00000000 00000000 10000000 00001001 */
+                                /* ./insns.decode:2223 */
+                                if (trans_x86inctop(ctx, &u.f_empty)) return true;
+                                break;
+                            case 0x1:
+                                /* 00000000 00000000 10000000 00101001 */
+                                /* ./insns.decode:2224 */
+                                if (trans_x86dectop(ctx, &u.f_empty)) return true;
+                                break;
+                            }
+                            break;
+                        }
+                        break;
+                    case 0x1:
+                        /* 00000000 00000000 100001.. ........ */
+                        /* ./insns.decode:242 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
+                        if (trans_pcnt_w(ctx, &u.f_rr)) return true;
+                        break;
+                    case 0x2:
+                        /* 00000000 00000000 100010.. ........ */
+                        /* ./insns.decode:243 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
+                        if (trans_pcnt_d(ctx, &u.f_rr)) return true;
+                        break;
+                    case 0x3:
+                        /* 00000000 00000000 100011.. ........ */
+                        /* ./insns.decode:244 */
+                        decode_extract_rr(ctx, &u.f_rr, insn);
+                        if (trans_orc_b(ctx, &u.f_rr)) return true;
                         break;
                     }
                     break;
@@ -4417,7 +5258,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch (insn & 0x0000001f) {
                     case 0x00000000:
                         /* 00000000 00000001 0....... ...00000 */
-                        /* ../target/loongarch/insns.decode:314 */
+                        /* ./insns.decode:382 */
                         if (trans_asrtle_d(ctx, &u.f_rr_jk)) return true;
                         break;
                     }
@@ -4428,7 +5269,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch (insn & 0x0000001f) {
                     case 0x00000000:
                         /* 00000000 00000001 1....... ...00000 */
-                        /* ../target/loongarch/insns.decode:315 */
+                        /* ./insns.decode:383 */
                         if (trans_asrtgt_d(ctx, &u.f_rr_jk)) return true;
                         break;
                     }
@@ -4441,12 +5282,12 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 17) & 0x1) {
                 case 0x0:
                     /* 00000000 0000010. ........ ........ */
-                    /* ../target/loongarch/insns.decode:138 */
+                    /* ./insns.decode:170 */
                     if (trans_alsl_w(ctx, &u.f_rrr_sa)) return true;
                     break;
                 case 0x1:
                     /* 00000000 0000011. ........ ........ */
-                    /* ../target/loongarch/insns.decode:139 */
+                    /* ./insns.decode:171 */
                     if (trans_alsl_wu(ctx, &u.f_rrr_sa)) return true;
                     break;
                 }
@@ -4457,14 +5298,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 17) & 0x1) {
                 case 0x0:
                     /* 00000000 0000100. ........ ........ */
-                    /* ../target/loongarch/insns.decode:198 */
+                    /* ./insns.decode:245 */
                     if (trans_bytepick_w(ctx, &u.f_rrr_sa)) return true;
                     break;
                 }
                 break;
             case 0x3:
                 /* 00000000 000011.. ........ ........ */
-                /* ../target/loongarch/insns.decode:199 */
+                /* ./insns.decode:246 */
                 decode_extract_rrr_sa3(ctx, &u.f_rrr_sa, insn);
                 if (trans_bytepick_d(ctx, &u.f_rrr_sa)) return true;
                 break;
@@ -4474,42 +5315,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 15) & 0x7) {
                 case 0x0:
                     /* 00000000 00010000 0....... ........ */
-                    /* ../target/loongarch/insns.decode:108 */
+                    /* ./insns.decode:140 */
                     if (trans_add_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x1:
                     /* 00000000 00010000 1....... ........ */
-                    /* ../target/loongarch/insns.decode:109 */
+                    /* ./insns.decode:141 */
                     if (trans_add_d(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x2:
                     /* 00000000 00010001 0....... ........ */
-                    /* ../target/loongarch/insns.decode:110 */
+                    /* ./insns.decode:142 */
                     if (trans_sub_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x3:
                     /* 00000000 00010001 1....... ........ */
-                    /* ../target/loongarch/insns.decode:111 */
+                    /* ./insns.decode:143 */
                     if (trans_sub_d(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x4:
                     /* 00000000 00010010 0....... ........ */
-                    /* ../target/loongarch/insns.decode:112 */
+                    /* ./insns.decode:144 */
                     if (trans_slt(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x5:
                     /* 00000000 00010010 1....... ........ */
-                    /* ../target/loongarch/insns.decode:113 */
+                    /* ./insns.decode:145 */
                     if (trans_sltu(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x6:
                     /* 00000000 00010011 0....... ........ */
-                    /* ../target/loongarch/insns.decode:200 */
+                    /* ./insns.decode:247 */
                     if (trans_maskeqz(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x7:
                     /* 00000000 00010011 1....... ........ */
-                    /* ../target/loongarch/insns.decode:201 */
+                    /* ./insns.decode:248 */
                     if (trans_masknez(ctx, &u.f_rrr)) return true;
                     break;
                 }
@@ -4520,42 +5361,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 15) & 0x7) {
                 case 0x0:
                     /* 00000000 00010100 0....... ........ */
-                    /* ../target/loongarch/insns.decode:116 */
+                    /* ./insns.decode:148 */
                     if (trans_nor(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x1:
                     /* 00000000 00010100 1....... ........ */
-                    /* ../target/loongarch/insns.decode:117 */
+                    /* ./insns.decode:149 */
                     if (trans_and(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x2:
                     /* 00000000 00010101 0....... ........ */
-                    /* ../target/loongarch/insns.decode:118 */
+                    /* ./insns.decode:150 */
                     if (trans_or(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x3:
                     /* 00000000 00010101 1....... ........ */
-                    /* ../target/loongarch/insns.decode:119 */
+                    /* ./insns.decode:151 */
                     if (trans_xor(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x4:
                     /* 00000000 00010110 0....... ........ */
-                    /* ../target/loongarch/insns.decode:120 */
+                    /* ./insns.decode:152 */
                     if (trans_orn(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x5:
                     /* 00000000 00010110 1....... ........ */
-                    /* ../target/loongarch/insns.decode:121 */
+                    /* ./insns.decode:153 */
                     if (trans_andn(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x6:
                     /* 00000000 00010111 0....... ........ */
-                    /* ../target/loongarch/insns.decode:158 */
+                    /* ./insns.decode:191 */
                     if (trans_sll_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x7:
                     /* 00000000 00010111 1....... ........ */
-                    /* ../target/loongarch/insns.decode:159 */
+                    /* ./insns.decode:192 */
                     if (trans_srl_w(ctx, &u.f_rrr)) return true;
                     break;
                 }
@@ -4566,32 +5407,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 15) & 0x7) {
                 case 0x0:
                     /* 00000000 00011000 0....... ........ */
-                    /* ../target/loongarch/insns.decode:160 */
+                    /* ./insns.decode:193 */
                     if (trans_sra_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x1:
                     /* 00000000 00011000 1....... ........ */
-                    /* ../target/loongarch/insns.decode:161 */
+                    /* ./insns.decode:194 */
                     if (trans_sll_d(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x2:
                     /* 00000000 00011001 0....... ........ */
-                    /* ../target/loongarch/insns.decode:162 */
+                    /* ./insns.decode:195 */
                     if (trans_srl_d(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x3:
                     /* 00000000 00011001 1....... ........ */
-                    /* ../target/loongarch/insns.decode:163 */
+                    /* ./insns.decode:196 */
                     if (trans_sra_d(ctx, &u.f_rrr)) return true;
+                    break;
+                case 0x4:
+                    /* 00000000 00011010 0....... ........ */
+                    /* ./insns.decode:2225 */
+                    if (trans_rotr_b(ctx, &u.f_rrr)) return true;
+                    break;
+                case 0x5:
+                    /* 00000000 00011010 1....... ........ */
+                    /* ./insns.decode:2226 */
+                    if (trans_rotr_h(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x6:
                     /* 00000000 00011011 0....... ........ */
-                    /* ../target/loongarch/insns.decode:164 */
+                    /* ./insns.decode:197 */
                     if (trans_rotr_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x7:
                     /* 00000000 00011011 1....... ........ */
-                    /* ../target/loongarch/insns.decode:165 */
+                    /* ./insns.decode:198 */
                     if (trans_rotr_d(ctx, &u.f_rrr)) return true;
                     break;
                 }
@@ -4602,42 +5453,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 15) & 0x7) {
                 case 0x0:
                     /* 00000000 00011100 0....... ........ */
-                    /* ../target/loongarch/insns.decode:122 */
+                    /* ./insns.decode:154 */
                     if (trans_mul_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x1:
                     /* 00000000 00011100 1....... ........ */
-                    /* ../target/loongarch/insns.decode:123 */
+                    /* ./insns.decode:155 */
                     if (trans_mulh_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x2:
                     /* 00000000 00011101 0....... ........ */
-                    /* ../target/loongarch/insns.decode:124 */
+                    /* ./insns.decode:156 */
                     if (trans_mulh_wu(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x3:
                     /* 00000000 00011101 1....... ........ */
-                    /* ../target/loongarch/insns.decode:125 */
+                    /* ./insns.decode:157 */
                     if (trans_mul_d(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x4:
                     /* 00000000 00011110 0....... ........ */
-                    /* ../target/loongarch/insns.decode:126 */
+                    /* ./insns.decode:158 */
                     if (trans_mulh_d(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x5:
                     /* 00000000 00011110 1....... ........ */
-                    /* ../target/loongarch/insns.decode:127 */
+                    /* ./insns.decode:159 */
                     if (trans_mulh_du(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x6:
                     /* 00000000 00011111 0....... ........ */
-                    /* ../target/loongarch/insns.decode:128 */
+                    /* ./insns.decode:160 */
                     if (trans_mulw_d_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x7:
                     /* 00000000 00011111 1....... ........ */
-                    /* ../target/loongarch/insns.decode:129 */
+                    /* ./insns.decode:161 */
                     if (trans_mulw_d_wu(ctx, &u.f_rrr)) return true;
                     break;
                 }
@@ -4648,42 +5499,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 15) & 0x7) {
                 case 0x0:
                     /* 00000000 00100000 0....... ........ */
-                    /* ../target/loongarch/insns.decode:130 */
+                    /* ./insns.decode:162 */
                     if (trans_div_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x1:
                     /* 00000000 00100000 1....... ........ */
-                    /* ../target/loongarch/insns.decode:131 */
+                    /* ./insns.decode:163 */
                     if (trans_mod_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x2:
                     /* 00000000 00100001 0....... ........ */
-                    /* ../target/loongarch/insns.decode:132 */
+                    /* ./insns.decode:164 */
                     if (trans_div_wu(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x3:
                     /* 00000000 00100001 1....... ........ */
-                    /* ../target/loongarch/insns.decode:133 */
+                    /* ./insns.decode:165 */
                     if (trans_mod_wu(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x4:
                     /* 00000000 00100010 0....... ........ */
-                    /* ../target/loongarch/insns.decode:134 */
+                    /* ./insns.decode:166 */
                     if (trans_div_d(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x5:
                     /* 00000000 00100010 1....... ........ */
-                    /* ../target/loongarch/insns.decode:135 */
+                    /* ./insns.decode:167 */
                     if (trans_mod_d(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x6:
                     /* 00000000 00100011 0....... ........ */
-                    /* ../target/loongarch/insns.decode:136 */
+                    /* ./insns.decode:168 */
                     if (trans_div_du(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x7:
                     /* 00000000 00100011 1....... ........ */
-                    /* ../target/loongarch/insns.decode:137 */
+                    /* ./insns.decode:169 */
                     if (trans_mod_du(ctx, &u.f_rrr)) return true;
                     break;
                 }
@@ -4694,63 +5545,83 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 15) & 0x7) {
                 case 0x0:
                     /* 00000000 00100100 0....... ........ */
-                    /* ../target/loongarch/insns.decode:304 */
+                    /* ./insns.decode:372 */
                     if (trans_crc_w_b_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x1:
                     /* 00000000 00100100 1....... ........ */
-                    /* ../target/loongarch/insns.decode:305 */
+                    /* ./insns.decode:373 */
                     if (trans_crc_w_h_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x2:
                     /* 00000000 00100101 0....... ........ */
-                    /* ../target/loongarch/insns.decode:306 */
+                    /* ./insns.decode:374 */
                     if (trans_crc_w_w_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x3:
                     /* 00000000 00100101 1....... ........ */
-                    /* ../target/loongarch/insns.decode:307 */
+                    /* ./insns.decode:375 */
                     if (trans_crc_w_d_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x4:
                     /* 00000000 00100110 0....... ........ */
-                    /* ../target/loongarch/insns.decode:308 */
+                    /* ./insns.decode:376 */
                     if (trans_crcc_w_b_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x5:
                     /* 00000000 00100110 1....... ........ */
-                    /* ../target/loongarch/insns.decode:309 */
+                    /* ./insns.decode:377 */
                     if (trans_crcc_w_h_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x6:
                     /* 00000000 00100111 0....... ........ */
-                    /* ../target/loongarch/insns.decode:310 */
+                    /* ./insns.decode:378 */
                     if (trans_crcc_w_w_w(ctx, &u.f_rrr)) return true;
                     break;
                 case 0x7:
                     /* 00000000 00100111 1....... ........ */
-                    /* ../target/loongarch/insns.decode:311 */
+                    /* ./insns.decode:379 */
                     if (trans_crcc_w_d_w(ctx, &u.f_rrr)) return true;
                     break;
                 }
                 break;
             case 0xa:
                 /* 00000000 001010.. ........ ........ */
-                decode_extract_i15(ctx, &u.f_i, insn);
                 switch ((insn >> 15) & 0x7) {
+                case 0x0:
+                    /* 00000000 00101000 0....... ........ */
+                    /* ./insns.decode:199 */
+                    decode_extract_rrr(ctx, &u.f_rrr, insn);
+                    if (trans_add_wu(ctx, &u.f_rrr)) return true;
+                    break;
+                case 0x2:
+                    /* 00000000 00101001 0....... ........ */
+                    /* ./insns.decode:2227 */
+                    decode_extract_fmt_rdrjsi5(ctx, &u.f_fmt_rdrjsi5, insn);
+                    if (trans_addu12i_w(ctx, &u.f_fmt_rdrjsi5)) return true;
+                    break;
+                case 0x3:
+                    /* 00000000 00101001 1....... ........ */
+                    /* ./insns.decode:2228 */
+                    decode_extract_fmt_rdrjsi5(ctx, &u.f_fmt_rdrjsi5, insn);
+                    if (trans_addu12i_d(ctx, &u.f_fmt_rdrjsi5)) return true;
+                    break;
                 case 0x4:
                     /* 00000000 00101010 0....... ........ */
-                    /* ../target/loongarch/insns.decode:312 */
+                    /* ./insns.decode:380 */
+                    decode_extract_i15(ctx, &u.f_i, insn);
                     if (trans_break(ctx, &u.f_i)) return true;
                     break;
                 case 0x5:
                     /* 00000000 00101010 1....... ........ */
-                    /* ../target/loongarch/insns.decode:490 */
+                    /* ./insns.decode:576 */
+                    decode_extract_i15(ctx, &u.f_i, insn);
                     if (trans_dbcl(ctx, &u.f_i)) return true;
                     break;
                 case 0x6:
                     /* 00000000 00101011 0....... ........ */
-                    /* ../target/loongarch/insns.decode:313 */
+                    /* ./insns.decode:381 */
+                    decode_extract_i15(ctx, &u.f_i, insn);
                     if (trans_syscall(ctx, &u.f_i)) return true;
                     break;
                 }
@@ -4761,8 +5632,456 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 17) & 0x1) {
                 case 0x0:
                     /* 00000000 0010110. ........ ........ */
-                    /* ../target/loongarch/insns.decode:140 */
+                    /* ./insns.decode:172 */
                     if (trans_alsl_d(ctx, &u.f_rrr_sa)) return true;
+                    break;
+                case 0x1:
+                    /* 00000000 0010111. ........ ........ */
+                    /* ./insns.decode:173 */
+                    if (trans_alsl_uw(ctx, &u.f_rrr_sa)) return true;
+                    break;
+                }
+                break;
+            case 0xc:
+                /* 00000000 001100.. ........ ........ */
+                decode_extract_rrr(ctx, &u.f_rrr, insn);
+                switch ((insn >> 15) & 0x7) {
+                case 0x0:
+                    /* 00000000 00110000 0....... ........ */
+                    /* ./insns.decode:2229 */
+                    if (trans_adc_b(ctx, &u.f_rrr)) return true;
+                    break;
+                case 0x1:
+                    /* 00000000 00110000 1....... ........ */
+                    /* ./insns.decode:2231 */
+                    if (trans_adc_h(ctx, &u.f_rrr)) return true;
+                    break;
+                case 0x2:
+                    /* 00000000 00110001 0....... ........ */
+                    /* ./insns.decode:2232 */
+                    if (trans_adc_w(ctx, &u.f_rrr)) return true;
+                    break;
+                case 0x3:
+                    /* 00000000 00110001 1....... ........ */
+                    /* ./insns.decode:2230 */
+                    if (trans_adc_d(ctx, &u.f_rrr)) return true;
+                    break;
+                case 0x4:
+                    /* 00000000 00110010 0....... ........ */
+                    /* ./insns.decode:2233 */
+                    if (trans_sbc_b(ctx, &u.f_rrr)) return true;
+                    break;
+                case 0x5:
+                    /* 00000000 00110010 1....... ........ */
+                    /* ./insns.decode:2235 */
+                    if (trans_sbc_h(ctx, &u.f_rrr)) return true;
+                    break;
+                case 0x6:
+                    /* 00000000 00110011 0....... ........ */
+                    /* ./insns.decode:2236 */
+                    if (trans_sbc_w(ctx, &u.f_rrr)) return true;
+                    break;
+                case 0x7:
+                    /* 00000000 00110011 1....... ........ */
+                    /* ./insns.decode:2234 */
+                    if (trans_sbc_d(ctx, &u.f_rrr)) return true;
+                    break;
+                }
+                break;
+            case 0xd:
+                /* 00000000 001101.. ........ ........ */
+                switch ((insn >> 15) & 0x7) {
+                case 0x0:
+                    /* 00000000 00110100 0....... ........ */
+                    /* ./insns.decode:2237 */
+                    decode_extract_rrr(ctx, &u.f_rrr, insn);
+                    if (trans_rcr_b(ctx, &u.f_rrr)) return true;
+                    break;
+                case 0x1:
+                    /* 00000000 00110100 1....... ........ */
+                    /* ./insns.decode:2239 */
+                    decode_extract_rrr(ctx, &u.f_rrr, insn);
+                    if (trans_rcr_h(ctx, &u.f_rrr)) return true;
+                    break;
+                case 0x2:
+                    /* 00000000 00110101 0....... ........ */
+                    /* ./insns.decode:2240 */
+                    decode_extract_rrr(ctx, &u.f_rrr, insn);
+                    if (trans_rcr_w(ctx, &u.f_rrr)) return true;
+                    break;
+                case 0x3:
+                    /* 00000000 00110101 1....... ........ */
+                    /* ./insns.decode:2238 */
+                    decode_extract_rrr(ctx, &u.f_rrr, insn);
+                    if (trans_rcr_d(ctx, &u.f_rrr)) return true;
+                    break;
+                case 0x4:
+                    /* 00000000 00110110 0....... ........ */
+                    decode_extract_rr_ui4(ctx, &u.f_rr_i, insn);
+                    switch ((insn >> 14) & 0x1) {
+                    case 0x0:
+                        /* 00000000 00110110 00...... ........ */
+                        /* ./insns.decode:2348 */
+                        if (trans_grsel(ctx, &u.f_rr_i)) return true;
+                        break;
+                    }
+                    break;
+                case 0x5:
+                    /* 00000000 00110110 1....... ........ */
+                    decode_extract_d_ui4(ctx, &u.f_d_ui4, insn);
+                    switch (insn & 0x000043e0) {
+                    case 0x00000000:
+                        /* 00000000 00110110 10....00 000..... */
+                        /* ./insns.decode:2241 */
+                        if (trans_setx86j(ctx, &u.f_d_ui4)) return true;
+                        break;
+                    }
+                    break;
+                }
+                break;
+            case 0xf:
+                /* 00000000 001111.. ........ ........ */
+                decode_extract_rr_jk(ctx, &u.f_rr_jk, insn);
+                switch (insn & 0x0003801f) {
+                case 0x00028000:
+                    /* 00000000 00111110 1....... ...00000 */
+                    /* ./insns.decode:2242 */
+                    if (trans_x86mul_b(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00028001:
+                    /* 00000000 00111110 1....... ...00001 */
+                    /* ./insns.decode:2246 */
+                    if (trans_x86mul_h(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00028002:
+                    /* 00000000 00111110 1....... ...00010 */
+                    /* ./insns.decode:2248 */
+                    if (trans_x86mul_w(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00028003:
+                    /* 00000000 00111110 1....... ...00011 */
+                    /* ./insns.decode:2244 */
+                    if (trans_x86mul_d(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00028004:
+                    /* 00000000 00111110 1....... ...00100 */
+                    /* ./insns.decode:2243 */
+                    if (trans_x86mul_bu(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00028005:
+                    /* 00000000 00111110 1....... ...00101 */
+                    /* ./insns.decode:2247 */
+                    if (trans_x86mul_hu(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00028006:
+                    /* 00000000 00111110 1....... ...00110 */
+                    /* ./insns.decode:2249 */
+                    if (trans_x86mul_wu(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00028007:
+                    /* 00000000 00111110 1....... ...00111 */
+                    /* ./insns.decode:2245 */
+                    if (trans_x86mul_du(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030000:
+                    /* 00000000 00111111 0....... ...00000 */
+                    /* ./insns.decode:2255 */
+                    if (trans_x86add_wu(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030001:
+                    /* 00000000 00111111 0....... ...00001 */
+                    /* ./insns.decode:2252 */
+                    if (trans_x86add_du(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030002:
+                    /* 00000000 00111111 0....... ...00010 */
+                    /* ./insns.decode:2261 */
+                    if (trans_x86sub_wu(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030003:
+                    /* 00000000 00111111 0....... ...00011 */
+                    /* ./insns.decode:2258 */
+                    if (trans_x86sub_du(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030004:
+                    /* 00000000 00111111 0....... ...00100 */
+                    /* ./insns.decode:2250 */
+                    if (trans_x86add_b(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030005:
+                    /* 00000000 00111111 0....... ...00101 */
+                    /* ./insns.decode:2253 */
+                    if (trans_x86add_h(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030006:
+                    /* 00000000 00111111 0....... ...00110 */
+                    /* ./insns.decode:2254 */
+                    if (trans_x86add_w(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030007:
+                    /* 00000000 00111111 0....... ...00111 */
+                    /* ./insns.decode:2251 */
+                    if (trans_x86add_d(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030008:
+                    /* 00000000 00111111 0....... ...01000 */
+                    /* ./insns.decode:2256 */
+                    if (trans_x86sub_b(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030009:
+                    /* 00000000 00111111 0....... ...01001 */
+                    /* ./insns.decode:2259 */
+                    if (trans_x86sub_h(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003000a:
+                    /* 00000000 00111111 0....... ...01010 */
+                    /* ./insns.decode:2260 */
+                    if (trans_x86sub_w(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003000b:
+                    /* 00000000 00111111 0....... ...01011 */
+                    /* ./insns.decode:2257 */
+                    if (trans_x86sub_d(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003000c:
+                    /* 00000000 00111111 0....... ...01100 */
+                    /* ./insns.decode:2262 */
+                    if (trans_x86adc_b(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003000d:
+                    /* 00000000 00111111 0....... ...01101 */
+                    /* ./insns.decode:2264 */
+                    if (trans_x86adc_h(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003000e:
+                    /* 00000000 00111111 0....... ...01110 */
+                    /* ./insns.decode:2265 */
+                    if (trans_x86adc_w(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003000f:
+                    /* 00000000 00111111 0....... ...01111 */
+                    /* ./insns.decode:2263 */
+                    if (trans_x86adc_d(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030010:
+                    /* 00000000 00111111 0....... ...10000 */
+                    /* ./insns.decode:2266 */
+                    if (trans_x86sbc_b(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030011:
+                    /* 00000000 00111111 0....... ...10001 */
+                    /* ./insns.decode:2268 */
+                    if (trans_x86sbc_h(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030012:
+                    /* 00000000 00111111 0....... ...10010 */
+                    /* ./insns.decode:2269 */
+                    if (trans_x86sbc_w(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030013:
+                    /* 00000000 00111111 0....... ...10011 */
+                    /* ./insns.decode:2267 */
+                    if (trans_x86sbc_d(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030014:
+                    /* 00000000 00111111 0....... ...10100 */
+                    /* ./insns.decode:2270 */
+                    if (trans_x86sll_b(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030015:
+                    /* 00000000 00111111 0....... ...10101 */
+                    /* ./insns.decode:2272 */
+                    if (trans_x86sll_h(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030016:
+                    /* 00000000 00111111 0....... ...10110 */
+                    /* ./insns.decode:2273 */
+                    if (trans_x86sll_w(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030017:
+                    /* 00000000 00111111 0....... ...10111 */
+                    /* ./insns.decode:2271 */
+                    if (trans_x86sll_d(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030018:
+                    /* 00000000 00111111 0....... ...11000 */
+                    /* ./insns.decode:2274 */
+                    if (trans_x86srl_b(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00030019:
+                    /* 00000000 00111111 0....... ...11001 */
+                    /* ./insns.decode:2276 */
+                    if (trans_x86srl_h(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003001a:
+                    /* 00000000 00111111 0....... ...11010 */
+                    /* ./insns.decode:2277 */
+                    if (trans_x86srl_w(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003001b:
+                    /* 00000000 00111111 0....... ...11011 */
+                    /* ./insns.decode:2275 */
+                    if (trans_x86srl_d(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003001c:
+                    /* 00000000 00111111 0....... ...11100 */
+                    /* ./insns.decode:2278 */
+                    if (trans_x86sra_b(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003001d:
+                    /* 00000000 00111111 0....... ...11101 */
+                    /* ./insns.decode:2280 */
+                    if (trans_x86sra_h(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003001e:
+                    /* 00000000 00111111 0....... ...11110 */
+                    /* ./insns.decode:2281 */
+                    if (trans_x86sra_w(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003001f:
+                    /* 00000000 00111111 0....... ...11111 */
+                    /* ./insns.decode:2279 */
+                    if (trans_x86sra_d(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038000:
+                    /* 00000000 00111111 1....... ...00000 */
+                    /* ./insns.decode:2282 */
+                    if (trans_x86rotr_b(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038001:
+                    /* 00000000 00111111 1....... ...00001 */
+                    /* ./insns.decode:2284 */
+                    if (trans_x86rotr_h(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038002:
+                    /* 00000000 00111111 1....... ...00010 */
+                    /* ./insns.decode:2283 */
+                    if (trans_x86rotr_d(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038003:
+                    /* 00000000 00111111 1....... ...00011 */
+                    /* ./insns.decode:2285 */
+                    if (trans_x86rotr_w(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038004:
+                    /* 00000000 00111111 1....... ...00100 */
+                    /* ./insns.decode:2286 */
+                    if (trans_x86rotl_b(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038005:
+                    /* 00000000 00111111 1....... ...00101 */
+                    /* ./insns.decode:2288 */
+                    if (trans_x86rotl_h(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038006:
+                    /* 00000000 00111111 1....... ...00110 */
+                    /* ./insns.decode:2289 */
+                    if (trans_x86rotl_w(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038007:
+                    /* 00000000 00111111 1....... ...00111 */
+                    /* ./insns.decode:2287 */
+                    if (trans_x86rotl_d(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038008:
+                    /* 00000000 00111111 1....... ...01000 */
+                    /* ./insns.decode:2290 */
+                    if (trans_x86rcr_b(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038009:
+                    /* 00000000 00111111 1....... ...01001 */
+                    /* ./insns.decode:2292 */
+                    if (trans_x86rcr_h(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003800a:
+                    /* 00000000 00111111 1....... ...01010 */
+                    /* ./insns.decode:2293 */
+                    if (trans_x86rcr_w(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003800b:
+                    /* 00000000 00111111 1....... ...01011 */
+                    /* ./insns.decode:2291 */
+                    if (trans_x86rcr_d(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003800c:
+                    /* 00000000 00111111 1....... ...01100 */
+                    /* ./insns.decode:2294 */
+                    if (trans_x86rcl_b(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003800d:
+                    /* 00000000 00111111 1....... ...01101 */
+                    /* ./insns.decode:2296 */
+                    if (trans_x86rcl_h(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003800e:
+                    /* 00000000 00111111 1....... ...01110 */
+                    /* ./insns.decode:2297 */
+                    if (trans_x86rcl_w(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003800f:
+                    /* 00000000 00111111 1....... ...01111 */
+                    /* ./insns.decode:2295 */
+                    if (trans_x86rcl_d(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038010:
+                    /* 00000000 00111111 1....... ...10000 */
+                    /* ./insns.decode:2298 */
+                    if (trans_x86and_b(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038011:
+                    /* 00000000 00111111 1....... ...10001 */
+                    /* ./insns.decode:2300 */
+                    if (trans_x86and_h(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038012:
+                    /* 00000000 00111111 1....... ...10010 */
+                    /* ./insns.decode:2301 */
+                    if (trans_x86and_w(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038013:
+                    /* 00000000 00111111 1....... ...10011 */
+                    /* ./insns.decode:2299 */
+                    if (trans_x86and_d(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038014:
+                    /* 00000000 00111111 1....... ...10100 */
+                    /* ./insns.decode:2302 */
+                    if (trans_x86or_b(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038015:
+                    /* 00000000 00111111 1....... ...10101 */
+                    /* ./insns.decode:2304 */
+                    if (trans_x86or_h(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038016:
+                    /* 00000000 00111111 1....... ...10110 */
+                    /* ./insns.decode:2305 */
+                    if (trans_x86or_w(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038017:
+                    /* 00000000 00111111 1....... ...10111 */
+                    /* ./insns.decode:2303 */
+                    if (trans_x86or_d(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038018:
+                    /* 00000000 00111111 1....... ...11000 */
+                    /* ./insns.decode:2306 */
+                    if (trans_x86xor_b(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x00038019:
+                    /* 00000000 00111111 1....... ...11001 */
+                    /* ./insns.decode:2308 */
+                    if (trans_x86xor_h(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003801a:
+                    /* 00000000 00111111 1....... ...11010 */
+                    /* ./insns.decode:2309 */
+                    if (trans_x86xor_w(ctx, &u.f_rr_jk)) return true;
+                    break;
+                case 0x0003801b:
+                    /* 00000000 00111111 1....... ...11011 */
+                    /* ./insns.decode:2307 */
+                    if (trans_x86xor_d(ctx, &u.f_rr_jk)) return true;
                     break;
                 }
                 break;
@@ -4773,74 +6092,542 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 21) & 0x1) {
             case 0x0:
                 /* 00000000 010..... ........ ........ */
-                switch ((insn >> 16) & 0x1f) {
+                switch ((insn >> 18) & 0x7) {
                 case 0x0:
-                    /* 00000000 01000000 ........ ........ */
-                    decode_extract_rr_ui5(ctx, &u.f_rr_i, insn);
-                    switch ((insn >> 15) & 0x1) {
+                    /* 00000000 010000.. ........ ........ */
+                    switch ((insn >> 16) & 0x3) {
+                    case 0x0:
+                        /* 00000000 01000000 ........ ........ */
+                        decode_extract_rr_ui5(ctx, &u.f_rr_i, insn);
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x1:
+                            /* 00000000 01000000 1....... ........ */
+                            /* ./insns.decode:209 */
+                            if (trans_slli_w(ctx, &u.f_rr_i)) return true;
+                            break;
+                        }
+                        break;
                     case 0x1:
-                        /* 00000000 01000000 1....... ........ */
-                        /* ../target/loongarch/insns.decode:166 */
-                        if (trans_slli_w(ctx, &u.f_rr_i)) return true;
+                        /* 00000000 01000001 ........ ........ */
+                        /* ./insns.decode:211 */
+                        decode_extract_rr_ui6(ctx, &u.f_rr_i, insn);
+                        if (trans_slli_d(ctx, &u.f_rr_i)) return true;
+                        break;
+                    case 0x2:
+                        /* 00000000 01000010 ........ ........ */
+                        decode_extract_rr_ui5(ctx, &u.f_rr_i, insn);
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x1:
+                            /* 00000000 01000010 1....... ........ */
+                            /* ./insns.decode:210 */
+                            if (trans_slli_wu(ctx, &u.f_rr_i)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x3:
+                        /* 00000000 01000011 ........ ........ */
+                        decode_extract_rrr(ctx, &u.f_rrr, insn);
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x0:
+                            /* 00000000 01000011 0....... ........ */
+                            /* ./insns.decode:200 */
+                            if (trans_max(ctx, &u.f_rrr)) return true;
+                            break;
+                        case 0x1:
+                            /* 00000000 01000011 1....... ........ */
+                            /* ./insns.decode:201 */
+                            if (trans_maxu(ctx, &u.f_rrr)) return true;
+                            break;
+                        }
                         break;
                     }
                     break;
                 case 0x1:
-                    /* 00000000 01000001 ........ ........ */
-                    /* ../target/loongarch/insns.decode:167 */
-                    decode_extract_rr_ui6(ctx, &u.f_rr_i, insn);
-                    if (trans_slli_d(ctx, &u.f_rr_i)) return true;
+                    /* 00000000 010001.. ........ ........ */
+                    switch ((insn >> 16) & 0x3) {
+                    case 0x0:
+                        /* 00000000 01000100 ........ ........ */
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x0:
+                            /* 00000000 01000100 0....... ........ */
+                            /* ./insns.decode:202 */
+                            decode_extract_rrr(ctx, &u.f_rrr, insn);
+                            if (trans_maxwu(ctx, &u.f_rrr)) return true;
+                            break;
+                        case 0x1:
+                            /* 00000000 01000100 1....... ........ */
+                            /* ./insns.decode:212 */
+                            decode_extract_rr_ui5(ctx, &u.f_rr_i, insn);
+                            if (trans_srli_w(ctx, &u.f_rr_i)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x1:
+                        /* 00000000 01000101 ........ ........ */
+                        /* ./insns.decode:213 */
+                        decode_extract_rr_ui6(ctx, &u.f_rr_i, insn);
+                        if (trans_srli_d(ctx, &u.f_rr_i)) return true;
+                        break;
+                    case 0x2:
+                        /* 00000000 01000110 ........ ........ */
+                        decode_extract_rrr(ctx, &u.f_rrr, insn);
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x0:
+                            /* 00000000 01000110 0....... ........ */
+                            /* ./insns.decode:203 */
+                            if (trans_xnor(ctx, &u.f_rrr)) return true;
+                            break;
+                        case 0x1:
+                            /* 00000000 01000110 1....... ........ */
+                            /* ./insns.decode:204 */
+                            if (trans_bitinv(ctx, &u.f_rrr)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x3:
+                        /* 00000000 01000111 ........ ........ */
+                        /* ./insns.decode:205 */
+                        decode_extract_rr_ui6(ctx, &u.f_rr_i, insn);
+                        if (trans_bitinvi(ctx, &u.f_rr_i)) return true;
+                        break;
+                    }
+                    break;
+                case 0x2:
+                    /* 00000000 010010.. ........ ........ */
+                    switch ((insn >> 16) & 0x3) {
+                    case 0x0:
+                        /* 00000000 01001000 ........ ........ */
+                        decode_extract_rr_ui5(ctx, &u.f_rr_i, insn);
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x1:
+                            /* 00000000 01001000 1....... ........ */
+                            /* ./insns.decode:214 */
+                            if (trans_srai_w(ctx, &u.f_rr_i)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x1:
+                        /* 00000000 01001001 ........ ........ */
+                        /* ./insns.decode:215 */
+                        decode_extract_rr_ui6(ctx, &u.f_rr_i, insn);
+                        if (trans_srai_d(ctx, &u.f_rr_i)) return true;
+                        break;
+                    case 0x2:
+                        /* 00000000 01001010 ........ ........ */
+                        decode_extract_rrr(ctx, &u.f_rrr, insn);
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x1:
+                            /* 00000000 01001010 1....... ........ */
+                            /* ./insns.decode:206 */
+                            if (trans_min(ctx, &u.f_rrr)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x3:
+                        /* 00000000 01001011 ........ ........ */
+                        decode_extract_rrr(ctx, &u.f_rrr, insn);
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x0:
+                            /* 00000000 01001011 0....... ........ */
+                            /* ./insns.decode:207 */
+                            if (trans_minu(ctx, &u.f_rrr)) return true;
+                            break;
+                        case 0x1:
+                            /* 00000000 01001011 1....... ........ */
+                            /* ./insns.decode:208 */
+                            if (trans_minwu(ctx, &u.f_rrr)) return true;
+                            break;
+                        }
+                        break;
+                    }
+                    break;
+                case 0x3:
+                    /* 00000000 010011.. ........ ........ */
+                    switch ((insn >> 16) & 0x3) {
+                    case 0x0:
+                        /* 00000000 01001100 ........ ........ */
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x0:
+                            /* 00000000 01001100 0....... ........ */
+                            switch ((insn >> 14) & 0x1) {
+                            case 0x0:
+                                /* 00000000 01001100 00...... ........ */
+                                decode_extract_rr_ui3(ctx, &u.f_rr_i, insn);
+                                switch ((insn >> 13) & 0x1) {
+                                case 0x1:
+                                    /* 00000000 01001100 001..... ........ */
+                                    /* ./insns.decode:2205 */
+                                    if (trans_rotri_b(ctx, &u.f_rr_i)) return true;
+                                    break;
+                                }
+                                break;
+                            case 0x1:
+                                /* 00000000 01001100 01...... ........ */
+                                /* ./insns.decode:2206 */
+                                decode_extract_rr_ui4(ctx, &u.f_rr_i, insn);
+                                if (trans_rotri_h(ctx, &u.f_rr_i)) return true;
+                                break;
+                            }
+                            break;
+                        case 0x1:
+                            /* 00000000 01001100 1....... ........ */
+                            /* ./insns.decode:216 */
+                            decode_extract_rr_ui5(ctx, &u.f_rr_i, insn);
+                            if (trans_rotri_w(ctx, &u.f_rr_i)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x1:
+                        /* 00000000 01001101 ........ ........ */
+                        /* ./insns.decode:217 */
+                        decode_extract_rr_ui6(ctx, &u.f_rr_i, insn);
+                        if (trans_rotri_d(ctx, &u.f_rr_i)) return true;
+                        break;
+                    }
                     break;
                 case 0x4:
-                    /* 00000000 01000100 ........ ........ */
-                    decode_extract_rr_ui5(ctx, &u.f_rr_i, insn);
-                    switch ((insn >> 15) & 0x1) {
+                    /* 00000000 010100.. ........ ........ */
+                    switch ((insn >> 16) & 0x3) {
+                    case 0x0:
+                        /* 00000000 01010000 ........ ........ */
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x0:
+                            /* 00000000 01010000 0....... ........ */
+                            switch ((insn >> 14) & 0x1) {
+                            case 0x0:
+                                /* 00000000 01010000 00...... ........ */
+                                decode_extract_rr_ui3(ctx, &u.f_rr_i, insn);
+                                switch ((insn >> 13) & 0x1) {
+                                case 0x1:
+                                    /* 00000000 01010000 001..... ........ */
+                                    /* ./insns.decode:2310 */
+                                    if (trans_rcri_b(ctx, &u.f_rr_i)) return true;
+                                    break;
+                                }
+                                break;
+                            case 0x1:
+                                /* 00000000 01010000 01...... ........ */
+                                /* ./insns.decode:2311 */
+                                decode_extract_rr_ui4(ctx, &u.f_rr_i, insn);
+                                if (trans_rcri_h(ctx, &u.f_rr_i)) return true;
+                                break;
+                            }
+                            break;
+                        case 0x1:
+                            /* 00000000 01010000 1....... ........ */
+                            /* ./insns.decode:2312 */
+                            decode_extract_rr_ui5(ctx, &u.f_rr_i, insn);
+                            if (trans_rcri_w(ctx, &u.f_rr_i)) return true;
+                            break;
+                        }
+                        break;
                     case 0x1:
-                        /* 00000000 01000100 1....... ........ */
-                        /* ../target/loongarch/insns.decode:168 */
-                        if (trans_srli_w(ctx, &u.f_rr_i)) return true;
+                        /* 00000000 01010001 ........ ........ */
+                        /* ./insns.decode:2313 */
+                        decode_extract_rr_ui6(ctx, &u.f_rr_i, insn);
+                        if (trans_rcri_d(ctx, &u.f_rr_i)) return true;
                         break;
                     }
                     break;
                 case 0x5:
-                    /* 00000000 01000101 ........ ........ */
-                    /* ../target/loongarch/insns.decode:169 */
-                    decode_extract_rr_ui6(ctx, &u.f_rr_i, insn);
-                    if (trans_srli_d(ctx, &u.f_rr_i)) return true;
-                    break;
-                case 0x8:
-                    /* 00000000 01001000 ........ ........ */
-                    decode_extract_rr_ui5(ctx, &u.f_rr_i, insn);
-                    switch ((insn >> 15) & 0x1) {
-                    case 0x1:
-                        /* 00000000 01001000 1....... ........ */
-                        /* ../target/loongarch/insns.decode:170 */
-                        if (trans_srai_w(ctx, &u.f_rr_i)) return true;
+                    /* 00000000 010101.. ........ ........ */
+                    switch (insn & 0x0003001f) {
+                    case 0x00000000:
+                        /* 00000000 01010100 ........ ...00000 */
+                        decode_extract_j_ui3(ctx, &u.f_j_ui3, insn);
+                        switch ((insn >> 13) & 0x7) {
+                        case 0x1:
+                            /* 00000000 01010100 001..... ...00000 */
+                            /* ./insns.decode:2314 */
+                            if (trans_x86slli_b(ctx, &u.f_j_ui3)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x00000001:
+                        /* 00000000 01010100 ........ ...00001 */
+                        decode_extract_j_ui4(ctx, &u.f_j_ui4, insn);
+                        switch ((insn >> 14) & 0x3) {
+                        case 0x1:
+                            /* 00000000 01010100 01...... ...00001 */
+                            /* ./insns.decode:2315 */
+                            if (trans_x86slli_h(ctx, &u.f_j_ui4)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x00000002:
+                        /* 00000000 01010100 ........ ...00010 */
+                        decode_extract_j_ui5(ctx, &u.f_j_ui5, insn);
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x1:
+                            /* 00000000 01010100 1....... ...00010 */
+                            /* ./insns.decode:2316 */
+                            if (trans_x86slli_w(ctx, &u.f_j_ui5)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x00000004:
+                        /* 00000000 01010100 ........ ...00100 */
+                        decode_extract_j_ui3(ctx, &u.f_j_ui3, insn);
+                        switch ((insn >> 13) & 0x7) {
+                        case 0x1:
+                            /* 00000000 01010100 001..... ...00100 */
+                            /* ./insns.decode:2318 */
+                            if (trans_x86srli_b(ctx, &u.f_j_ui3)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x00000005:
+                        /* 00000000 01010100 ........ ...00101 */
+                        decode_extract_j_ui4(ctx, &u.f_j_ui4, insn);
+                        switch ((insn >> 14) & 0x3) {
+                        case 0x1:
+                            /* 00000000 01010100 01...... ...00101 */
+                            /* ./insns.decode:2319 */
+                            if (trans_x86srli_h(ctx, &u.f_j_ui4)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x00000006:
+                        /* 00000000 01010100 ........ ...00110 */
+                        decode_extract_j_ui5(ctx, &u.f_j_ui5, insn);
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x1:
+                            /* 00000000 01010100 1....... ...00110 */
+                            /* ./insns.decode:2320 */
+                            if (trans_x86srli_w(ctx, &u.f_j_ui5)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x00000008:
+                        /* 00000000 01010100 ........ ...01000 */
+                        decode_extract_j_ui3(ctx, &u.f_j_ui3, insn);
+                        switch ((insn >> 13) & 0x7) {
+                        case 0x1:
+                            /* 00000000 01010100 001..... ...01000 */
+                            /* ./insns.decode:2322 */
+                            if (trans_x86srai_b(ctx, &u.f_j_ui3)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x00000009:
+                        /* 00000000 01010100 ........ ...01001 */
+                        decode_extract_j_ui4(ctx, &u.f_j_ui4, insn);
+                        switch ((insn >> 14) & 0x3) {
+                        case 0x1:
+                            /* 00000000 01010100 01...... ...01001 */
+                            /* ./insns.decode:2323 */
+                            if (trans_x86srai_h(ctx, &u.f_j_ui4)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x0000000a:
+                        /* 00000000 01010100 ........ ...01010 */
+                        decode_extract_j_ui5(ctx, &u.f_j_ui5, insn);
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x1:
+                            /* 00000000 01010100 1....... ...01010 */
+                            /* ./insns.decode:2324 */
+                            if (trans_x86srai_w(ctx, &u.f_j_ui5)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x0000000c:
+                        /* 00000000 01010100 ........ ...01100 */
+                        decode_extract_j_ui3(ctx, &u.f_j_ui3, insn);
+                        switch ((insn >> 13) & 0x7) {
+                        case 0x1:
+                            /* 00000000 01010100 001..... ...01100 */
+                            /* ./insns.decode:2326 */
+                            if (trans_x86rotri_b(ctx, &u.f_j_ui3)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x0000000d:
+                        /* 00000000 01010100 ........ ...01101 */
+                        decode_extract_j_ui4(ctx, &u.f_j_ui4, insn);
+                        switch ((insn >> 14) & 0x3) {
+                        case 0x1:
+                            /* 00000000 01010100 01...... ...01101 */
+                            /* ./insns.decode:2327 */
+                            if (trans_x86rotri_h(ctx, &u.f_j_ui4)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x0000000e:
+                        /* 00000000 01010100 ........ ...01110 */
+                        decode_extract_j_ui5(ctx, &u.f_j_ui5, insn);
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x1:
+                            /* 00000000 01010100 1....... ...01110 */
+                            /* ./insns.decode:2328 */
+                            if (trans_x86rotri_w(ctx, &u.f_j_ui5)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x00000010:
+                        /* 00000000 01010100 ........ ...10000 */
+                        decode_extract_j_ui3(ctx, &u.f_j_ui3, insn);
+                        switch ((insn >> 13) & 0x7) {
+                        case 0x1:
+                            /* 00000000 01010100 001..... ...10000 */
+                            /* ./insns.decode:2330 */
+                            if (trans_x86rcri_b(ctx, &u.f_j_ui3)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x00000011:
+                        /* 00000000 01010100 ........ ...10001 */
+                        decode_extract_j_ui4(ctx, &u.f_j_ui4, insn);
+                        switch ((insn >> 14) & 0x3) {
+                        case 0x1:
+                            /* 00000000 01010100 01...... ...10001 */
+                            /* ./insns.decode:2331 */
+                            if (trans_x86rcri_h(ctx, &u.f_j_ui4)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x00000012:
+                        /* 00000000 01010100 ........ ...10010 */
+                        decode_extract_j_ui5(ctx, &u.f_j_ui5, insn);
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x1:
+                            /* 00000000 01010100 1....... ...10010 */
+                            /* ./insns.decode:2332 */
+                            if (trans_x86rcri_w(ctx, &u.f_j_ui5)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x00000014:
+                        /* 00000000 01010100 ........ ...10100 */
+                        decode_extract_j_ui3(ctx, &u.f_j_ui3, insn);
+                        switch ((insn >> 13) & 0x7) {
+                        case 0x1:
+                            /* 00000000 01010100 001..... ...10100 */
+                            /* ./insns.decode:2334 */
+                            if (trans_x86rotli_b(ctx, &u.f_j_ui3)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x00000015:
+                        /* 00000000 01010100 ........ ...10101 */
+                        decode_extract_j_ui4(ctx, &u.f_j_ui4, insn);
+                        switch ((insn >> 14) & 0x3) {
+                        case 0x1:
+                            /* 00000000 01010100 01...... ...10101 */
+                            /* ./insns.decode:2335 */
+                            if (trans_x86rotli_h(ctx, &u.f_j_ui4)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x00000016:
+                        /* 00000000 01010100 ........ ...10110 */
+                        decode_extract_j_ui5(ctx, &u.f_j_ui5, insn);
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x1:
+                            /* 00000000 01010100 1....... ...10110 */
+                            /* ./insns.decode:2336 */
+                            if (trans_x86rotli_w(ctx, &u.f_j_ui5)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x00000018:
+                        /* 00000000 01010100 ........ ...11000 */
+                        decode_extract_j_ui3(ctx, &u.f_j_ui3, insn);
+                        switch ((insn >> 13) & 0x7) {
+                        case 0x1:
+                            /* 00000000 01010100 001..... ...11000 */
+                            /* ./insns.decode:2338 */
+                            if (trans_x86rcli_b(ctx, &u.f_j_ui3)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x00000019:
+                        /* 00000000 01010100 ........ ...11001 */
+                        decode_extract_j_ui4(ctx, &u.f_j_ui4, insn);
+                        switch ((insn >> 14) & 0x3) {
+                        case 0x1:
+                            /* 00000000 01010100 01...... ...11001 */
+                            /* ./insns.decode:2339 */
+                            if (trans_x86rcli_h(ctx, &u.f_j_ui4)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x0000001a:
+                        /* 00000000 01010100 ........ ...11010 */
+                        decode_extract_j_ui5(ctx, &u.f_j_ui5, insn);
+                        switch ((insn >> 15) & 0x1) {
+                        case 0x1:
+                            /* 00000000 01010100 1....... ...11010 */
+                            /* ./insns.decode:2340 */
+                            if (trans_x86rcli_w(ctx, &u.f_j_ui5)) return true;
+                            break;
+                        }
+                        break;
+                    case 0x00010003:
+                        /* 00000000 01010101 ........ ...00011 */
+                        /* ./insns.decode:2317 */
+                        decode_extract_j_ui6(ctx, &u.f_j_ui6, insn);
+                        if (trans_x86slli_d(ctx, &u.f_j_ui6)) return true;
+                        break;
+                    case 0x00010007:
+                        /* 00000000 01010101 ........ ...00111 */
+                        /* ./insns.decode:2321 */
+                        decode_extract_j_ui6(ctx, &u.f_j_ui6, insn);
+                        if (trans_x86srli_d(ctx, &u.f_j_ui6)) return true;
+                        break;
+                    case 0x0001000b:
+                        /* 00000000 01010101 ........ ...01011 */
+                        /* ./insns.decode:2325 */
+                        decode_extract_j_ui6(ctx, &u.f_j_ui6, insn);
+                        if (trans_x86srai_d(ctx, &u.f_j_ui6)) return true;
+                        break;
+                    case 0x0001000f:
+                        /* 00000000 01010101 ........ ...01111 */
+                        /* ./insns.decode:2329 */
+                        decode_extract_j_ui6(ctx, &u.f_j_ui6, insn);
+                        if (trans_x86rotri_d(ctx, &u.f_j_ui6)) return true;
+                        break;
+                    case 0x00010013:
+                        /* 00000000 01010101 ........ ...10011 */
+                        /* ./insns.decode:2333 */
+                        decode_extract_j_ui6(ctx, &u.f_j_ui6, insn);
+                        if (trans_x86rcri_d(ctx, &u.f_j_ui6)) return true;
+                        break;
+                    case 0x00010017:
+                        /* 00000000 01010101 ........ ...10111 */
+                        /* ./insns.decode:2337 */
+                        decode_extract_j_ui6(ctx, &u.f_j_ui6, insn);
+                        if (trans_x86rotli_d(ctx, &u.f_j_ui6)) return true;
+                        break;
+                    case 0x0001001b:
+                        /* 00000000 01010101 ........ ...11011 */
+                        /* ./insns.decode:2341 */
+                        decode_extract_j_ui6(ctx, &u.f_j_ui6, insn);
+                        if (trans_x86rcli_d(ctx, &u.f_j_ui6)) return true;
                         break;
                     }
                     break;
-                case 0x9:
-                    /* 00000000 01001001 ........ ........ */
-                    /* ../target/loongarch/insns.decode:171 */
-                    decode_extract_rr_ui6(ctx, &u.f_rr_i, insn);
-                    if (trans_srai_d(ctx, &u.f_rr_i)) return true;
+                case 0x6:
+                    /* 00000000 010110.. ........ ........ */
+                    /* ./insns.decode:2349 */
+                    decode_extract_fmt_rdui8(ctx, &u.f_fmt_rdui8, insn);
+                    if (trans_x86settag(ctx, &u.f_fmt_rdui8)) return true;
                     break;
-                case 0xc:
-                    /* 00000000 01001100 ........ ........ */
-                    decode_extract_rr_ui5(ctx, &u.f_rr_i, insn);
-                    switch ((insn >> 15) & 0x1) {
+                case 0x7:
+                    /* 00000000 010111.. ........ ........ */
+                    decode_extract_d_ui8(ctx, &u.f_d_ui8, insn);
+                    switch ((insn >> 5) & 0x1f) {
+                    case 0x0:
+                        /* 00000000 010111.. ......00 000..... */
+                        /* ./insns.decode:2342 */
+                        if (trans_x86mfflag(ctx, &u.f_d_ui8)) return true;
+                        break;
                     case 0x1:
-                        /* 00000000 01001100 1....... ........ */
-                        /* ../target/loongarch/insns.decode:172 */
-                        if (trans_rotri_w(ctx, &u.f_rr_i)) return true;
+                        /* 00000000 010111.. ......00 001..... */
+                        /* ./insns.decode:2343 */
+                        if (trans_x86mtflag(ctx, &u.f_d_ui8)) return true;
                         break;
                     }
-                    break;
-                case 0xd:
-                    /* 00000000 01001101 ........ ........ */
-                    /* ../target/loongarch/insns.decode:173 */
-                    decode_extract_rr_ui6(ctx, &u.f_rr_i, insn);
-                    if (trans_rotri_d(ctx, &u.f_rr_i)) return true;
                     break;
                 }
                 break;
@@ -4850,12 +6637,12 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 15) & 0x1) {
                 case 0x0:
                     /* 00000000 011..... 0....... ........ */
-                    /* ../target/loongarch/insns.decode:202 */
+                    /* ./insns.decode:249 */
                     if (trans_bstrins_w(ctx, &u.f_rr_ms_ls)) return true;
                     break;
                 case 0x1:
                     /* 00000000 011..... 1....... ........ */
-                    /* ../target/loongarch/insns.decode:203 */
+                    /* ./insns.decode:250 */
                     if (trans_bstrpick_w(ctx, &u.f_rr_ms_ls)) return true;
                     break;
                 }
@@ -4864,13 +6651,13 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             break;
         case 0x2:
             /* 00000000 10...... ........ ........ */
-            /* ../target/loongarch/insns.decode:204 */
+            /* ./insns.decode:251 */
             decode_extract_rr_2bd(ctx, &u.f_rr_ms_ls, insn);
             if (trans_bstrins_d(ctx, &u.f_rr_ms_ls)) return true;
             break;
         case 0x3:
             /* 00000000 11...... ........ ........ */
-            /* ../target/loongarch/insns.decode:205 */
+            /* ./insns.decode:252 */
             decode_extract_rr_2bd(ctx, &u.f_rr_ms_ls, insn);
             if (trans_bstrpick_d(ctx, &u.f_rr_ms_ls)) return true;
             break;
@@ -4879,121 +6666,121 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7f) {
             case 0x1:
                 /* 00000001 00000000 1....... ........ */
-                /* ../target/loongarch/insns.decode:324 */
+                /* ./insns.decode:392 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fadd_s(ctx, &u.f_fff)) return true;
                 break;
             case 0x2:
                 /* 00000001 00000001 0....... ........ */
-                /* ../target/loongarch/insns.decode:325 */
+                /* ./insns.decode:393 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fadd_d(ctx, &u.f_fff)) return true;
                 break;
             case 0x5:
                 /* 00000001 00000010 1....... ........ */
-                /* ../target/loongarch/insns.decode:326 */
+                /* ./insns.decode:394 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fsub_s(ctx, &u.f_fff)) return true;
                 break;
             case 0x6:
                 /* 00000001 00000011 0....... ........ */
-                /* ../target/loongarch/insns.decode:327 */
+                /* ./insns.decode:395 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fsub_d(ctx, &u.f_fff)) return true;
                 break;
             case 0x9:
                 /* 00000001 00000100 1....... ........ */
-                /* ../target/loongarch/insns.decode:328 */
+                /* ./insns.decode:396 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fmul_s(ctx, &u.f_fff)) return true;
                 break;
             case 0xa:
                 /* 00000001 00000101 0....... ........ */
-                /* ../target/loongarch/insns.decode:329 */
+                /* ./insns.decode:397 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fmul_d(ctx, &u.f_fff)) return true;
                 break;
             case 0xd:
                 /* 00000001 00000110 1....... ........ */
-                /* ../target/loongarch/insns.decode:330 */
+                /* ./insns.decode:398 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fdiv_s(ctx, &u.f_fff)) return true;
                 break;
             case 0xe:
                 /* 00000001 00000111 0....... ........ */
-                /* ../target/loongarch/insns.decode:331 */
+                /* ./insns.decode:399 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fdiv_d(ctx, &u.f_fff)) return true;
                 break;
             case 0x11:
                 /* 00000001 00001000 1....... ........ */
-                /* ../target/loongarch/insns.decode:340 */
+                /* ./insns.decode:408 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fmax_s(ctx, &u.f_fff)) return true;
                 break;
             case 0x12:
                 /* 00000001 00001001 0....... ........ */
-                /* ../target/loongarch/insns.decode:341 */
+                /* ./insns.decode:409 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fmax_d(ctx, &u.f_fff)) return true;
                 break;
             case 0x15:
                 /* 00000001 00001010 1....... ........ */
-                /* ../target/loongarch/insns.decode:342 */
+                /* ./insns.decode:410 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fmin_s(ctx, &u.f_fff)) return true;
                 break;
             case 0x16:
                 /* 00000001 00001011 0....... ........ */
-                /* ../target/loongarch/insns.decode:343 */
+                /* ./insns.decode:411 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fmin_d(ctx, &u.f_fff)) return true;
                 break;
             case 0x19:
                 /* 00000001 00001100 1....... ........ */
-                /* ../target/loongarch/insns.decode:344 */
+                /* ./insns.decode:412 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fmaxa_s(ctx, &u.f_fff)) return true;
                 break;
             case 0x1a:
                 /* 00000001 00001101 0....... ........ */
-                /* ../target/loongarch/insns.decode:345 */
+                /* ./insns.decode:413 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fmaxa_d(ctx, &u.f_fff)) return true;
                 break;
             case 0x1d:
                 /* 00000001 00001110 1....... ........ */
-                /* ../target/loongarch/insns.decode:346 */
+                /* ./insns.decode:414 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fmina_s(ctx, &u.f_fff)) return true;
                 break;
             case 0x1e:
                 /* 00000001 00001111 0....... ........ */
-                /* ../target/loongarch/insns.decode:347 */
+                /* ./insns.decode:415 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fmina_d(ctx, &u.f_fff)) return true;
                 break;
             case 0x21:
                 /* 00000001 00010000 1....... ........ */
-                /* ../target/loongarch/insns.decode:358 */
+                /* ./insns.decode:434 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fscaleb_s(ctx, &u.f_fff)) return true;
                 break;
             case 0x22:
                 /* 00000001 00010001 0....... ........ */
-                /* ../target/loongarch/insns.decode:359 */
+                /* ./insns.decode:435 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fscaleb_d(ctx, &u.f_fff)) return true;
                 break;
             case 0x25:
                 /* 00000001 00010010 1....... ........ */
-                /* ../target/loongarch/insns.decode:362 */
+                /* ./insns.decode:438 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fcopysign_s(ctx, &u.f_fff)) return true;
                 break;
             case 0x26:
                 /* 00000001 00010011 0....... ........ */
-                /* ../target/loongarch/insns.decode:363 */
+                /* ./insns.decode:439 */
                 decode_extract_fff(ctx, &u.f_fff, insn);
                 if (trans_fcopysign_d(ctx, &u.f_fff)) return true;
                 break;
@@ -5003,136 +6790,158 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 10) & 0x1f) {
                 case 0x1:
                     /* 00000001 00010100 000001.. ........ */
-                    /* ../target/loongarch/insns.decode:348 */
+                    /* ./insns.decode:420 */
                     if (trans_fabs_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0x2:
                     /* 00000001 00010100 000010.. ........ */
-                    /* ../target/loongarch/insns.decode:349 */
+                    /* ./insns.decode:421 */
                     if (trans_fabs_d(ctx, &u.f_ff)) return true;
                     break;
                 case 0x5:
                     /* 00000001 00010100 000101.. ........ */
-                    /* ../target/loongarch/insns.decode:350 */
+                    /* ./insns.decode:422 */
                     if (trans_fneg_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0x6:
                     /* 00000001 00010100 000110.. ........ */
-                    /* ../target/loongarch/insns.decode:351 */
+                    /* ./insns.decode:423 */
                     if (trans_fneg_d(ctx, &u.f_ff)) return true;
                     break;
                 case 0x9:
                     /* 00000001 00010100 001001.. ........ */
-                    /* ../target/loongarch/insns.decode:360 */
+                    /* ./insns.decode:436 */
                     if (trans_flogb_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0xa:
                     /* 00000001 00010100 001010.. ........ */
-                    /* ../target/loongarch/insns.decode:361 */
+                    /* ./insns.decode:437 */
                     if (trans_flogb_d(ctx, &u.f_ff)) return true;
                     break;
                 case 0xd:
                     /* 00000001 00010100 001101.. ........ */
-                    /* ../target/loongarch/insns.decode:364 */
+                    /* ./insns.decode:440 */
                     if (trans_fclass_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0xe:
                     /* 00000001 00010100 001110.. ........ */
-                    /* ../target/loongarch/insns.decode:365 */
+                    /* ./insns.decode:441 */
                     if (trans_fclass_d(ctx, &u.f_ff)) return true;
                     break;
                 case 0x11:
                     /* 00000001 00010100 010001.. ........ */
-                    /* ../target/loongarch/insns.decode:352 */
+                    /* ./insns.decode:424 */
                     if (trans_fsqrt_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0x12:
                     /* 00000001 00010100 010010.. ........ */
-                    /* ../target/loongarch/insns.decode:353 */
+                    /* ./insns.decode:425 */
                     if (trans_fsqrt_d(ctx, &u.f_ff)) return true;
                     break;
                 case 0x15:
                     /* 00000001 00010100 010101.. ........ */
-                    /* ../target/loongarch/insns.decode:354 */
+                    /* ./insns.decode:426 */
                     if (trans_frecip_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0x16:
                     /* 00000001 00010100 010110.. ........ */
-                    /* ../target/loongarch/insns.decode:355 */
+                    /* ./insns.decode:427 */
                     if (trans_frecip_d(ctx, &u.f_ff)) return true;
                     break;
                 case 0x19:
                     /* 00000001 00010100 011001.. ........ */
-                    /* ../target/loongarch/insns.decode:356 */
+                    /* ./insns.decode:428 */
                     if (trans_frsqrt_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0x1a:
                     /* 00000001 00010100 011010.. ........ */
-                    /* ../target/loongarch/insns.decode:357 */
+                    /* ./insns.decode:429 */
                     if (trans_frsqrt_d(ctx, &u.f_ff)) return true;
+                    break;
+                case 0x1d:
+                    /* 00000001 00010100 011101.. ........ */
+                    /* ./insns.decode:430 */
+                    if (trans_frecipe_s(ctx, &u.f_ff)) return true;
+                    break;
+                case 0x1e:
+                    /* 00000001 00010100 011110.. ........ */
+                    /* ./insns.decode:431 */
+                    if (trans_frecipe_d(ctx, &u.f_ff)) return true;
                     break;
                 }
                 break;
             case 0x29:
                 /* 00000001 00010100 1....... ........ */
                 switch ((insn >> 10) & 0x1f) {
+                case 0x1:
+                    /* 00000001 00010100 100001.. ........ */
+                    /* ./insns.decode:432 */
+                    decode_extract_ff(ctx, &u.f_ff, insn);
+                    if (trans_frsqrte_s(ctx, &u.f_ff)) return true;
+                    break;
+                case 0x2:
+                    /* 00000001 00010100 100010.. ........ */
+                    /* ./insns.decode:433 */
+                    decode_extract_ff(ctx, &u.f_ff, insn);
+                    if (trans_frsqrte_d(ctx, &u.f_ff)) return true;
+                    break;
                 case 0x5:
                     /* 00000001 00010100 100101.. ........ */
-                    /* ../target/loongarch/insns.decode:408 */
+                    /* ./insns.decode:494 */
                     decode_extract_ff(ctx, &u.f_ff, insn);
                     if (trans_fmov_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0x6:
                     /* 00000001 00010100 100110.. ........ */
-                    /* ../target/loongarch/insns.decode:409 */
+                    /* ./insns.decode:495 */
                     decode_extract_ff(ctx, &u.f_ff, insn);
                     if (trans_fmov_d(ctx, &u.f_ff)) return true;
                     break;
                 case 0x9:
                     /* 00000001 00010100 101001.. ........ */
-                    /* ../target/loongarch/insns.decode:411 */
+                    /* ./insns.decode:497 */
                     decode_extract_fr(ctx, &u.f_fr, insn);
                     if (trans_movgr2fr_w(ctx, &u.f_fr)) return true;
                     break;
                 case 0xa:
                     /* 00000001 00010100 101010.. ........ */
-                    /* ../target/loongarch/insns.decode:412 */
+                    /* ./insns.decode:498 */
                     decode_extract_fr(ctx, &u.f_fr, insn);
                     if (trans_movgr2fr_d(ctx, &u.f_fr)) return true;
                     break;
                 case 0xb:
                     /* 00000001 00010100 101011.. ........ */
-                    /* ../target/loongarch/insns.decode:413 */
+                    /* ./insns.decode:499 */
                     decode_extract_fr(ctx, &u.f_fr, insn);
                     if (trans_movgr2frh_w(ctx, &u.f_fr)) return true;
                     break;
                 case 0xd:
                     /* 00000001 00010100 101101.. ........ */
-                    /* ../target/loongarch/insns.decode:414 */
+                    /* ./insns.decode:500 */
                     decode_extract_rf(ctx, &u.f_rf, insn);
                     if (trans_movfr2gr_s(ctx, &u.f_rf)) return true;
                     break;
                 case 0xe:
                     /* 00000001 00010100 101110.. ........ */
-                    /* ../target/loongarch/insns.decode:415 */
+                    /* ./insns.decode:501 */
                     decode_extract_rf(ctx, &u.f_rf, insn);
                     if (trans_movfr2gr_d(ctx, &u.f_rf)) return true;
                     break;
                 case 0xf:
                     /* 00000001 00010100 101111.. ........ */
-                    /* ../target/loongarch/insns.decode:416 */
+                    /* ./insns.decode:502 */
                     decode_extract_rf(ctx, &u.f_rf, insn);
                     if (trans_movfrh2gr_s(ctx, &u.f_rf)) return true;
                     break;
                 case 0x10:
                     /* 00000001 00010100 110000.. ........ */
-                    /* ../target/loongarch/insns.decode:417 */
+                    /* ./insns.decode:503 */
                     decode_extract_fcsrd_r(ctx, &u.f_fcsrd_r, insn);
                     if (trans_movgr2fcsr(ctx, &u.f_fcsrd_r)) return true;
                     break;
                 case 0x12:
                     /* 00000001 00010100 110010.. ........ */
-                    /* ../target/loongarch/insns.decode:418 */
+                    /* ./insns.decode:504 */
                     decode_extract_r_fcsrs(ctx, &u.f_r_fcsrs, insn);
                     if (trans_movfcsr2gr(ctx, &u.f_r_fcsrs)) return true;
                     break;
@@ -5142,7 +6951,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 3) & 0x3) {
                     case 0x0:
                         /* 00000001 00010100 110100.. ...00... */
-                        /* ../target/loongarch/insns.decode:419 */
+                        /* ./insns.decode:505 */
                         if (trans_movfr2cf(ctx, &u.f_cf)) return true;
                         break;
                     }
@@ -5153,7 +6962,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 8) & 0x3) {
                     case 0x0:
                         /* 00000001 00010100 11010100 ........ */
-                        /* ../target/loongarch/insns.decode:420 */
+                        /* ./insns.decode:506 */
                         if (trans_movcf2fr(ctx, &u.f_fc)) return true;
                         break;
                     }
@@ -5164,7 +6973,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 3) & 0x3) {
                     case 0x0:
                         /* 00000001 00010100 110110.. ...00... */
-                        /* ../target/loongarch/insns.decode:421 */
+                        /* ./insns.decode:507 */
                         if (trans_movgr2cf(ctx, &u.f_cr)) return true;
                         break;
                     }
@@ -5175,8 +6984,69 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 8) & 0x3) {
                     case 0x0:
                         /* 00000001 00010100 11011100 ........ */
-                        /* ../target/loongarch/insns.decode:422 */
+                        /* ./insns.decode:508 */
                         if (trans_movcf2gr(ctx, &u.f_rc)) return true;
+                        break;
+                    }
+                    break;
+                case 0x18:
+                    /* 00000001 00010100 111000.. ........ */
+                    /* ./insns.decode:2202 */
+                    decode_extract_ff(ctx, &u.f_ff, insn);
+                    if (trans_fcvt_ld_d(ctx, &u.f_ff)) return true;
+                    break;
+                case 0x19:
+                    /* 00000001 00010100 111001.. ........ */
+                    /* ./insns.decode:2203 */
+                    decode_extract_ff(ctx, &u.f_ff, insn);
+                    if (trans_fcvt_ud_d(ctx, &u.f_ff)) return true;
+                    break;
+                }
+                break;
+            case 0x2a:
+                /* 00000001 00010101 0....... ........ */
+                /* ./insns.decode:2204 */
+                decode_extract_fff(ctx, &u.f_fff, insn);
+                if (trans_fcvt_d_ld(ctx, &u.f_fff)) return true;
+                break;
+            case 0x2b:
+                /* 00000001 00010101 1....... ........ */
+                switch ((insn >> 13) & 0x3) {
+                case 0x1:
+                    /* 00000001 00010101 101..... ........ */
+                    /* ./insns.decode:488 */
+                    decode_extract_f_i8(ctx, &u.f_f_i, insn);
+                    if (trans_fldi_s(ctx, &u.f_f_i)) return true;
+                    break;
+                case 0x2:
+                    /* 00000001 00010101 110..... ........ */
+                    /* ./insns.decode:489 */
+                    decode_extract_f_i8(ctx, &u.f_f_i, insn);
+                    if (trans_fldi_d(ctx, &u.f_f_i)) return true;
+                    break;
+                case 0x3:
+                    /* 00000001 00010101 111..... ........ */
+                    decode_extract_ff(ctx, &u.f_ff, insn);
+                    switch ((insn >> 10) & 0x7) {
+                    case 0x0:
+                        /* 00000001 00010101 111000.. ........ */
+                        /* ./insns.decode:416 */
+                        if (trans_fmaxn_s(ctx, &u.f_ff)) return true;
+                        break;
+                    case 0x1:
+                        /* 00000001 00010101 111001.. ........ */
+                        /* ./insns.decode:417 */
+                        if (trans_fmaxn_d(ctx, &u.f_ff)) return true;
+                        break;
+                    case 0x2:
+                        /* 00000001 00010101 111010.. ........ */
+                        /* ./insns.decode:418 */
+                        if (trans_fminn_s(ctx, &u.f_ff)) return true;
+                        break;
+                    case 0x3:
+                        /* 00000001 00010101 111011.. ........ */
+                        /* ./insns.decode:419 */
+                        if (trans_fminn_d(ctx, &u.f_ff)) return true;
                         break;
                     }
                     break;
@@ -5188,12 +7058,12 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 10) & 0x1f) {
                 case 0x6:
                     /* 00000001 00011001 000110.. ........ */
-                    /* ../target/loongarch/insns.decode:376 */
+                    /* ./insns.decode:452 */
                     if (trans_fcvt_s_d(ctx, &u.f_ff)) return true;
                     break;
                 case 0x9:
                     /* 00000001 00011001 001001.. ........ */
-                    /* ../target/loongarch/insns.decode:377 */
+                    /* ./insns.decode:453 */
                     if (trans_fcvt_d_s(ctx, &u.f_ff)) return true;
                     break;
                 }
@@ -5204,42 +7074,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 10) & 0x1f) {
                 case 0x1:
                     /* 00000001 00011010 000001.. ........ */
-                    /* ../target/loongarch/insns.decode:378 */
+                    /* ./insns.decode:454 */
                     if (trans_ftintrm_w_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0x2:
                     /* 00000001 00011010 000010.. ........ */
-                    /* ../target/loongarch/insns.decode:379 */
+                    /* ./insns.decode:455 */
                     if (trans_ftintrm_w_d(ctx, &u.f_ff)) return true;
                     break;
                 case 0x9:
                     /* 00000001 00011010 001001.. ........ */
-                    /* ../target/loongarch/insns.decode:380 */
+                    /* ./insns.decode:456 */
                     if (trans_ftintrm_l_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0xa:
                     /* 00000001 00011010 001010.. ........ */
-                    /* ../target/loongarch/insns.decode:381 */
+                    /* ./insns.decode:457 */
                     if (trans_ftintrm_l_d(ctx, &u.f_ff)) return true;
                     break;
                 case 0x11:
                     /* 00000001 00011010 010001.. ........ */
-                    /* ../target/loongarch/insns.decode:382 */
+                    /* ./insns.decode:458 */
                     if (trans_ftintrp_w_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0x12:
                     /* 00000001 00011010 010010.. ........ */
-                    /* ../target/loongarch/insns.decode:383 */
+                    /* ./insns.decode:459 */
                     if (trans_ftintrp_w_d(ctx, &u.f_ff)) return true;
                     break;
                 case 0x19:
                     /* 00000001 00011010 011001.. ........ */
-                    /* ../target/loongarch/insns.decode:384 */
+                    /* ./insns.decode:460 */
                     if (trans_ftintrp_l_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0x1a:
                     /* 00000001 00011010 011010.. ........ */
-                    /* ../target/loongarch/insns.decode:385 */
+                    /* ./insns.decode:461 */
                     if (trans_ftintrp_l_d(ctx, &u.f_ff)) return true;
                     break;
                 }
@@ -5250,42 +7120,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 10) & 0x1f) {
                 case 0x1:
                     /* 00000001 00011010 100001.. ........ */
-                    /* ../target/loongarch/insns.decode:386 */
+                    /* ./insns.decode:462 */
                     if (trans_ftintrz_w_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0x2:
                     /* 00000001 00011010 100010.. ........ */
-                    /* ../target/loongarch/insns.decode:387 */
+                    /* ./insns.decode:463 */
                     if (trans_ftintrz_w_d(ctx, &u.f_ff)) return true;
                     break;
                 case 0x9:
                     /* 00000001 00011010 101001.. ........ */
-                    /* ../target/loongarch/insns.decode:388 */
+                    /* ./insns.decode:464 */
                     if (trans_ftintrz_l_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0xa:
                     /* 00000001 00011010 101010.. ........ */
-                    /* ../target/loongarch/insns.decode:389 */
+                    /* ./insns.decode:465 */
                     if (trans_ftintrz_l_d(ctx, &u.f_ff)) return true;
                     break;
                 case 0x11:
                     /* 00000001 00011010 110001.. ........ */
-                    /* ../target/loongarch/insns.decode:390 */
+                    /* ./insns.decode:466 */
                     if (trans_ftintrne_w_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0x12:
                     /* 00000001 00011010 110010.. ........ */
-                    /* ../target/loongarch/insns.decode:391 */
+                    /* ./insns.decode:467 */
                     if (trans_ftintrne_w_d(ctx, &u.f_ff)) return true;
                     break;
                 case 0x19:
                     /* 00000001 00011010 111001.. ........ */
-                    /* ../target/loongarch/insns.decode:392 */
+                    /* ./insns.decode:468 */
                     if (trans_ftintrne_l_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0x1a:
                     /* 00000001 00011010 111010.. ........ */
-                    /* ../target/loongarch/insns.decode:393 */
+                    /* ./insns.decode:469 */
                     if (trans_ftintrne_l_d(ctx, &u.f_ff)) return true;
                     break;
                 }
@@ -5296,22 +7166,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 10) & 0x1f) {
                 case 0x1:
                     /* 00000001 00011011 000001.. ........ */
-                    /* ../target/loongarch/insns.decode:394 */
+                    /* ./insns.decode:470 */
                     if (trans_ftint_w_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0x2:
                     /* 00000001 00011011 000010.. ........ */
-                    /* ../target/loongarch/insns.decode:395 */
+                    /* ./insns.decode:471 */
                     if (trans_ftint_w_d(ctx, &u.f_ff)) return true;
                     break;
                 case 0x9:
                     /* 00000001 00011011 001001.. ........ */
-                    /* ../target/loongarch/insns.decode:396 */
+                    /* ./insns.decode:472 */
                     if (trans_ftint_l_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0xa:
                     /* 00000001 00011011 001010.. ........ */
-                    /* ../target/loongarch/insns.decode:397 */
+                    /* ./insns.decode:473 */
                     if (trans_ftint_l_d(ctx, &u.f_ff)) return true;
                     break;
                 }
@@ -5322,22 +7192,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 10) & 0x1f) {
                 case 0x4:
                     /* 00000001 00011101 000100.. ........ */
-                    /* ../target/loongarch/insns.decode:398 */
+                    /* ./insns.decode:474 */
                     if (trans_ffint_s_w(ctx, &u.f_ff)) return true;
                     break;
                 case 0x6:
                     /* 00000001 00011101 000110.. ........ */
-                    /* ../target/loongarch/insns.decode:399 */
+                    /* ./insns.decode:475 */
                     if (trans_ffint_s_l(ctx, &u.f_ff)) return true;
                     break;
                 case 0x8:
                     /* 00000001 00011101 001000.. ........ */
-                    /* ../target/loongarch/insns.decode:400 */
+                    /* ./insns.decode:476 */
                     if (trans_ffint_d_w(ctx, &u.f_ff)) return true;
                     break;
                 case 0xa:
                     /* 00000001 00011101 001010.. ........ */
-                    /* ../target/loongarch/insns.decode:401 */
+                    /* ./insns.decode:477 */
                     if (trans_ffint_d_l(ctx, &u.f_ff)) return true;
                     break;
                 }
@@ -5346,14 +7216,54 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 /* 00000001 00011110 0....... ........ */
                 decode_extract_ff(ctx, &u.f_ff, insn);
                 switch ((insn >> 10) & 0x1f) {
+                case 0x1:
+                    /* 00000001 00011110 000001.. ........ */
+                    /* ./insns.decode:478 */
+                    if (trans_frintirm_s(ctx, &u.f_ff)) return true;
+                    break;
+                case 0x2:
+                    /* 00000001 00011110 000010.. ........ */
+                    /* ./insns.decode:479 */
+                    if (trans_frintirm_d(ctx, &u.f_ff)) return true;
+                    break;
+                case 0x5:
+                    /* 00000001 00011110 000101.. ........ */
+                    /* ./insns.decode:480 */
+                    if (trans_frintirp_s(ctx, &u.f_ff)) return true;
+                    break;
+                case 0x6:
+                    /* 00000001 00011110 000110.. ........ */
+                    /* ./insns.decode:481 */
+                    if (trans_frintirp_d(ctx, &u.f_ff)) return true;
+                    break;
+                case 0x9:
+                    /* 00000001 00011110 001001.. ........ */
+                    /* ./insns.decode:482 */
+                    if (trans_frintirz_s(ctx, &u.f_ff)) return true;
+                    break;
+                case 0xa:
+                    /* 00000001 00011110 001010.. ........ */
+                    /* ./insns.decode:483 */
+                    if (trans_frintirz_d(ctx, &u.f_ff)) return true;
+                    break;
+                case 0xd:
+                    /* 00000001 00011110 001101.. ........ */
+                    /* ./insns.decode:484 */
+                    if (trans_frintirne_s(ctx, &u.f_ff)) return true;
+                    break;
+                case 0xe:
+                    /* 00000001 00011110 001110.. ........ */
+                    /* ./insns.decode:485 */
+                    if (trans_frintirne_d(ctx, &u.f_ff)) return true;
+                    break;
                 case 0x11:
                     /* 00000001 00011110 010001.. ........ */
-                    /* ../target/loongarch/insns.decode:402 */
+                    /* ./insns.decode:486 */
                     if (trans_frint_s(ctx, &u.f_ff)) return true;
                     break;
                 case 0x12:
                     /* 00000001 00011110 010010.. ........ */
-                    /* ../target/loongarch/insns.decode:403 */
+                    /* ./insns.decode:487 */
                     if (trans_frint_d(ctx, &u.f_ff)) return true;
                     break;
                 }
@@ -5362,49 +7272,49 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             break;
         case 0x8:
             /* 00000010 00...... ........ ........ */
-            /* ../target/loongarch/insns.decode:114 */
+            /* ./insns.decode:146 */
             decode_extract_rr_i12(ctx, &u.f_rr_i, insn);
             if (trans_slti(ctx, &u.f_rr_i)) return true;
             break;
         case 0x9:
             /* 00000010 01...... ........ ........ */
-            /* ../target/loongarch/insns.decode:115 */
+            /* ./insns.decode:147 */
             decode_extract_rr_i12(ctx, &u.f_rr_i, insn);
             if (trans_sltui(ctx, &u.f_rr_i)) return true;
             break;
         case 0xa:
             /* 00000010 10...... ........ ........ */
-            /* ../target/loongarch/insns.decode:148 */
+            /* ./insns.decode:181 */
             decode_extract_rr_i12(ctx, &u.f_rr_i, insn);
             if (trans_addi_w(ctx, &u.f_rr_i)) return true;
             break;
         case 0xb:
             /* 00000010 11...... ........ ........ */
-            /* ../target/loongarch/insns.decode:149 */
+            /* ./insns.decode:182 */
             decode_extract_rr_i12(ctx, &u.f_rr_i, insn);
             if (trans_addi_d(ctx, &u.f_rr_i)) return true;
             break;
         case 0xc:
             /* 00000011 00...... ........ ........ */
-            /* ../target/loongarch/insns.decode:143 */
+            /* ./insns.decode:176 */
             decode_extract_rr_i12(ctx, &u.f_rr_i, insn);
             if (trans_lu52i_d(ctx, &u.f_rr_i)) return true;
             break;
         case 0xd:
             /* 00000011 01...... ........ ........ */
-            /* ../target/loongarch/insns.decode:151 */
+            /* ./insns.decode:184 */
             decode_extract_rr_ui12(ctx, &u.f_rr_i, insn);
             if (trans_andi(ctx, &u.f_rr_i)) return true;
             break;
         case 0xe:
             /* 00000011 10...... ........ ........ */
-            /* ../target/loongarch/insns.decode:152 */
+            /* ./insns.decode:185 */
             decode_extract_rr_ui12(ctx, &u.f_rr_i, insn);
             if (trans_ori(ctx, &u.f_rr_i)) return true;
             break;
         case 0xf:
             /* 00000011 11...... ........ ........ */
-            /* ../target/loongarch/insns.decode:153 */
+            /* ./insns.decode:186 */
             decode_extract_rr_ui12(ctx, &u.f_rr_i, insn);
             if (trans_xori(ctx, &u.f_rr_i)) return true;
             break;
@@ -5417,17 +7327,17 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             /* 00000100 ........ ........ ........ */
             if ((insn & 0x000003e0) == 0x00000000) {
                 /* 00000100 ........ ......00 000..... */
-                /* ../target/loongarch/insns.decode:465 */
+                /* ./insns.decode:551 */
                 decode_extract_r_csr(ctx, &u.f_r_csr, insn);
                 if (trans_csrrd(ctx, &u.f_r_csr)) return true;
             }
             if ((insn & 0x000003e0) == 0x00000020) {
                 /* 00000100 ........ ......00 001..... */
-                /* ../target/loongarch/insns.decode:466 */
+                /* ./insns.decode:552 */
                 decode_extract_r_csr(ctx, &u.f_r_csr, insn);
                 if (trans_csrwr(ctx, &u.f_r_csr)) return true;
             }
-            /* ../target/loongarch/insns.decode:467 */
+            /* ./insns.decode:553 */
             decode_extract_rr_csr(ctx, &u.f_rr_csr, insn);
             if (trans_csrxchg(ctx, &u.f_rr_csr)) return true;
             break;
@@ -5436,7 +7346,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 22) & 0x3) {
             case 0x0:
                 /* 00000110 00...... ........ ........ */
-                /* ../target/loongarch/insns.decode:485 */
+                /* ./insns.decode:571 */
                 decode_extract_cop_r_i(ctx, &u.f_cop_r_i, insn);
                 if (trans_cacop(ctx, &u.f_cop_r_i)) return true;
                 break;
@@ -5445,7 +7355,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 18) & 0xf) {
                 case 0x0:
                     /* 00000110 010000.. ........ ........ */
-                    /* ../target/loongarch/insns.decode:486 */
+                    /* ./insns.decode:572 */
                     decode_extract_rr_ui8(ctx, &u.f_rr_i, insn);
                     if (trans_lddir(ctx, &u.f_rr_i)) return true;
                     break;
@@ -5455,7 +7365,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch (insn & 0x0000001f) {
                     case 0x00000000:
                         /* 00000110 010001.. ........ ...00000 */
-                        /* ../target/loongarch/insns.decode:487 */
+                        /* ./insns.decode:573 */
                         if (trans_ldpte(ctx, &u.f_j_i)) return true;
                         break;
                     }
@@ -5468,49 +7378,49 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 10) & 0x1f) {
                         case 0x0:
                             /* 00000110 01001000 000000.. ........ */
-                            /* ../target/loongarch/insns.decode:470 */
+                            /* ./insns.decode:556 */
                             decode_extract_rr(ctx, &u.f_rr, insn);
                             if (trans_iocsrrd_b(ctx, &u.f_rr)) return true;
                             break;
                         case 0x1:
                             /* 00000110 01001000 000001.. ........ */
-                            /* ../target/loongarch/insns.decode:471 */
+                            /* ./insns.decode:557 */
                             decode_extract_rr(ctx, &u.f_rr, insn);
                             if (trans_iocsrrd_h(ctx, &u.f_rr)) return true;
                             break;
                         case 0x2:
                             /* 00000110 01001000 000010.. ........ */
-                            /* ../target/loongarch/insns.decode:472 */
+                            /* ./insns.decode:558 */
                             decode_extract_rr(ctx, &u.f_rr, insn);
                             if (trans_iocsrrd_w(ctx, &u.f_rr)) return true;
                             break;
                         case 0x3:
                             /* 00000110 01001000 000011.. ........ */
-                            /* ../target/loongarch/insns.decode:473 */
+                            /* ./insns.decode:559 */
                             decode_extract_rr(ctx, &u.f_rr, insn);
                             if (trans_iocsrrd_d(ctx, &u.f_rr)) return true;
                             break;
                         case 0x4:
                             /* 00000110 01001000 000100.. ........ */
-                            /* ../target/loongarch/insns.decode:474 */
+                            /* ./insns.decode:560 */
                             decode_extract_rr(ctx, &u.f_rr, insn);
                             if (trans_iocsrwr_b(ctx, &u.f_rr)) return true;
                             break;
                         case 0x5:
                             /* 00000110 01001000 000101.. ........ */
-                            /* ../target/loongarch/insns.decode:475 */
+                            /* ./insns.decode:561 */
                             decode_extract_rr(ctx, &u.f_rr, insn);
                             if (trans_iocsrwr_h(ctx, &u.f_rr)) return true;
                             break;
                         case 0x6:
                             /* 00000110 01001000 000110.. ........ */
-                            /* ../target/loongarch/insns.decode:476 */
+                            /* ./insns.decode:562 */
                             decode_extract_rr(ctx, &u.f_rr, insn);
                             if (trans_iocsrwr_w(ctx, &u.f_rr)) return true;
                             break;
                         case 0x7:
                             /* 00000110 01001000 000111.. ........ */
-                            /* ../target/loongarch/insns.decode:477 */
+                            /* ./insns.decode:563 */
                             decode_extract_rr(ctx, &u.f_rr, insn);
                             if (trans_iocsrwr_d(ctx, &u.f_rr)) return true;
                             break;
@@ -5520,7 +7430,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                             switch (insn & 0x000003ff) {
                             case 0x00000000:
                                 /* 00000110 01001000 00100000 00000000 */
-                                /* ../target/loongarch/insns.decode:482 */
+                                /* ./insns.decode:568 */
                                 if (trans_tlbclr(ctx, &u.f_empty)) return true;
                                 break;
                             }
@@ -5531,7 +7441,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                             switch (insn & 0x000003ff) {
                             case 0x00000000:
                                 /* 00000110 01001000 00100100 00000000 */
-                                /* ../target/loongarch/insns.decode:483 */
+                                /* ./insns.decode:569 */
                                 if (trans_tlbflush(ctx, &u.f_empty)) return true;
                                 break;
                             }
@@ -5542,7 +7452,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                             switch (insn & 0x000003ff) {
                             case 0x00000000:
                                 /* 00000110 01001000 00101000 00000000 */
-                                /* ../target/loongarch/insns.decode:478 */
+                                /* ./insns.decode:564 */
                                 if (trans_tlbsrch(ctx, &u.f_empty)) return true;
                                 break;
                             }
@@ -5553,7 +7463,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                             switch (insn & 0x000003ff) {
                             case 0x00000000:
                                 /* 00000110 01001000 00101100 00000000 */
-                                /* ../target/loongarch/insns.decode:479 */
+                                /* ./insns.decode:565 */
                                 if (trans_tlbrd(ctx, &u.f_empty)) return true;
                                 break;
                             }
@@ -5564,7 +7474,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                             switch (insn & 0x000003ff) {
                             case 0x00000000:
                                 /* 00000110 01001000 00110000 00000000 */
-                                /* ../target/loongarch/insns.decode:480 */
+                                /* ./insns.decode:566 */
                                 if (trans_tlbwr(ctx, &u.f_empty)) return true;
                                 break;
                             }
@@ -5575,7 +7485,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                             switch (insn & 0x000003ff) {
                             case 0x00000000:
                                 /* 00000110 01001000 00110100 00000000 */
-                                /* ../target/loongarch/insns.decode:481 */
+                                /* ./insns.decode:567 */
                                 if (trans_tlbfill(ctx, &u.f_empty)) return true;
                                 break;
                             }
@@ -5586,7 +7496,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                             switch (insn & 0x000003ff) {
                             case 0x00000000:
                                 /* 00000110 01001000 00111000 00000000 */
-                                /* ../target/loongarch/insns.decode:488 */
+                                /* ./insns.decode:574 */
                                 if (trans_ertn(ctx, &u.f_empty)) return true;
                                 break;
                             }
@@ -5595,13 +7505,13 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         break;
                     case 0x1:
                         /* 00000110 01001000 1....... ........ */
-                        /* ../target/loongarch/insns.decode:489 */
+                        /* ./insns.decode:575 */
                         decode_extract_i15(ctx, &u.f_i, insn);
                         if (trans_idle(ctx, &u.f_i)) return true;
                         break;
                     case 0x3:
                         /* 00000110 01001001 1....... ........ */
-                        /* ../target/loongarch/insns.decode:484 */
+                        /* ./insns.decode:570 */
                         decode_extract_i_rr(ctx, &u.f_i_rr, insn);
                         if (trans_invtlb(ctx, &u.f_i_rr)) return true;
                         break;
@@ -5618,145 +7528,145 @@ static bool decode(DisasContext *ctx, uint32_t insn)
         switch ((insn >> 20) & 0x3f) {
         case 0x1:
             /* 00001000 0001.... ........ ........ */
-            /* ../target/loongarch/insns.decode:332 */
+            /* ./insns.decode:400 */
             decode_extract_ffff(ctx, &u.f_ffff, insn);
             if (trans_fmadd_s(ctx, &u.f_ffff)) return true;
             break;
         case 0x2:
             /* 00001000 0010.... ........ ........ */
-            /* ../target/loongarch/insns.decode:333 */
+            /* ./insns.decode:401 */
             decode_extract_ffff(ctx, &u.f_ffff, insn);
             if (trans_fmadd_d(ctx, &u.f_ffff)) return true;
             break;
         case 0x5:
             /* 00001000 0101.... ........ ........ */
-            /* ../target/loongarch/insns.decode:334 */
+            /* ./insns.decode:402 */
             decode_extract_ffff(ctx, &u.f_ffff, insn);
             if (trans_fmsub_s(ctx, &u.f_ffff)) return true;
             break;
         case 0x6:
             /* 00001000 0110.... ........ ........ */
-            /* ../target/loongarch/insns.decode:335 */
+            /* ./insns.decode:403 */
             decode_extract_ffff(ctx, &u.f_ffff, insn);
             if (trans_fmsub_d(ctx, &u.f_ffff)) return true;
             break;
         case 0x9:
             /* 00001000 1001.... ........ ........ */
-            /* ../target/loongarch/insns.decode:336 */
+            /* ./insns.decode:404 */
             decode_extract_ffff(ctx, &u.f_ffff, insn);
             if (trans_fnmadd_s(ctx, &u.f_ffff)) return true;
             break;
         case 0xa:
             /* 00001000 1010.... ........ ........ */
-            /* ../target/loongarch/insns.decode:337 */
+            /* ./insns.decode:405 */
             decode_extract_ffff(ctx, &u.f_ffff, insn);
             if (trans_fnmadd_d(ctx, &u.f_ffff)) return true;
             break;
         case 0xd:
             /* 00001000 1101.... ........ ........ */
-            /* ../target/loongarch/insns.decode:338 */
+            /* ./insns.decode:406 */
             decode_extract_ffff(ctx, &u.f_ffff, insn);
             if (trans_fnmsub_s(ctx, &u.f_ffff)) return true;
             break;
         case 0xe:
             /* 00001000 1110.... ........ ........ */
-            /* ../target/loongarch/insns.decode:339 */
+            /* ./insns.decode:407 */
             decode_extract_ffff(ctx, &u.f_ffff, insn);
             if (trans_fnmsub_d(ctx, &u.f_ffff)) return true;
             break;
         case 0x11:
             /* 00001001 0001.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1071 */
+            /* ./insns.decode:1157 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_vfmadd_s(ctx, &u.f_vvvv)) return true;
             break;
         case 0x12:
             /* 00001001 0010.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1072 */
+            /* ./insns.decode:1158 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_vfmadd_d(ctx, &u.f_vvvv)) return true;
             break;
         case 0x15:
             /* 00001001 0101.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1073 */
+            /* ./insns.decode:1159 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_vfmsub_s(ctx, &u.f_vvvv)) return true;
             break;
         case 0x16:
             /* 00001001 0110.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1074 */
+            /* ./insns.decode:1160 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_vfmsub_d(ctx, &u.f_vvvv)) return true;
             break;
         case 0x19:
             /* 00001001 1001.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1075 */
+            /* ./insns.decode:1161 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_vfnmadd_s(ctx, &u.f_vvvv)) return true;
             break;
         case 0x1a:
             /* 00001001 1010.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1076 */
+            /* ./insns.decode:1162 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_vfnmadd_d(ctx, &u.f_vvvv)) return true;
             break;
         case 0x1d:
             /* 00001001 1101.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1077 */
+            /* ./insns.decode:1163 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_vfnmsub_s(ctx, &u.f_vvvv)) return true;
             break;
         case 0x1e:
             /* 00001001 1110.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1078 */
+            /* ./insns.decode:1164 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_vfnmsub_d(ctx, &u.f_vvvv)) return true;
             break;
         case 0x21:
             /* 00001010 0001.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1835 */
+            /* ./insns.decode:1937 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_xvfmadd_s(ctx, &u.f_vvvv)) return true;
             break;
         case 0x22:
             /* 00001010 0010.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1836 */
+            /* ./insns.decode:1938 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_xvfmadd_d(ctx, &u.f_vvvv)) return true;
             break;
         case 0x25:
             /* 00001010 0101.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1837 */
+            /* ./insns.decode:1939 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_xvfmsub_s(ctx, &u.f_vvvv)) return true;
             break;
         case 0x26:
             /* 00001010 0110.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1838 */
+            /* ./insns.decode:1940 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_xvfmsub_d(ctx, &u.f_vvvv)) return true;
             break;
         case 0x29:
             /* 00001010 1001.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1839 */
+            /* ./insns.decode:1941 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_xvfnmadd_s(ctx, &u.f_vvvv)) return true;
             break;
         case 0x2a:
             /* 00001010 1010.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1840 */
+            /* ./insns.decode:1942 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_xvfnmadd_d(ctx, &u.f_vvvv)) return true;
             break;
         case 0x2d:
             /* 00001010 1101.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1841 */
+            /* ./insns.decode:1943 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_xvfnmsub_s(ctx, &u.f_vvvv)) return true;
             break;
         case 0x2e:
             /* 00001010 1110.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1842 */
+            /* ./insns.decode:1944 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_xvfnmsub_d(ctx, &u.f_vvvv)) return true;
             break;
@@ -5771,7 +7681,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 3) & 0x3) {
             case 0x0:
                 /* 00001100 0001.... ........ ...00... */
-                /* ../target/loongarch/insns.decode:370 */
+                /* ./insns.decode:446 */
                 if (trans_fcmp_cond_s(ctx, &u.f_cff_fcond)) return true;
                 break;
             }
@@ -5782,32 +7692,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 3) & 0x3) {
             case 0x0:
                 /* 00001100 0010.... ........ ...00... */
-                /* ../target/loongarch/insns.decode:371 */
+                /* ./insns.decode:447 */
                 if (trans_fcmp_cond_d(ctx, &u.f_cff_fcond)) return true;
                 break;
             }
             break;
         case 0x5:
             /* 00001100 0101.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1202 */
+            /* ./insns.decode:1304 */
             decode_extract_vvv_fcond(ctx, &u.f_vvv_fcond, insn);
             if (trans_vfcmp_cond_s(ctx, &u.f_vvv_fcond)) return true;
             break;
         case 0x6:
             /* 00001100 0110.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1203 */
+            /* ./insns.decode:1305 */
             decode_extract_vvv_fcond(ctx, &u.f_vvv_fcond, insn);
             if (trans_vfcmp_cond_d(ctx, &u.f_vvv_fcond)) return true;
             break;
         case 0x9:
             /* 00001100 1001.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1968 */
+            /* ./insns.decode:2086 */
             decode_extract_vvv_fcond(ctx, &u.f_vvv_fcond, insn);
             if (trans_xvfcmp_cond_s(ctx, &u.f_vvv_fcond)) return true;
             break;
         case 0xa:
             /* 00001100 1010.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1969 */
+            /* ./insns.decode:2087 */
             decode_extract_vvv_fcond(ctx, &u.f_vvv_fcond, insn);
             if (trans_xvfcmp_cond_d(ctx, &u.f_vvv_fcond)) return true;
             break;
@@ -5817,32 +7727,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 18) & 0x3) {
             case 0x0:
                 /* 00001101 000000.. ........ ........ */
-                /* ../target/loongarch/insns.decode:410 */
+                /* ./insns.decode:496 */
                 if (trans_fsel(ctx, &u.f_fffc)) return true;
                 break;
             }
             break;
         case 0x11:
             /* 00001101 0001.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1205 */
+            /* ./insns.decode:1307 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_vbitsel_v(ctx, &u.f_vvvv)) return true;
             break;
         case 0x12:
             /* 00001101 0010.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1971 */
+            /* ./insns.decode:2089 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_xvbitsel_v(ctx, &u.f_vvvv)) return true;
             break;
         case 0x15:
             /* 00001101 0101.... ........ ........ */
-            /* ../target/loongarch/insns.decode:1277 */
+            /* ./insns.decode:1379 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_vshuf_b(ctx, &u.f_vvvv)) return true;
             break;
         case 0x16:
             /* 00001101 0110.... ........ ........ */
-            /* ../target/loongarch/insns.decode:2050 */
+            /* ./insns.decode:2168 */
             decode_extract_vvvv(ctx, &u.f_vvvv, insn);
             if (trans_xvshuf_b(ctx, &u.f_vvvv)) return true;
             break;
@@ -5850,7 +7760,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
         break;
     case 0x4:
         /* 000100.. ........ ........ ........ */
-        /* ../target/loongarch/insns.decode:150 */
+        /* ./insns.decode:183 */
         decode_extract_rr_i16(ctx, &u.f_rr_i, insn);
         if (trans_addu16i_d(ctx, &u.f_rr_i)) return true;
         break;
@@ -5860,12 +7770,12 @@ static bool decode(DisasContext *ctx, uint32_t insn)
         switch ((insn >> 25) & 0x1) {
         case 0x0:
             /* 0001010. ........ ........ ........ */
-            /* ../target/loongarch/insns.decode:141 */
+            /* ./insns.decode:174 */
             if (trans_lu12i_w(ctx, &u.f_r_i)) return true;
             break;
         case 0x1:
             /* 0001011. ........ ........ ........ */
-            /* ../target/loongarch/insns.decode:142 */
+            /* ./insns.decode:175 */
             if (trans_lu32i_d(ctx, &u.f_r_i)) return true;
             break;
         }
@@ -5876,12 +7786,12 @@ static bool decode(DisasContext *ctx, uint32_t insn)
         switch ((insn >> 25) & 0x1) {
         case 0x0:
             /* 0001100. ........ ........ ........ */
-            /* ../target/loongarch/insns.decode:144 */
+            /* ./insns.decode:177 */
             if (trans_pcaddi(ctx, &u.f_r_i)) return true;
             break;
         case 0x1:
             /* 0001101. ........ ........ ........ */
-            /* ../target/loongarch/insns.decode:145 */
+            /* ./insns.decode:178 */
             if (trans_pcalau12i(ctx, &u.f_r_i)) return true;
             break;
         }
@@ -5892,12 +7802,12 @@ static bool decode(DisasContext *ctx, uint32_t insn)
         switch ((insn >> 25) & 0x1) {
         case 0x0:
             /* 0001110. ........ ........ ........ */
-            /* ../target/loongarch/insns.decode:146 */
+            /* ./insns.decode:179 */
             if (trans_pcaddu12i(ctx, &u.f_r_i)) return true;
             break;
         case 0x1:
             /* 0001111. ........ ........ ........ */
-            /* ../target/loongarch/insns.decode:147 */
+            /* ./insns.decode:180 */
             if (trans_pcaddu18i(ctx, &u.f_r_i)) return true;
             break;
         }
@@ -5908,22 +7818,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
         switch ((insn >> 24) & 0x3) {
         case 0x0:
             /* 00100000 ........ ........ ........ */
-            /* ../target/loongarch/insns.decode:260 */
+            /* ./insns.decode:307 */
             if (trans_ll_w(ctx, &u.f_rr_i)) return true;
             break;
         case 0x1:
             /* 00100001 ........ ........ ........ */
-            /* ../target/loongarch/insns.decode:261 */
+            /* ./insns.decode:308 */
             if (trans_sc_w(ctx, &u.f_rr_i)) return true;
             break;
         case 0x2:
             /* 00100010 ........ ........ ........ */
-            /* ../target/loongarch/insns.decode:262 */
+            /* ./insns.decode:309 */
             if (trans_ll_d(ctx, &u.f_rr_i)) return true;
             break;
         case 0x3:
             /* 00100011 ........ ........ ........ */
-            /* ../target/loongarch/insns.decode:263 */
+            /* ./insns.decode:310 */
             if (trans_sc_d(ctx, &u.f_rr_i)) return true;
             break;
         }
@@ -5934,22 +7844,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
         switch ((insn >> 24) & 0x3) {
         case 0x0:
             /* 00100100 ........ ........ ........ */
-            /* ../target/loongarch/insns.decode:236 */
+            /* ./insns.decode:283 */
             if (trans_ldptr_w(ctx, &u.f_rr_i)) return true;
             break;
         case 0x1:
             /* 00100101 ........ ........ ........ */
-            /* ../target/loongarch/insns.decode:237 */
+            /* ./insns.decode:284 */
             if (trans_stptr_w(ctx, &u.f_rr_i)) return true;
             break;
         case 0x2:
             /* 00100110 ........ ........ ........ */
-            /* ../target/loongarch/insns.decode:238 */
+            /* ./insns.decode:285 */
             if (trans_ldptr_d(ctx, &u.f_rr_i)) return true;
             break;
         case 0x3:
             /* 00100111 ........ ........ ........ */
-            /* ../target/loongarch/insns.decode:239 */
+            /* ./insns.decode:286 */
             if (trans_stptr_d(ctx, &u.f_rr_i)) return true;
             break;
         }
@@ -5959,97 +7869,97 @@ static bool decode(DisasContext *ctx, uint32_t insn)
         switch ((insn >> 22) & 0xf) {
         case 0x0:
             /* 00101000 00...... ........ ........ */
-            /* ../target/loongarch/insns.decode:210 */
+            /* ./insns.decode:257 */
             decode_extract_rr_i12(ctx, &u.f_rr_i, insn);
             if (trans_ld_b(ctx, &u.f_rr_i)) return true;
             break;
         case 0x1:
             /* 00101000 01...... ........ ........ */
-            /* ../target/loongarch/insns.decode:211 */
+            /* ./insns.decode:258 */
             decode_extract_rr_i12(ctx, &u.f_rr_i, insn);
             if (trans_ld_h(ctx, &u.f_rr_i)) return true;
             break;
         case 0x2:
             /* 00101000 10...... ........ ........ */
-            /* ../target/loongarch/insns.decode:212 */
+            /* ./insns.decode:259 */
             decode_extract_rr_i12(ctx, &u.f_rr_i, insn);
             if (trans_ld_w(ctx, &u.f_rr_i)) return true;
             break;
         case 0x3:
             /* 00101000 11...... ........ ........ */
-            /* ../target/loongarch/insns.decode:213 */
+            /* ./insns.decode:260 */
             decode_extract_rr_i12(ctx, &u.f_rr_i, insn);
             if (trans_ld_d(ctx, &u.f_rr_i)) return true;
             break;
         case 0x4:
             /* 00101001 00...... ........ ........ */
-            /* ../target/loongarch/insns.decode:214 */
+            /* ./insns.decode:261 */
             decode_extract_rr_i12(ctx, &u.f_rr_i, insn);
             if (trans_st_b(ctx, &u.f_rr_i)) return true;
             break;
         case 0x5:
             /* 00101001 01...... ........ ........ */
-            /* ../target/loongarch/insns.decode:215 */
+            /* ./insns.decode:262 */
             decode_extract_rr_i12(ctx, &u.f_rr_i, insn);
             if (trans_st_h(ctx, &u.f_rr_i)) return true;
             break;
         case 0x6:
             /* 00101001 10...... ........ ........ */
-            /* ../target/loongarch/insns.decode:216 */
+            /* ./insns.decode:263 */
             decode_extract_rr_i12(ctx, &u.f_rr_i, insn);
             if (trans_st_w(ctx, &u.f_rr_i)) return true;
             break;
         case 0x7:
             /* 00101001 11...... ........ ........ */
-            /* ../target/loongarch/insns.decode:217 */
+            /* ./insns.decode:264 */
             decode_extract_rr_i12(ctx, &u.f_rr_i, insn);
             if (trans_st_d(ctx, &u.f_rr_i)) return true;
             break;
         case 0x8:
             /* 00101010 00...... ........ ........ */
-            /* ../target/loongarch/insns.decode:218 */
+            /* ./insns.decode:265 */
             decode_extract_rr_i12(ctx, &u.f_rr_i, insn);
             if (trans_ld_bu(ctx, &u.f_rr_i)) return true;
             break;
         case 0x9:
             /* 00101010 01...... ........ ........ */
-            /* ../target/loongarch/insns.decode:219 */
+            /* ./insns.decode:266 */
             decode_extract_rr_i12(ctx, &u.f_rr_i, insn);
             if (trans_ld_hu(ctx, &u.f_rr_i)) return true;
             break;
         case 0xa:
             /* 00101010 10...... ........ ........ */
-            /* ../target/loongarch/insns.decode:220 */
+            /* ./insns.decode:267 */
             decode_extract_rr_i12(ctx, &u.f_rr_i, insn);
             if (trans_ld_wu(ctx, &u.f_rr_i)) return true;
             break;
         case 0xb:
             /* 00101010 11...... ........ ........ */
-            /* ../target/loongarch/insns.decode:232 */
+            /* ./insns.decode:279 */
             decode_extract_hint_r_i12(ctx, &u.f_hint_r_i, insn);
             if (trans_preld(ctx, &u.f_hint_r_i)) return true;
             break;
         case 0xc:
             /* 00101011 00...... ........ ........ */
-            /* ../target/loongarch/insns.decode:427 */
+            /* ./insns.decode:513 */
             decode_extract_fr_i12(ctx, &u.f_fr_i, insn);
             if (trans_fld_s(ctx, &u.f_fr_i)) return true;
             break;
         case 0xd:
             /* 00101011 01...... ........ ........ */
-            /* ../target/loongarch/insns.decode:428 */
+            /* ./insns.decode:514 */
             decode_extract_fr_i12(ctx, &u.f_fr_i, insn);
             if (trans_fst_s(ctx, &u.f_fr_i)) return true;
             break;
         case 0xe:
             /* 00101011 10...... ........ ........ */
-            /* ../target/loongarch/insns.decode:429 */
+            /* ./insns.decode:515 */
             decode_extract_fr_i12(ctx, &u.f_fr_i, insn);
             if (trans_fld_d(ctx, &u.f_fr_i)) return true;
             break;
         case 0xf:
             /* 00101011 11...... ........ ........ */
-            /* ../target/loongarch/insns.decode:430 */
+            /* ./insns.decode:516 */
             decode_extract_fr_i12(ctx, &u.f_fr_i, insn);
             if (trans_fst_d(ctx, &u.f_fr_i)) return true;
             break;
@@ -6061,22 +7971,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
         switch ((insn >> 22) & 0xf) {
         case 0x0:
             /* 00101100 00...... ........ ........ */
-            /* ../target/loongarch/insns.decode:1293 */
+            /* ./insns.decode:1395 */
             if (trans_vld(ctx, &u.f_vr_i)) return true;
             break;
         case 0x1:
             /* 00101100 01...... ........ ........ */
-            /* ../target/loongarch/insns.decode:1294 */
+            /* ./insns.decode:1396 */
             if (trans_vst(ctx, &u.f_vr_i)) return true;
             break;
         case 0x2:
             /* 00101100 10...... ........ ........ */
-            /* ../target/loongarch/insns.decode:2071 */
+            /* ./insns.decode:2189 */
             if (trans_xvld(ctx, &u.f_vr_i)) return true;
             break;
         case 0x3:
             /* 00101100 11...... ........ ........ */
-            /* ../target/loongarch/insns.decode:2072 */
+            /* ./insns.decode:2190 */
             if (trans_xvst(ctx, &u.f_vr_i)) return true;
             break;
         }
@@ -6093,7 +8003,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 19) & 0x3) {
                 case 0x2:
                     /* 00110000 00010... ........ ........ */
-                    /* ../target/loongarch/insns.decode:1298 */
+                    /* ./insns.decode:1400 */
                     if (trans_vldrepl_d(ctx, &u.f_vr_i)) return true;
                     break;
                 }
@@ -6104,14 +8014,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 20) & 0x1) {
                 case 0x0:
                     /* 00110000 0010.... ........ ........ */
-                    /* ../target/loongarch/insns.decode:1299 */
+                    /* ./insns.decode:1401 */
                     if (trans_vldrepl_w(ctx, &u.f_vr_i)) return true;
                     break;
                 }
                 break;
             case 0x2:
                 /* 00110000 010..... ........ ........ */
-                /* ../target/loongarch/insns.decode:1300 */
+                /* ./insns.decode:1402 */
                 decode_extract_vr_i11(ctx, &u.f_vr_i, insn);
                 if (trans_vldrepl_h(ctx, &u.f_vr_i)) return true;
                 break;
@@ -6123,7 +8033,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 22) & 0x1) {
             case 0x0:
                 /* 00110000 10...... ........ ........ */
-                /* ../target/loongarch/insns.decode:1301 */
+                /* ./insns.decode:1403 */
                 if (trans_vldrepl_b(ctx, &u.f_vr_i)) return true;
                 break;
             }
@@ -6137,7 +8047,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 19) & 0x3) {
                 case 0x2:
                     /* 00110001 00010... ........ ........ */
-                    /* ../target/loongarch/insns.decode:1302 */
+                    /* ./insns.decode:1404 */
                     if (trans_vstelm_d(ctx, &u.f_vr_ii)) return true;
                     break;
                 }
@@ -6148,14 +8058,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 20) & 0x1) {
                 case 0x0:
                     /* 00110001 0010.... ........ ........ */
-                    /* ../target/loongarch/insns.decode:1303 */
+                    /* ./insns.decode:1405 */
                     if (trans_vstelm_w(ctx, &u.f_vr_ii)) return true;
                     break;
                 }
                 break;
             case 0x2:
                 /* 00110001 010..... ........ ........ */
-                /* ../target/loongarch/insns.decode:1304 */
+                /* ./insns.decode:1406 */
                 decode_extract_vr_i8i3(ctx, &u.f_vr_ii, insn);
                 if (trans_vstelm_h(ctx, &u.f_vr_ii)) return true;
                 break;
@@ -6167,7 +8077,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 22) & 0x1) {
             case 0x0:
                 /* 00110001 10...... ........ ........ */
-                /* ../target/loongarch/insns.decode:1305 */
+                /* ./insns.decode:1407 */
                 if (trans_vstelm_b(ctx, &u.f_vr_ii)) return true;
                 break;
             }
@@ -6181,7 +8091,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 19) & 0x3) {
                 case 0x2:
                     /* 00110010 00010... ........ ........ */
-                    /* ../target/loongarch/insns.decode:2076 */
+                    /* ./insns.decode:2194 */
                     if (trans_xvldrepl_d(ctx, &u.f_vr_i)) return true;
                     break;
                 }
@@ -6192,14 +8102,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 20) & 0x1) {
                 case 0x0:
                     /* 00110010 0010.... ........ ........ */
-                    /* ../target/loongarch/insns.decode:2077 */
+                    /* ./insns.decode:2195 */
                     if (trans_xvldrepl_w(ctx, &u.f_vr_i)) return true;
                     break;
                 }
                 break;
             case 0x2:
                 /* 00110010 010..... ........ ........ */
-                /* ../target/loongarch/insns.decode:2078 */
+                /* ./insns.decode:2196 */
                 decode_extract_vr_i11(ctx, &u.f_vr_i, insn);
                 if (trans_xvldrepl_h(ctx, &u.f_vr_i)) return true;
                 break;
@@ -6211,7 +8121,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 22) & 0x1) {
             case 0x0:
                 /* 00110010 10...... ........ ........ */
-                /* ../target/loongarch/insns.decode:2079 */
+                /* ./insns.decode:2197 */
                 if (trans_xvldrepl_b(ctx, &u.f_vr_i)) return true;
                 break;
             }
@@ -6228,14 +8138,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 20) & 0x1) {
                     case 0x1:
                         /* 00110011 0001.... ........ ........ */
-                        /* ../target/loongarch/insns.decode:2080 */
+                        /* ./insns.decode:2198 */
                         if (trans_xvstelm_d(ctx, &u.f_vr_ii)) return true;
                         break;
                     }
                     break;
                 case 0x1:
                     /* 00110011 001..... ........ ........ */
-                    /* ../target/loongarch/insns.decode:2081 */
+                    /* ./insns.decode:2199 */
                     decode_extract_vr_i8i3x(ctx, &u.f_vr_ii, insn);
                     if (trans_xvstelm_w(ctx, &u.f_vr_ii)) return true;
                     break;
@@ -6243,7 +8153,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 00110011 01...... ........ ........ */
-                /* ../target/loongarch/insns.decode:2082 */
+                /* ./insns.decode:2200 */
                 decode_extract_vr_i8i4x(ctx, &u.f_vr_ii, insn);
                 if (trans_xvstelm_h(ctx, &u.f_vr_ii)) return true;
                 break;
@@ -6251,7 +8161,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             break;
         case 0x7:
             /* 00110011 1....... ........ ........ */
-            /* ../target/loongarch/insns.decode:2083 */
+            /* ./insns.decode:2201 */
             decode_extract_vr_i8i5x(ctx, &u.f_vr_ii, insn);
             if (trans_xvstelm_b(ctx, &u.f_vr_ii)) return true;
             break;
@@ -6262,493 +8172,621 @@ static bool decode(DisasContext *ctx, uint32_t insn)
         switch ((insn >> 15) & 0x7ff) {
         case 0x0:
             /* 00111000 00000000 0....... ........ */
-            /* ../target/loongarch/insns.decode:221 */
+            /* ./insns.decode:268 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ldx_b(ctx, &u.f_rrr)) return true;
             break;
         case 0x8:
             /* 00111000 00000100 0....... ........ */
-            /* ../target/loongarch/insns.decode:222 */
+            /* ./insns.decode:269 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ldx_h(ctx, &u.f_rrr)) return true;
             break;
         case 0x10:
             /* 00111000 00001000 0....... ........ */
-            /* ../target/loongarch/insns.decode:223 */
+            /* ./insns.decode:270 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ldx_w(ctx, &u.f_rrr)) return true;
             break;
         case 0x18:
             /* 00111000 00001100 0....... ........ */
-            /* ../target/loongarch/insns.decode:224 */
+            /* ./insns.decode:271 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ldx_d(ctx, &u.f_rrr)) return true;
             break;
         case 0x20:
             /* 00111000 00010000 0....... ........ */
-            /* ../target/loongarch/insns.decode:225 */
+            /* ./insns.decode:272 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_stx_b(ctx, &u.f_rrr)) return true;
             break;
         case 0x28:
             /* 00111000 00010100 0....... ........ */
-            /* ../target/loongarch/insns.decode:226 */
+            /* ./insns.decode:273 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_stx_h(ctx, &u.f_rrr)) return true;
             break;
         case 0x30:
             /* 00111000 00011000 0....... ........ */
-            /* ../target/loongarch/insns.decode:227 */
+            /* ./insns.decode:274 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_stx_w(ctx, &u.f_rrr)) return true;
             break;
         case 0x38:
             /* 00111000 00011100 0....... ........ */
-            /* ../target/loongarch/insns.decode:228 */
+            /* ./insns.decode:275 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_stx_d(ctx, &u.f_rrr)) return true;
             break;
         case 0x40:
             /* 00111000 00100000 0....... ........ */
-            /* ../target/loongarch/insns.decode:229 */
+            /* ./insns.decode:276 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ldx_bu(ctx, &u.f_rrr)) return true;
             break;
         case 0x48:
             /* 00111000 00100100 0....... ........ */
-            /* ../target/loongarch/insns.decode:230 */
+            /* ./insns.decode:277 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ldx_hu(ctx, &u.f_rrr)) return true;
             break;
         case 0x50:
             /* 00111000 00101000 0....... ........ */
-            /* ../target/loongarch/insns.decode:231 */
+            /* ./insns.decode:278 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ldx_wu(ctx, &u.f_rrr)) return true;
             break;
         case 0x58:
             /* 00111000 00101100 0....... ........ */
-            /* ../target/loongarch/insns.decode:233 */
+            /* ./insns.decode:280 */
             decode_extract_hint_rr(ctx, &u.f_hint_rr, insn);
             if (trans_preldx(ctx, &u.f_hint_rr)) return true;
             break;
         case 0x60:
             /* 00111000 00110000 0....... ........ */
-            /* ../target/loongarch/insns.decode:431 */
+            /* ./insns.decode:517 */
             decode_extract_frr(ctx, &u.f_frr, insn);
             if (trans_fldx_s(ctx, &u.f_frr)) return true;
             break;
         case 0x68:
             /* 00111000 00110100 0....... ........ */
-            /* ../target/loongarch/insns.decode:432 */
+            /* ./insns.decode:518 */
             decode_extract_frr(ctx, &u.f_frr, insn);
             if (trans_fldx_d(ctx, &u.f_frr)) return true;
             break;
         case 0x70:
             /* 00111000 00111000 0....... ........ */
-            /* ../target/loongarch/insns.decode:433 */
+            /* ./insns.decode:519 */
             decode_extract_frr(ctx, &u.f_frr, insn);
             if (trans_fstx_s(ctx, &u.f_frr)) return true;
             break;
         case 0x78:
             /* 00111000 00111100 0....... ........ */
-            /* ../target/loongarch/insns.decode:434 */
+            /* ./insns.decode:520 */
             decode_extract_frr(ctx, &u.f_frr, insn);
             if (trans_fstx_d(ctx, &u.f_frr)) return true;
             break;
         case 0x80:
             /* 00111000 01000000 0....... ........ */
-            /* ../target/loongarch/insns.decode:1295 */
+            /* ./insns.decode:1397 */
             decode_extract_vrr(ctx, &u.f_vrr, insn);
             if (trans_vldx(ctx, &u.f_vrr)) return true;
             break;
         case 0x88:
             /* 00111000 01000100 0....... ........ */
-            /* ../target/loongarch/insns.decode:1296 */
+            /* ./insns.decode:1398 */
             decode_extract_vrr(ctx, &u.f_vrr, insn);
             if (trans_vstx(ctx, &u.f_vrr)) return true;
             break;
         case 0x90:
             /* 00111000 01001000 0....... ........ */
-            /* ../target/loongarch/insns.decode:2073 */
+            /* ./insns.decode:2191 */
             decode_extract_vrr(ctx, &u.f_vrr, insn);
             if (trans_xvldx(ctx, &u.f_vrr)) return true;
             break;
         case 0x98:
             /* 00111000 01001100 0....... ........ */
-            /* ../target/loongarch/insns.decode:2074 */
+            /* ./insns.decode:2192 */
             decode_extract_vrr(ctx, &u.f_vrr, insn);
             if (trans_xvstx(ctx, &u.f_vrr)) return true;
             break;
+        case 0xae:
+            /* 00111000 01010111 0....... ........ */
+            /* ./insns.decode:367 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_sc_q(ctx, &u.f_rrr)) return true;
+            break;
+        case 0xaf:
+            /* 00111000 01010111 1....... ........ */
+            decode_extract_rr(ctx, &u.f_rr, insn);
+            switch ((insn >> 10) & 0x1f) {
+            case 0x0:
+                /* 00111000 01010111 100000.. ........ */
+                /* ./insns.decode:311 */
+                if (trans_llacq_w(ctx, &u.f_rr)) return true;
+                break;
+            case 0x1:
+                /* 00111000 01010111 100001.. ........ */
+                /* ./insns.decode:312 */
+                if (trans_screl_w(ctx, &u.f_rr)) return true;
+                break;
+            case 0x2:
+                /* 00111000 01010111 100010.. ........ */
+                /* ./insns.decode:313 */
+                if (trans_llacq_d(ctx, &u.f_rr)) return true;
+                break;
+            case 0x3:
+                /* 00111000 01010111 100011.. ........ */
+                /* ./insns.decode:314 */
+                if (trans_screl_d(ctx, &u.f_rr)) return true;
+                break;
+            }
+            break;
+        case 0xb0:
+            /* 00111000 01011000 0....... ........ */
+            /* ./insns.decode:315 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_amcas_b(ctx, &u.f_rrr)) return true;
+            break;
+        case 0xb1:
+            /* 00111000 01011000 1....... ........ */
+            /* ./insns.decode:316 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_amcas_h(ctx, &u.f_rrr)) return true;
+            break;
+        case 0xb2:
+            /* 00111000 01011001 0....... ........ */
+            /* ./insns.decode:317 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_amcas_w(ctx, &u.f_rrr)) return true;
+            break;
+        case 0xb3:
+            /* 00111000 01011001 1....... ........ */
+            /* ./insns.decode:318 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_amcas_d(ctx, &u.f_rrr)) return true;
+            break;
+        case 0xb4:
+            /* 00111000 01011010 0....... ........ */
+            /* ./insns.decode:319 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_amcas_db_b(ctx, &u.f_rrr)) return true;
+            break;
+        case 0xb5:
+            /* 00111000 01011010 1....... ........ */
+            /* ./insns.decode:320 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_amcas_db_h(ctx, &u.f_rrr)) return true;
+            break;
+        case 0xb6:
+            /* 00111000 01011011 0....... ........ */
+            /* ./insns.decode:321 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_amcas_db_w(ctx, &u.f_rrr)) return true;
+            break;
+        case 0xb7:
+            /* 00111000 01011011 1....... ........ */
+            /* ./insns.decode:322 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_amcas_db_d(ctx, &u.f_rrr)) return true;
+            break;
+        case 0xb8:
+            /* 00111000 01011100 0....... ........ */
+            /* ./insns.decode:323 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_amswap_b(ctx, &u.f_rrr)) return true;
+            break;
+        case 0xb9:
+            /* 00111000 01011100 1....... ........ */
+            /* ./insns.decode:324 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_amswap_h(ctx, &u.f_rrr)) return true;
+            break;
+        case 0xba:
+            /* 00111000 01011101 0....... ........ */
+            /* ./insns.decode:325 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_amadd_b(ctx, &u.f_rrr)) return true;
+            break;
+        case 0xbb:
+            /* 00111000 01011101 1....... ........ */
+            /* ./insns.decode:326 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_amadd_h(ctx, &u.f_rrr)) return true;
+            break;
+        case 0xbc:
+            /* 00111000 01011110 0....... ........ */
+            /* ./insns.decode:327 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_amswap_db_b(ctx, &u.f_rrr)) return true;
+            break;
+        case 0xbd:
+            /* 00111000 01011110 1....... ........ */
+            /* ./insns.decode:328 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_amswap_db_h(ctx, &u.f_rrr)) return true;
+            break;
+        case 0xbe:
+            /* 00111000 01011111 0....... ........ */
+            /* ./insns.decode:329 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_amadd_db_b(ctx, &u.f_rrr)) return true;
+            break;
+        case 0xbf:
+            /* 00111000 01011111 1....... ........ */
+            /* ./insns.decode:330 */
+            decode_extract_rrr(ctx, &u.f_rrr, insn);
+            if (trans_amadd_db_h(ctx, &u.f_rrr)) return true;
+            break;
         case 0xc0:
             /* 00111000 01100000 0....... ........ */
-            /* ../target/loongarch/insns.decode:264 */
+            /* ./insns.decode:331 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amswap_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xc1:
             /* 00111000 01100000 1....... ........ */
-            /* ../target/loongarch/insns.decode:265 */
+            /* ./insns.decode:332 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amswap_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xc2:
             /* 00111000 01100001 0....... ........ */
-            /* ../target/loongarch/insns.decode:266 */
+            /* ./insns.decode:333 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amadd_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xc3:
             /* 00111000 01100001 1....... ........ */
-            /* ../target/loongarch/insns.decode:267 */
+            /* ./insns.decode:334 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amadd_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xc4:
             /* 00111000 01100010 0....... ........ */
-            /* ../target/loongarch/insns.decode:268 */
+            /* ./insns.decode:335 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amand_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xc5:
             /* 00111000 01100010 1....... ........ */
-            /* ../target/loongarch/insns.decode:269 */
+            /* ./insns.decode:336 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amand_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xc6:
             /* 00111000 01100011 0....... ........ */
-            /* ../target/loongarch/insns.decode:270 */
+            /* ./insns.decode:337 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amor_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xc7:
             /* 00111000 01100011 1....... ........ */
-            /* ../target/loongarch/insns.decode:271 */
+            /* ./insns.decode:338 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amor_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xc8:
             /* 00111000 01100100 0....... ........ */
-            /* ../target/loongarch/insns.decode:272 */
+            /* ./insns.decode:339 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amxor_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xc9:
             /* 00111000 01100100 1....... ........ */
-            /* ../target/loongarch/insns.decode:273 */
+            /* ./insns.decode:340 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amxor_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xca:
             /* 00111000 01100101 0....... ........ */
-            /* ../target/loongarch/insns.decode:274 */
+            /* ./insns.decode:341 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ammax_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xcb:
             /* 00111000 01100101 1....... ........ */
-            /* ../target/loongarch/insns.decode:275 */
+            /* ./insns.decode:342 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ammax_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xcc:
             /* 00111000 01100110 0....... ........ */
-            /* ../target/loongarch/insns.decode:276 */
+            /* ./insns.decode:343 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ammin_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xcd:
             /* 00111000 01100110 1....... ........ */
-            /* ../target/loongarch/insns.decode:277 */
+            /* ./insns.decode:344 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ammin_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xce:
             /* 00111000 01100111 0....... ........ */
-            /* ../target/loongarch/insns.decode:278 */
+            /* ./insns.decode:345 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ammax_wu(ctx, &u.f_rrr)) return true;
             break;
         case 0xcf:
             /* 00111000 01100111 1....... ........ */
-            /* ../target/loongarch/insns.decode:279 */
+            /* ./insns.decode:346 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ammax_du(ctx, &u.f_rrr)) return true;
             break;
         case 0xd0:
             /* 00111000 01101000 0....... ........ */
-            /* ../target/loongarch/insns.decode:280 */
+            /* ./insns.decode:347 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ammin_wu(ctx, &u.f_rrr)) return true;
             break;
         case 0xd1:
             /* 00111000 01101000 1....... ........ */
-            /* ../target/loongarch/insns.decode:281 */
+            /* ./insns.decode:348 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ammin_du(ctx, &u.f_rrr)) return true;
             break;
         case 0xd2:
             /* 00111000 01101001 0....... ........ */
-            /* ../target/loongarch/insns.decode:282 */
+            /* ./insns.decode:349 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amswap_db_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xd3:
             /* 00111000 01101001 1....... ........ */
-            /* ../target/loongarch/insns.decode:283 */
+            /* ./insns.decode:350 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amswap_db_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xd4:
             /* 00111000 01101010 0....... ........ */
-            /* ../target/loongarch/insns.decode:284 */
+            /* ./insns.decode:351 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amadd_db_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xd5:
             /* 00111000 01101010 1....... ........ */
-            /* ../target/loongarch/insns.decode:285 */
+            /* ./insns.decode:352 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amadd_db_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xd6:
             /* 00111000 01101011 0....... ........ */
-            /* ../target/loongarch/insns.decode:286 */
+            /* ./insns.decode:353 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amand_db_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xd7:
             /* 00111000 01101011 1....... ........ */
-            /* ../target/loongarch/insns.decode:287 */
+            /* ./insns.decode:354 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amand_db_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xd8:
             /* 00111000 01101100 0....... ........ */
-            /* ../target/loongarch/insns.decode:288 */
+            /* ./insns.decode:355 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amor_db_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xd9:
             /* 00111000 01101100 1....... ........ */
-            /* ../target/loongarch/insns.decode:289 */
+            /* ./insns.decode:356 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amor_db_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xda:
             /* 00111000 01101101 0....... ........ */
-            /* ../target/loongarch/insns.decode:290 */
+            /* ./insns.decode:357 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amxor_db_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xdb:
             /* 00111000 01101101 1....... ........ */
-            /* ../target/loongarch/insns.decode:291 */
+            /* ./insns.decode:358 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_amxor_db_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xdc:
             /* 00111000 01101110 0....... ........ */
-            /* ../target/loongarch/insns.decode:292 */
+            /* ./insns.decode:359 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ammax_db_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xdd:
             /* 00111000 01101110 1....... ........ */
-            /* ../target/loongarch/insns.decode:293 */
+            /* ./insns.decode:360 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ammax_db_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xde:
             /* 00111000 01101111 0....... ........ */
-            /* ../target/loongarch/insns.decode:294 */
+            /* ./insns.decode:361 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ammin_db_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xdf:
             /* 00111000 01101111 1....... ........ */
-            /* ../target/loongarch/insns.decode:295 */
+            /* ./insns.decode:362 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ammin_db_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xe0:
             /* 00111000 01110000 0....... ........ */
-            /* ../target/loongarch/insns.decode:296 */
+            /* ./insns.decode:363 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ammax_db_wu(ctx, &u.f_rrr)) return true;
             break;
         case 0xe1:
             /* 00111000 01110000 1....... ........ */
-            /* ../target/loongarch/insns.decode:297 */
+            /* ./insns.decode:364 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ammax_db_du(ctx, &u.f_rrr)) return true;
             break;
         case 0xe2:
             /* 00111000 01110001 0....... ........ */
-            /* ../target/loongarch/insns.decode:298 */
+            /* ./insns.decode:365 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ammin_db_wu(ctx, &u.f_rrr)) return true;
             break;
         case 0xe3:
             /* 00111000 01110001 1....... ........ */
-            /* ../target/loongarch/insns.decode:299 */
+            /* ./insns.decode:366 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ammin_db_du(ctx, &u.f_rrr)) return true;
             break;
         case 0xe4:
             /* 00111000 01110010 0....... ........ */
-            /* ../target/loongarch/insns.decode:234 */
+            /* ./insns.decode:281 */
             decode_extract_i15(ctx, &u.f_i, insn);
             if (trans_dbar(ctx, &u.f_i)) return true;
             break;
         case 0xe5:
             /* 00111000 01110010 1....... ........ */
-            /* ../target/loongarch/insns.decode:235 */
+            /* ./insns.decode:282 */
             decode_extract_i15(ctx, &u.f_i, insn);
             if (trans_ibar(ctx, &u.f_i)) return true;
             break;
         case 0xe8:
             /* 00111000 01110100 0....... ........ */
-            /* ../target/loongarch/insns.decode:435 */
+            /* ./insns.decode:521 */
             decode_extract_frr(ctx, &u.f_frr, insn);
             if (trans_fldgt_s(ctx, &u.f_frr)) return true;
             break;
         case 0xe9:
             /* 00111000 01110100 1....... ........ */
-            /* ../target/loongarch/insns.decode:436 */
+            /* ./insns.decode:522 */
             decode_extract_frr(ctx, &u.f_frr, insn);
             if (trans_fldgt_d(ctx, &u.f_frr)) return true;
             break;
         case 0xea:
             /* 00111000 01110101 0....... ........ */
-            /* ../target/loongarch/insns.decode:437 */
+            /* ./insns.decode:523 */
             decode_extract_frr(ctx, &u.f_frr, insn);
             if (trans_fldle_s(ctx, &u.f_frr)) return true;
             break;
         case 0xeb:
             /* 00111000 01110101 1....... ........ */
-            /* ../target/loongarch/insns.decode:438 */
+            /* ./insns.decode:524 */
             decode_extract_frr(ctx, &u.f_frr, insn);
             if (trans_fldle_d(ctx, &u.f_frr)) return true;
             break;
         case 0xec:
             /* 00111000 01110110 0....... ........ */
-            /* ../target/loongarch/insns.decode:439 */
+            /* ./insns.decode:525 */
             decode_extract_frr(ctx, &u.f_frr, insn);
             if (trans_fstgt_s(ctx, &u.f_frr)) return true;
             break;
         case 0xed:
             /* 00111000 01110110 1....... ........ */
-            /* ../target/loongarch/insns.decode:440 */
+            /* ./insns.decode:526 */
             decode_extract_frr(ctx, &u.f_frr, insn);
             if (trans_fstgt_d(ctx, &u.f_frr)) return true;
             break;
         case 0xee:
             /* 00111000 01110111 0....... ........ */
-            /* ../target/loongarch/insns.decode:441 */
+            /* ./insns.decode:527 */
             decode_extract_frr(ctx, &u.f_frr, insn);
             if (trans_fstle_s(ctx, &u.f_frr)) return true;
             break;
         case 0xef:
             /* 00111000 01110111 1....... ........ */
-            /* ../target/loongarch/insns.decode:442 */
+            /* ./insns.decode:528 */
             decode_extract_frr(ctx, &u.f_frr, insn);
             if (trans_fstle_d(ctx, &u.f_frr)) return true;
             break;
         case 0xf0:
             /* 00111000 01111000 0....... ........ */
-            /* ../target/loongarch/insns.decode:240 */
+            /* ./insns.decode:287 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ldgt_b(ctx, &u.f_rrr)) return true;
             break;
         case 0xf1:
             /* 00111000 01111000 1....... ........ */
-            /* ../target/loongarch/insns.decode:241 */
+            /* ./insns.decode:288 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ldgt_h(ctx, &u.f_rrr)) return true;
             break;
         case 0xf2:
             /* 00111000 01111001 0....... ........ */
-            /* ../target/loongarch/insns.decode:242 */
+            /* ./insns.decode:289 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ldgt_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xf3:
             /* 00111000 01111001 1....... ........ */
-            /* ../target/loongarch/insns.decode:243 */
+            /* ./insns.decode:290 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ldgt_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xf4:
             /* 00111000 01111010 0....... ........ */
-            /* ../target/loongarch/insns.decode:244 */
+            /* ./insns.decode:291 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ldle_b(ctx, &u.f_rrr)) return true;
             break;
         case 0xf5:
             /* 00111000 01111010 1....... ........ */
-            /* ../target/loongarch/insns.decode:245 */
+            /* ./insns.decode:292 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ldle_h(ctx, &u.f_rrr)) return true;
             break;
         case 0xf6:
             /* 00111000 01111011 0....... ........ */
-            /* ../target/loongarch/insns.decode:246 */
+            /* ./insns.decode:293 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ldle_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xf7:
             /* 00111000 01111011 1....... ........ */
-            /* ../target/loongarch/insns.decode:247 */
+            /* ./insns.decode:294 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_ldle_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xf8:
             /* 00111000 01111100 0....... ........ */
-            /* ../target/loongarch/insns.decode:248 */
+            /* ./insns.decode:295 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_stgt_b(ctx, &u.f_rrr)) return true;
             break;
         case 0xf9:
             /* 00111000 01111100 1....... ........ */
-            /* ../target/loongarch/insns.decode:249 */
+            /* ./insns.decode:296 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_stgt_h(ctx, &u.f_rrr)) return true;
             break;
         case 0xfa:
             /* 00111000 01111101 0....... ........ */
-            /* ../target/loongarch/insns.decode:250 */
+            /* ./insns.decode:297 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_stgt_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xfb:
             /* 00111000 01111101 1....... ........ */
-            /* ../target/loongarch/insns.decode:251 */
+            /* ./insns.decode:298 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_stgt_d(ctx, &u.f_rrr)) return true;
             break;
         case 0xfc:
             /* 00111000 01111110 0....... ........ */
-            /* ../target/loongarch/insns.decode:252 */
+            /* ./insns.decode:299 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_stle_b(ctx, &u.f_rrr)) return true;
             break;
         case 0xfd:
             /* 00111000 01111110 1....... ........ */
-            /* ../target/loongarch/insns.decode:253 */
+            /* ./insns.decode:300 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_stle_h(ctx, &u.f_rrr)) return true;
             break;
         case 0xfe:
             /* 00111000 01111111 0....... ........ */
-            /* ../target/loongarch/insns.decode:254 */
+            /* ./insns.decode:301 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_stle_w(ctx, &u.f_rrr)) return true;
             break;
         case 0xff:
             /* 00111000 01111111 1....... ........ */
-            /* ../target/loongarch/insns.decode:255 */
+            /* ./insns.decode:302 */
             decode_extract_rrr(ctx, &u.f_rrr, insn);
             if (trans_stle_d(ctx, &u.f_rrr)) return true;
             break;
@@ -6756,83 +8794,106 @@ static bool decode(DisasContext *ctx, uint32_t insn)
         break;
     case 0x10:
         /* 010000.. ........ ........ ........ */
-        /* ../target/loongarch/insns.decode:447 */
+        /* ./insns.decode:533 */
         decode_extract_r_offs21(ctx, &u.f_r_offs, insn);
         if (trans_beqz(ctx, &u.f_r_offs)) return true;
         break;
     case 0x11:
         /* 010001.. ........ ........ ........ */
-        /* ../target/loongarch/insns.decode:448 */
+        /* ./insns.decode:534 */
         decode_extract_r_offs21(ctx, &u.f_r_offs, insn);
         if (trans_bnez(ctx, &u.f_r_offs)) return true;
         break;
     case 0x12:
         /* 010010.. ........ ........ ........ */
-        decode_extract_c_offs21(ctx, &u.f_c_offs, insn);
         switch ((insn >> 8) & 0x3) {
         case 0x0:
             /* 010010.. ........ ......00 ........ */
-            /* ../target/loongarch/insns.decode:449 */
+            /* ./insns.decode:535 */
+            decode_extract_c_offs21(ctx, &u.f_c_offs, insn);
             if (trans_bceqz(ctx, &u.f_c_offs)) return true;
             break;
         case 0x1:
             /* 010010.. ........ ......01 ........ */
-            /* ../target/loongarch/insns.decode:450 */
+            /* ./insns.decode:536 */
+            decode_extract_c_offs21(ctx, &u.f_c_offs, insn);
             if (trans_bcnez(ctx, &u.f_c_offs)) return true;
+            break;
+        case 0x2:
+            /* 010010.. ........ ......10 ........ */
+            decode_extract_fmt_offs21(ctx, &u.f_fmt_offs21, insn);
+            switch ((insn >> 5) & 0x7) {
+            case 0x0:
+                /* 010010.. ........ ......10 000..... */
+                /* ./insns.decode:2344 */
+                if (trans_jiscr0(ctx, &u.f_fmt_offs21)) return true;
+                break;
+            }
+            break;
+        case 0x3:
+            /* 010010.. ........ ......11 ........ */
+            decode_extract_fmt_offs21(ctx, &u.f_fmt_offs21, insn);
+            switch ((insn >> 5) & 0x7) {
+            case 0x0:
+                /* 010010.. ........ ......11 000..... */
+                /* ./insns.decode:2345 */
+                if (trans_jiscr1(ctx, &u.f_fmt_offs21)) return true;
+                break;
+            }
             break;
         }
         break;
     case 0x13:
         /* 010011.. ........ ........ ........ */
-        /* ../target/loongarch/insns.decode:451 */
+        /* ./insns.decode:537 */
         decode_extract_rr_i16s2(ctx, &u.f_rr_i, insn);
         if (trans_jirl(ctx, &u.f_rr_i)) return true;
         break;
     case 0x14:
         /* 010100.. ........ ........ ........ */
-        /* ../target/loongarch/insns.decode:452 */
+        /* ./insns.decode:538 */
         decode_extract_offs26(ctx, &u.f_offs, insn);
         if (trans_b(ctx, &u.f_offs)) return true;
         break;
     case 0x15:
         /* 010101.. ........ ........ ........ */
-        /* ../target/loongarch/insns.decode:453 */
+        /* ./insns.decode:539 */
         decode_extract_offs26(ctx, &u.f_offs, insn);
         if (trans_bl(ctx, &u.f_offs)) return true;
         break;
     case 0x16:
         /* 010110.. ........ ........ ........ */
-        /* ../target/loongarch/insns.decode:454 */
+        /* ./insns.decode:540 */
         decode_extract_rr_offs16(ctx, &u.f_rr_offs, insn);
         if (trans_beq(ctx, &u.f_rr_offs)) return true;
         break;
     case 0x17:
         /* 010111.. ........ ........ ........ */
-        /* ../target/loongarch/insns.decode:455 */
+        /* ./insns.decode:541 */
         decode_extract_rr_offs16(ctx, &u.f_rr_offs, insn);
         if (trans_bne(ctx, &u.f_rr_offs)) return true;
         break;
     case 0x18:
         /* 011000.. ........ ........ ........ */
-        /* ../target/loongarch/insns.decode:456 */
+        /* ./insns.decode:542 */
         decode_extract_rr_offs16(ctx, &u.f_rr_offs, insn);
         if (trans_blt(ctx, &u.f_rr_offs)) return true;
         break;
     case 0x19:
         /* 011001.. ........ ........ ........ */
-        /* ../target/loongarch/insns.decode:457 */
+        /* ./insns.decode:543 */
         decode_extract_rr_offs16(ctx, &u.f_rr_offs, insn);
         if (trans_bge(ctx, &u.f_rr_offs)) return true;
         break;
     case 0x1a:
         /* 011010.. ........ ........ ........ */
-        /* ../target/loongarch/insns.decode:458 */
+        /* ./insns.decode:544 */
         decode_extract_rr_offs16(ctx, &u.f_rr_offs, insn);
         if (trans_bltu(ctx, &u.f_rr_offs)) return true;
         break;
     case 0x1b:
         /* 011011.. ........ ........ ........ */
-        /* ../target/loongarch/insns.decode:459 */
+        /* ./insns.decode:545 */
         decode_extract_rr_offs16(ctx, &u.f_rr_offs, insn);
         if (trans_bgeu(ctx, &u.f_rr_offs)) return true;
         break;
@@ -6845,42 +8906,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 00000000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1159 */
+                /* ./insns.decode:1261 */
                 if (trans_vseq_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 00000000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1160 */
+                /* ./insns.decode:1262 */
                 if (trans_vseq_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 00000001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1161 */
+                /* ./insns.decode:1263 */
                 if (trans_vseq_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 00000001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1162 */
+                /* ./insns.decode:1264 */
                 if (trans_vseq_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 00000010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1168 */
+                /* ./insns.decode:1270 */
                 if (trans_vsle_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 00000010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1169 */
+                /* ./insns.decode:1271 */
                 if (trans_vsle_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 00000011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1170 */
+                /* ./insns.decode:1272 */
                 if (trans_vsle_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 00000011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1171 */
+                /* ./insns.decode:1273 */
                 if (trans_vsle_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -6891,42 +8952,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 00000100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1176 */
+                /* ./insns.decode:1278 */
                 if (trans_vsle_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 00000100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1177 */
+                /* ./insns.decode:1279 */
                 if (trans_vsle_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 00000101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1178 */
+                /* ./insns.decode:1280 */
                 if (trans_vsle_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 00000101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1179 */
+                /* ./insns.decode:1281 */
                 if (trans_vsle_du(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 00000110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1185 */
+                /* ./insns.decode:1287 */
                 if (trans_vslt_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 00000110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1186 */
+                /* ./insns.decode:1288 */
                 if (trans_vslt_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 00000111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1187 */
+                /* ./insns.decode:1289 */
                 if (trans_vslt_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 00000111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1188 */
+                /* ./insns.decode:1290 */
                 if (trans_vslt_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -6937,42 +8998,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 00001000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1193 */
+                /* ./insns.decode:1295 */
                 if (trans_vslt_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 00001000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1194 */
+                /* ./insns.decode:1296 */
                 if (trans_vslt_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 00001001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1195 */
+                /* ./insns.decode:1297 */
                 if (trans_vslt_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 00001001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1196 */
+                /* ./insns.decode:1298 */
                 if (trans_vslt_du(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 00001010 0....... ........ */
-                /* ../target/loongarch/insns.decode:563 */
+                /* ./insns.decode:649 */
                 if (trans_vadd_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 00001010 1....... ........ */
-                /* ../target/loongarch/insns.decode:564 */
+                /* ./insns.decode:650 */
                 if (trans_vadd_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 00001011 0....... ........ */
-                /* ../target/loongarch/insns.decode:565 */
+                /* ./insns.decode:651 */
                 if (trans_vadd_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 00001011 1....... ........ */
-                /* ../target/loongarch/insns.decode:566 */
+                /* ./insns.decode:652 */
                 if (trans_vadd_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -6983,22 +9044,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 00001100 0....... ........ */
-                /* ../target/loongarch/insns.decode:568 */
+                /* ./insns.decode:654 */
                 if (trans_vsub_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 00001100 1....... ........ */
-                /* ../target/loongarch/insns.decode:569 */
+                /* ./insns.decode:655 */
                 if (trans_vsub_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 00001101 0....... ........ */
-                /* ../target/loongarch/insns.decode:570 */
+                /* ./insns.decode:656 */
                 if (trans_vsub_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 00001101 1....... ........ */
-                /* ../target/loongarch/insns.decode:571 */
+                /* ./insns.decode:657 */
                 if (trans_vsub_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7009,22 +9070,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x4:
                 /* 01110000 00011110 0....... ........ */
-                /* ../target/loongarch/insns.decode:622 */
+                /* ./insns.decode:708 */
                 if (trans_vaddwev_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 00011110 1....... ........ */
-                /* ../target/loongarch/insns.decode:623 */
+                /* ./insns.decode:709 */
                 if (trans_vaddwev_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 00011111 0....... ........ */
-                /* ../target/loongarch/insns.decode:624 */
+                /* ./insns.decode:710 */
                 if (trans_vaddwev_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 00011111 1....... ........ */
-                /* ../target/loongarch/insns.decode:625 */
+                /* ./insns.decode:711 */
                 if (trans_vaddwev_q_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7035,42 +9096,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 00100000 0....... ........ */
-                /* ../target/loongarch/insns.decode:630 */
+                /* ./insns.decode:716 */
                 if (trans_vsubwev_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 00100000 1....... ........ */
-                /* ../target/loongarch/insns.decode:631 */
+                /* ./insns.decode:717 */
                 if (trans_vsubwev_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 00100001 0....... ........ */
-                /* ../target/loongarch/insns.decode:632 */
+                /* ./insns.decode:718 */
                 if (trans_vsubwev_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 00100001 1....... ........ */
-                /* ../target/loongarch/insns.decode:633 */
+                /* ./insns.decode:719 */
                 if (trans_vsubwev_q_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 00100010 0....... ........ */
-                /* ../target/loongarch/insns.decode:626 */
+                /* ./insns.decode:712 */
                 if (trans_vaddwod_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 00100010 1....... ........ */
-                /* ../target/loongarch/insns.decode:627 */
+                /* ./insns.decode:713 */
                 if (trans_vaddwod_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 00100011 0....... ........ */
-                /* ../target/loongarch/insns.decode:628 */
+                /* ./insns.decode:714 */
                 if (trans_vaddwod_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 00100011 1....... ........ */
-                /* ../target/loongarch/insns.decode:629 */
+                /* ./insns.decode:715 */
                 if (trans_vaddwod_q_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7081,22 +9142,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 00100100 0....... ........ */
-                /* ../target/loongarch/insns.decode:634 */
+                /* ./insns.decode:720 */
                 if (trans_vsubwod_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 00100100 1....... ........ */
-                /* ../target/loongarch/insns.decode:635 */
+                /* ./insns.decode:721 */
                 if (trans_vsubwod_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 00100101 0....... ........ */
-                /* ../target/loongarch/insns.decode:636 */
+                /* ./insns.decode:722 */
                 if (trans_vsubwod_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 00100101 1....... ........ */
-                /* ../target/loongarch/insns.decode:637 */
+                /* ./insns.decode:723 */
                 if (trans_vsubwod_q_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7107,22 +9168,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x4:
                 /* 01110000 00101110 0....... ........ */
-                /* ../target/loongarch/insns.decode:639 */
+                /* ./insns.decode:725 */
                 if (trans_vaddwev_h_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 00101110 1....... ........ */
-                /* ../target/loongarch/insns.decode:640 */
+                /* ./insns.decode:726 */
                 if (trans_vaddwev_w_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 00101111 0....... ........ */
-                /* ../target/loongarch/insns.decode:641 */
+                /* ./insns.decode:727 */
                 if (trans_vaddwev_d_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 00101111 1....... ........ */
-                /* ../target/loongarch/insns.decode:642 */
+                /* ./insns.decode:728 */
                 if (trans_vaddwev_q_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7133,42 +9194,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 00110000 0....... ........ */
-                /* ../target/loongarch/insns.decode:647 */
+                /* ./insns.decode:733 */
                 if (trans_vsubwev_h_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 00110000 1....... ........ */
-                /* ../target/loongarch/insns.decode:648 */
+                /* ./insns.decode:734 */
                 if (trans_vsubwev_w_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 00110001 0....... ........ */
-                /* ../target/loongarch/insns.decode:649 */
+                /* ./insns.decode:735 */
                 if (trans_vsubwev_d_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 00110001 1....... ........ */
-                /* ../target/loongarch/insns.decode:650 */
+                /* ./insns.decode:736 */
                 if (trans_vsubwev_q_du(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 00110010 0....... ........ */
-                /* ../target/loongarch/insns.decode:643 */
+                /* ./insns.decode:729 */
                 if (trans_vaddwod_h_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 00110010 1....... ........ */
-                /* ../target/loongarch/insns.decode:644 */
+                /* ./insns.decode:730 */
                 if (trans_vaddwod_w_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 00110011 0....... ........ */
-                /* ../target/loongarch/insns.decode:645 */
+                /* ./insns.decode:731 */
                 if (trans_vaddwod_d_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 00110011 1....... ........ */
-                /* ../target/loongarch/insns.decode:646 */
+                /* ./insns.decode:732 */
                 if (trans_vaddwod_q_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7179,22 +9240,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 00110100 0....... ........ */
-                /* ../target/loongarch/insns.decode:651 */
+                /* ./insns.decode:737 */
                 if (trans_vsubwod_h_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 00110100 1....... ........ */
-                /* ../target/loongarch/insns.decode:652 */
+                /* ./insns.decode:738 */
                 if (trans_vsubwod_w_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 00110101 0....... ........ */
-                /* ../target/loongarch/insns.decode:653 */
+                /* ./insns.decode:739 */
                 if (trans_vsubwod_d_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 00110101 1....... ........ */
-                /* ../target/loongarch/insns.decode:654 */
+                /* ./insns.decode:740 */
                 if (trans_vsubwod_q_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7205,22 +9266,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x4:
                 /* 01110000 00111110 0....... ........ */
-                /* ../target/loongarch/insns.decode:656 */
+                /* ./insns.decode:742 */
                 if (trans_vaddwev_h_bu_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 00111110 1....... ........ */
-                /* ../target/loongarch/insns.decode:657 */
+                /* ./insns.decode:743 */
                 if (trans_vaddwev_w_hu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 00111111 0....... ........ */
-                /* ../target/loongarch/insns.decode:658 */
+                /* ./insns.decode:744 */
                 if (trans_vaddwev_d_wu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 00111111 1....... ........ */
-                /* ../target/loongarch/insns.decode:659 */
+                /* ./insns.decode:745 */
                 if (trans_vaddwev_q_du_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7231,22 +9292,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 01000000 0....... ........ */
-                /* ../target/loongarch/insns.decode:660 */
+                /* ./insns.decode:746 */
                 if (trans_vaddwod_h_bu_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 01000000 1....... ........ */
-                /* ../target/loongarch/insns.decode:661 */
+                /* ./insns.decode:747 */
                 if (trans_vaddwod_w_hu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 01000001 0....... ........ */
-                /* ../target/loongarch/insns.decode:662 */
+                /* ./insns.decode:748 */
                 if (trans_vaddwod_d_wu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 01000001 1....... ........ */
-                /* ../target/loongarch/insns.decode:663 */
+                /* ./insns.decode:749 */
                 if (trans_vaddwod_q_du_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7257,22 +9318,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x4:
                 /* 01110000 01000110 0....... ........ */
-                /* ../target/loongarch/insns.decode:588 */
+                /* ./insns.decode:674 */
                 if (trans_vsadd_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 01000110 1....... ........ */
-                /* ../target/loongarch/insns.decode:589 */
+                /* ./insns.decode:675 */
                 if (trans_vsadd_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 01000111 0....... ........ */
-                /* ../target/loongarch/insns.decode:590 */
+                /* ./insns.decode:676 */
                 if (trans_vsadd_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 01000111 1....... ........ */
-                /* ../target/loongarch/insns.decode:591 */
+                /* ./insns.decode:677 */
                 if (trans_vsadd_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7283,42 +9344,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 01001000 0....... ........ */
-                /* ../target/loongarch/insns.decode:596 */
+                /* ./insns.decode:682 */
                 if (trans_vssub_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 01001000 1....... ........ */
-                /* ../target/loongarch/insns.decode:597 */
+                /* ./insns.decode:683 */
                 if (trans_vssub_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 01001001 0....... ........ */
-                /* ../target/loongarch/insns.decode:598 */
+                /* ./insns.decode:684 */
                 if (trans_vssub_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 01001001 1....... ........ */
-                /* ../target/loongarch/insns.decode:599 */
+                /* ./insns.decode:685 */
                 if (trans_vssub_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 01001010 0....... ........ */
-                /* ../target/loongarch/insns.decode:592 */
+                /* ./insns.decode:678 */
                 if (trans_vsadd_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 01001010 1....... ........ */
-                /* ../target/loongarch/insns.decode:593 */
+                /* ./insns.decode:679 */
                 if (trans_vsadd_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 01001011 0....... ........ */
-                /* ../target/loongarch/insns.decode:594 */
+                /* ./insns.decode:680 */
                 if (trans_vsadd_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 01001011 1....... ........ */
-                /* ../target/loongarch/insns.decode:595 */
+                /* ./insns.decode:681 */
                 if (trans_vsadd_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7329,22 +9390,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 01001100 0....... ........ */
-                /* ../target/loongarch/insns.decode:600 */
+                /* ./insns.decode:686 */
                 if (trans_vssub_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 01001100 1....... ........ */
-                /* ../target/loongarch/insns.decode:601 */
+                /* ./insns.decode:687 */
                 if (trans_vssub_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 01001101 0....... ........ */
-                /* ../target/loongarch/insns.decode:602 */
+                /* ./insns.decode:688 */
                 if (trans_vssub_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 01001101 1....... ........ */
-                /* ../target/loongarch/insns.decode:603 */
+                /* ./insns.decode:689 */
                 if (trans_vssub_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7355,42 +9416,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 01010100 0....... ........ */
-                /* ../target/loongarch/insns.decode:605 */
+                /* ./insns.decode:691 */
                 if (trans_vhaddw_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 01010100 1....... ........ */
-                /* ../target/loongarch/insns.decode:606 */
+                /* ./insns.decode:692 */
                 if (trans_vhaddw_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 01010101 0....... ........ */
-                /* ../target/loongarch/insns.decode:607 */
+                /* ./insns.decode:693 */
                 if (trans_vhaddw_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 01010101 1....... ........ */
-                /* ../target/loongarch/insns.decode:608 */
+                /* ./insns.decode:694 */
                 if (trans_vhaddw_q_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 01010110 0....... ........ */
-                /* ../target/loongarch/insns.decode:613 */
+                /* ./insns.decode:699 */
                 if (trans_vhsubw_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 01010110 1....... ........ */
-                /* ../target/loongarch/insns.decode:614 */
+                /* ./insns.decode:700 */
                 if (trans_vhsubw_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 01010111 0....... ........ */
-                /* ../target/loongarch/insns.decode:615 */
+                /* ./insns.decode:701 */
                 if (trans_vhsubw_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 01010111 1....... ........ */
-                /* ../target/loongarch/insns.decode:616 */
+                /* ./insns.decode:702 */
                 if (trans_vhsubw_q_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7401,42 +9462,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 01011000 0....... ........ */
-                /* ../target/loongarch/insns.decode:609 */
+                /* ./insns.decode:695 */
                 if (trans_vhaddw_hu_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 01011000 1....... ........ */
-                /* ../target/loongarch/insns.decode:610 */
+                /* ./insns.decode:696 */
                 if (trans_vhaddw_wu_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 01011001 0....... ........ */
-                /* ../target/loongarch/insns.decode:611 */
+                /* ./insns.decode:697 */
                 if (trans_vhaddw_du_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 01011001 1....... ........ */
-                /* ../target/loongarch/insns.decode:612 */
+                /* ./insns.decode:698 */
                 if (trans_vhaddw_qu_du(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 01011010 0....... ........ */
-                /* ../target/loongarch/insns.decode:617 */
+                /* ./insns.decode:703 */
                 if (trans_vhsubw_hu_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 01011010 1....... ........ */
-                /* ../target/loongarch/insns.decode:618 */
+                /* ./insns.decode:704 */
                 if (trans_vhsubw_wu_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 01011011 0....... ........ */
-                /* ../target/loongarch/insns.decode:619 */
+                /* ./insns.decode:705 */
                 if (trans_vhsubw_du_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 01011011 1....... ........ */
-                /* ../target/loongarch/insns.decode:620 */
+                /* ./insns.decode:706 */
                 if (trans_vhsubw_qu_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7447,22 +9508,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 01011100 0....... ........ */
-                /* ../target/loongarch/insns.decode:691 */
+                /* ./insns.decode:777 */
                 if (trans_vadda_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 01011100 1....... ........ */
-                /* ../target/loongarch/insns.decode:692 */
+                /* ./insns.decode:778 */
                 if (trans_vadda_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 01011101 0....... ........ */
-                /* ../target/loongarch/insns.decode:693 */
+                /* ./insns.decode:779 */
                 if (trans_vadda_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 01011101 1....... ........ */
-                /* ../target/loongarch/insns.decode:694 */
+                /* ./insns.decode:780 */
                 if (trans_vadda_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7473,42 +9534,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 01100000 0....... ........ */
-                /* ../target/loongarch/insns.decode:682 */
+                /* ./insns.decode:768 */
                 if (trans_vabsd_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 01100000 1....... ........ */
-                /* ../target/loongarch/insns.decode:683 */
+                /* ./insns.decode:769 */
                 if (trans_vabsd_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 01100001 0....... ........ */
-                /* ../target/loongarch/insns.decode:684 */
+                /* ./insns.decode:770 */
                 if (trans_vabsd_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 01100001 1....... ........ */
-                /* ../target/loongarch/insns.decode:685 */
+                /* ./insns.decode:771 */
                 if (trans_vabsd_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 01100010 0....... ........ */
-                /* ../target/loongarch/insns.decode:686 */
+                /* ./insns.decode:772 */
                 if (trans_vabsd_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 01100010 1....... ........ */
-                /* ../target/loongarch/insns.decode:687 */
+                /* ./insns.decode:773 */
                 if (trans_vabsd_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 01100011 0....... ........ */
-                /* ../target/loongarch/insns.decode:688 */
+                /* ./insns.decode:774 */
                 if (trans_vabsd_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 01100011 1....... ........ */
-                /* ../target/loongarch/insns.decode:689 */
+                /* ./insns.decode:775 */
                 if (trans_vabsd_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7519,42 +9580,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 01100100 0....... ........ */
-                /* ../target/loongarch/insns.decode:665 */
+                /* ./insns.decode:751 */
                 if (trans_vavg_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 01100100 1....... ........ */
-                /* ../target/loongarch/insns.decode:666 */
+                /* ./insns.decode:752 */
                 if (trans_vavg_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 01100101 0....... ........ */
-                /* ../target/loongarch/insns.decode:667 */
+                /* ./insns.decode:753 */
                 if (trans_vavg_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 01100101 1....... ........ */
-                /* ../target/loongarch/insns.decode:668 */
+                /* ./insns.decode:754 */
                 if (trans_vavg_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 01100110 0....... ........ */
-                /* ../target/loongarch/insns.decode:669 */
+                /* ./insns.decode:755 */
                 if (trans_vavg_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 01100110 1....... ........ */
-                /* ../target/loongarch/insns.decode:670 */
+                /* ./insns.decode:756 */
                 if (trans_vavg_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 01100111 0....... ........ */
-                /* ../target/loongarch/insns.decode:671 */
+                /* ./insns.decode:757 */
                 if (trans_vavg_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 01100111 1....... ........ */
-                /* ../target/loongarch/insns.decode:672 */
+                /* ./insns.decode:758 */
                 if (trans_vavg_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7565,42 +9626,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 01101000 0....... ........ */
-                /* ../target/loongarch/insns.decode:673 */
+                /* ./insns.decode:759 */
                 if (trans_vavgr_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 01101000 1....... ........ */
-                /* ../target/loongarch/insns.decode:674 */
+                /* ./insns.decode:760 */
                 if (trans_vavgr_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 01101001 0....... ........ */
-                /* ../target/loongarch/insns.decode:675 */
+                /* ./insns.decode:761 */
                 if (trans_vavgr_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 01101001 1....... ........ */
-                /* ../target/loongarch/insns.decode:676 */
+                /* ./insns.decode:762 */
                 if (trans_vavgr_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 01101010 0....... ........ */
-                /* ../target/loongarch/insns.decode:677 */
+                /* ./insns.decode:763 */
                 if (trans_vavgr_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 01101010 1....... ........ */
-                /* ../target/loongarch/insns.decode:678 */
+                /* ./insns.decode:764 */
                 if (trans_vavgr_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 01101011 0....... ........ */
-                /* ../target/loongarch/insns.decode:679 */
+                /* ./insns.decode:765 */
                 if (trans_vavgr_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 01101011 1....... ........ */
-                /* ../target/loongarch/insns.decode:680 */
+                /* ./insns.decode:766 */
                 if (trans_vavgr_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7611,42 +9672,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 01110000 0....... ........ */
-                /* ../target/loongarch/insns.decode:696 */
+                /* ./insns.decode:782 */
                 if (trans_vmax_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 01110000 1....... ........ */
-                /* ../target/loongarch/insns.decode:697 */
+                /* ./insns.decode:783 */
                 if (trans_vmax_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 01110001 0....... ........ */
-                /* ../target/loongarch/insns.decode:698 */
+                /* ./insns.decode:784 */
                 if (trans_vmax_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 01110001 1....... ........ */
-                /* ../target/loongarch/insns.decode:699 */
+                /* ./insns.decode:785 */
                 if (trans_vmax_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 01110010 0....... ........ */
-                /* ../target/loongarch/insns.decode:713 */
+                /* ./insns.decode:799 */
                 if (trans_vmin_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 01110010 1....... ........ */
-                /* ../target/loongarch/insns.decode:714 */
+                /* ./insns.decode:800 */
                 if (trans_vmin_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 01110011 0....... ........ */
-                /* ../target/loongarch/insns.decode:715 */
+                /* ./insns.decode:801 */
                 if (trans_vmin_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 01110011 1....... ........ */
-                /* ../target/loongarch/insns.decode:716 */
+                /* ./insns.decode:802 */
                 if (trans_vmin_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7657,42 +9718,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 01110100 0....... ........ */
-                /* ../target/loongarch/insns.decode:704 */
+                /* ./insns.decode:790 */
                 if (trans_vmax_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 01110100 1....... ........ */
-                /* ../target/loongarch/insns.decode:705 */
+                /* ./insns.decode:791 */
                 if (trans_vmax_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 01110101 0....... ........ */
-                /* ../target/loongarch/insns.decode:706 */
+                /* ./insns.decode:792 */
                 if (trans_vmax_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 01110101 1....... ........ */
-                /* ../target/loongarch/insns.decode:707 */
+                /* ./insns.decode:793 */
                 if (trans_vmax_du(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 01110110 0....... ........ */
-                /* ../target/loongarch/insns.decode:721 */
+                /* ./insns.decode:807 */
                 if (trans_vmin_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 01110110 1....... ........ */
-                /* ../target/loongarch/insns.decode:722 */
+                /* ./insns.decode:808 */
                 if (trans_vmin_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 01110111 0....... ........ */
-                /* ../target/loongarch/insns.decode:723 */
+                /* ./insns.decode:809 */
                 if (trans_vmin_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 01110111 1....... ........ */
-                /* ../target/loongarch/insns.decode:724 */
+                /* ./insns.decode:810 */
                 if (trans_vmin_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7703,42 +9764,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 10000100 0....... ........ */
-                /* ../target/loongarch/insns.decode:730 */
+                /* ./insns.decode:816 */
                 if (trans_vmul_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 10000100 1....... ........ */
-                /* ../target/loongarch/insns.decode:731 */
+                /* ./insns.decode:817 */
                 if (trans_vmul_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 10000101 0....... ........ */
-                /* ../target/loongarch/insns.decode:732 */
+                /* ./insns.decode:818 */
                 if (trans_vmul_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 10000101 1....... ........ */
-                /* ../target/loongarch/insns.decode:733 */
+                /* ./insns.decode:819 */
                 if (trans_vmul_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 10000110 0....... ........ */
-                /* ../target/loongarch/insns.decode:734 */
+                /* ./insns.decode:820 */
                 if (trans_vmuh_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 10000110 1....... ........ */
-                /* ../target/loongarch/insns.decode:735 */
+                /* ./insns.decode:821 */
                 if (trans_vmuh_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 10000111 0....... ........ */
-                /* ../target/loongarch/insns.decode:736 */
+                /* ./insns.decode:822 */
                 if (trans_vmuh_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 10000111 1....... ........ */
-                /* ../target/loongarch/insns.decode:737 */
+                /* ./insns.decode:823 */
                 if (trans_vmuh_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7749,22 +9810,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 10001000 0....... ........ */
-                /* ../target/loongarch/insns.decode:738 */
+                /* ./insns.decode:824 */
                 if (trans_vmuh_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 10001000 1....... ........ */
-                /* ../target/loongarch/insns.decode:739 */
+                /* ./insns.decode:825 */
                 if (trans_vmuh_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 10001001 0....... ........ */
-                /* ../target/loongarch/insns.decode:740 */
+                /* ./insns.decode:826 */
                 if (trans_vmuh_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 10001001 1....... ........ */
-                /* ../target/loongarch/insns.decode:741 */
+                /* ./insns.decode:827 */
                 if (trans_vmuh_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7775,42 +9836,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 10010000 0....... ........ */
-                /* ../target/loongarch/insns.decode:743 */
+                /* ./insns.decode:829 */
                 if (trans_vmulwev_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 10010000 1....... ........ */
-                /* ../target/loongarch/insns.decode:744 */
+                /* ./insns.decode:830 */
                 if (trans_vmulwev_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 10010001 0....... ........ */
-                /* ../target/loongarch/insns.decode:745 */
+                /* ./insns.decode:831 */
                 if (trans_vmulwev_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 10010001 1....... ........ */
-                /* ../target/loongarch/insns.decode:746 */
+                /* ./insns.decode:832 */
                 if (trans_vmulwev_q_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 10010010 0....... ........ */
-                /* ../target/loongarch/insns.decode:747 */
+                /* ./insns.decode:833 */
                 if (trans_vmulwod_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 10010010 1....... ........ */
-                /* ../target/loongarch/insns.decode:748 */
+                /* ./insns.decode:834 */
                 if (trans_vmulwod_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 10010011 0....... ........ */
-                /* ../target/loongarch/insns.decode:749 */
+                /* ./insns.decode:835 */
                 if (trans_vmulwod_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 10010011 1....... ........ */
-                /* ../target/loongarch/insns.decode:750 */
+                /* ./insns.decode:836 */
                 if (trans_vmulwod_q_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7821,42 +9882,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 10011000 0....... ........ */
-                /* ../target/loongarch/insns.decode:751 */
+                /* ./insns.decode:837 */
                 if (trans_vmulwev_h_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 10011000 1....... ........ */
-                /* ../target/loongarch/insns.decode:752 */
+                /* ./insns.decode:838 */
                 if (trans_vmulwev_w_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 10011001 0....... ........ */
-                /* ../target/loongarch/insns.decode:753 */
+                /* ./insns.decode:839 */
                 if (trans_vmulwev_d_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 10011001 1....... ........ */
-                /* ../target/loongarch/insns.decode:754 */
+                /* ./insns.decode:840 */
                 if (trans_vmulwev_q_du(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 10011010 0....... ........ */
-                /* ../target/loongarch/insns.decode:755 */
+                /* ./insns.decode:841 */
                 if (trans_vmulwod_h_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 10011010 1....... ........ */
-                /* ../target/loongarch/insns.decode:756 */
+                /* ./insns.decode:842 */
                 if (trans_vmulwod_w_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 10011011 0....... ........ */
-                /* ../target/loongarch/insns.decode:757 */
+                /* ./insns.decode:843 */
                 if (trans_vmulwod_d_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 10011011 1....... ........ */
-                /* ../target/loongarch/insns.decode:758 */
+                /* ./insns.decode:844 */
                 if (trans_vmulwod_q_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7867,42 +9928,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 10100000 0....... ........ */
-                /* ../target/loongarch/insns.decode:759 */
+                /* ./insns.decode:845 */
                 if (trans_vmulwev_h_bu_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 10100000 1....... ........ */
-                /* ../target/loongarch/insns.decode:760 */
+                /* ./insns.decode:846 */
                 if (trans_vmulwev_w_hu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 10100001 0....... ........ */
-                /* ../target/loongarch/insns.decode:761 */
+                /* ./insns.decode:847 */
                 if (trans_vmulwev_d_wu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 10100001 1....... ........ */
-                /* ../target/loongarch/insns.decode:762 */
+                /* ./insns.decode:848 */
                 if (trans_vmulwev_q_du_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 10100010 0....... ........ */
-                /* ../target/loongarch/insns.decode:763 */
+                /* ./insns.decode:849 */
                 if (trans_vmulwod_h_bu_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 10100010 1....... ........ */
-                /* ../target/loongarch/insns.decode:764 */
+                /* ./insns.decode:850 */
                 if (trans_vmulwod_w_hu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 10100011 0....... ........ */
-                /* ../target/loongarch/insns.decode:765 */
+                /* ./insns.decode:851 */
                 if (trans_vmulwod_d_wu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 10100011 1....... ........ */
-                /* ../target/loongarch/insns.decode:766 */
+                /* ./insns.decode:852 */
                 if (trans_vmulwod_q_du_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7913,42 +9974,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 10101000 0....... ........ */
-                /* ../target/loongarch/insns.decode:768 */
+                /* ./insns.decode:854 */
                 if (trans_vmadd_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 10101000 1....... ........ */
-                /* ../target/loongarch/insns.decode:769 */
+                /* ./insns.decode:855 */
                 if (trans_vmadd_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 10101001 0....... ........ */
-                /* ../target/loongarch/insns.decode:770 */
+                /* ./insns.decode:856 */
                 if (trans_vmadd_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 10101001 1....... ........ */
-                /* ../target/loongarch/insns.decode:771 */
+                /* ./insns.decode:857 */
                 if (trans_vmadd_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 10101010 0....... ........ */
-                /* ../target/loongarch/insns.decode:772 */
+                /* ./insns.decode:858 */
                 if (trans_vmsub_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 10101010 1....... ........ */
-                /* ../target/loongarch/insns.decode:773 */
+                /* ./insns.decode:859 */
                 if (trans_vmsub_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 10101011 0....... ........ */
-                /* ../target/loongarch/insns.decode:774 */
+                /* ./insns.decode:860 */
                 if (trans_vmsub_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 10101011 1....... ........ */
-                /* ../target/loongarch/insns.decode:775 */
+                /* ./insns.decode:861 */
                 if (trans_vmsub_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -7959,42 +10020,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 10101100 0....... ........ */
-                /* ../target/loongarch/insns.decode:777 */
+                /* ./insns.decode:863 */
                 if (trans_vmaddwev_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 10101100 1....... ........ */
-                /* ../target/loongarch/insns.decode:778 */
+                /* ./insns.decode:864 */
                 if (trans_vmaddwev_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 10101101 0....... ........ */
-                /* ../target/loongarch/insns.decode:779 */
+                /* ./insns.decode:865 */
                 if (trans_vmaddwev_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 10101101 1....... ........ */
-                /* ../target/loongarch/insns.decode:780 */
+                /* ./insns.decode:866 */
                 if (trans_vmaddwev_q_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 10101110 0....... ........ */
-                /* ../target/loongarch/insns.decode:781 */
+                /* ./insns.decode:867 */
                 if (trans_vmaddwod_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 10101110 1....... ........ */
-                /* ../target/loongarch/insns.decode:782 */
+                /* ./insns.decode:868 */
                 if (trans_vmaddwod_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 10101111 0....... ........ */
-                /* ../target/loongarch/insns.decode:783 */
+                /* ./insns.decode:869 */
                 if (trans_vmaddwod_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 10101111 1....... ........ */
-                /* ../target/loongarch/insns.decode:784 */
+                /* ./insns.decode:870 */
                 if (trans_vmaddwod_q_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8005,42 +10066,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 10110100 0....... ........ */
-                /* ../target/loongarch/insns.decode:785 */
+                /* ./insns.decode:871 */
                 if (trans_vmaddwev_h_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 10110100 1....... ........ */
-                /* ../target/loongarch/insns.decode:786 */
+                /* ./insns.decode:872 */
                 if (trans_vmaddwev_w_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 10110101 0....... ........ */
-                /* ../target/loongarch/insns.decode:787 */
+                /* ./insns.decode:873 */
                 if (trans_vmaddwev_d_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 10110101 1....... ........ */
-                /* ../target/loongarch/insns.decode:788 */
+                /* ./insns.decode:874 */
                 if (trans_vmaddwev_q_du(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 10110110 0....... ........ */
-                /* ../target/loongarch/insns.decode:789 */
+                /* ./insns.decode:875 */
                 if (trans_vmaddwod_h_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 10110110 1....... ........ */
-                /* ../target/loongarch/insns.decode:790 */
+                /* ./insns.decode:876 */
                 if (trans_vmaddwod_w_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 10110111 0....... ........ */
-                /* ../target/loongarch/insns.decode:791 */
+                /* ./insns.decode:877 */
                 if (trans_vmaddwod_d_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 10110111 1....... ........ */
-                /* ../target/loongarch/insns.decode:792 */
+                /* ./insns.decode:878 */
                 if (trans_vmaddwod_q_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8051,42 +10112,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 10111100 0....... ........ */
-                /* ../target/loongarch/insns.decode:793 */
+                /* ./insns.decode:879 */
                 if (trans_vmaddwev_h_bu_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 10111100 1....... ........ */
-                /* ../target/loongarch/insns.decode:794 */
+                /* ./insns.decode:880 */
                 if (trans_vmaddwev_w_hu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 10111101 0....... ........ */
-                /* ../target/loongarch/insns.decode:795 */
+                /* ./insns.decode:881 */
                 if (trans_vmaddwev_d_wu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 10111101 1....... ........ */
-                /* ../target/loongarch/insns.decode:796 */
+                /* ./insns.decode:882 */
                 if (trans_vmaddwev_q_du_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 10111110 0....... ........ */
-                /* ../target/loongarch/insns.decode:797 */
+                /* ./insns.decode:883 */
                 if (trans_vmaddwod_h_bu_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 10111110 1....... ........ */
-                /* ../target/loongarch/insns.decode:798 */
+                /* ./insns.decode:884 */
                 if (trans_vmaddwod_w_hu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 10111111 0....... ........ */
-                /* ../target/loongarch/insns.decode:799 */
+                /* ./insns.decode:885 */
                 if (trans_vmaddwod_d_wu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 10111111 1....... ........ */
-                /* ../target/loongarch/insns.decode:800 */
+                /* ./insns.decode:886 */
                 if (trans_vmaddwod_q_du_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8097,42 +10158,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 11100000 0....... ........ */
-                /* ../target/loongarch/insns.decode:802 */
+                /* ./insns.decode:888 */
                 if (trans_vdiv_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 11100000 1....... ........ */
-                /* ../target/loongarch/insns.decode:803 */
+                /* ./insns.decode:889 */
                 if (trans_vdiv_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 11100001 0....... ........ */
-                /* ../target/loongarch/insns.decode:804 */
+                /* ./insns.decode:890 */
                 if (trans_vdiv_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 11100001 1....... ........ */
-                /* ../target/loongarch/insns.decode:805 */
+                /* ./insns.decode:891 */
                 if (trans_vdiv_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 11100010 0....... ........ */
-                /* ../target/loongarch/insns.decode:810 */
+                /* ./insns.decode:896 */
                 if (trans_vmod_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 11100010 1....... ........ */
-                /* ../target/loongarch/insns.decode:811 */
+                /* ./insns.decode:897 */
                 if (trans_vmod_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 11100011 0....... ........ */
-                /* ../target/loongarch/insns.decode:812 */
+                /* ./insns.decode:898 */
                 if (trans_vmod_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 11100011 1....... ........ */
-                /* ../target/loongarch/insns.decode:813 */
+                /* ./insns.decode:899 */
                 if (trans_vmod_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8143,42 +10204,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 11100100 0....... ........ */
-                /* ../target/loongarch/insns.decode:806 */
+                /* ./insns.decode:892 */
                 if (trans_vdiv_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 11100100 1....... ........ */
-                /* ../target/loongarch/insns.decode:807 */
+                /* ./insns.decode:893 */
                 if (trans_vdiv_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 11100101 0....... ........ */
-                /* ../target/loongarch/insns.decode:808 */
+                /* ./insns.decode:894 */
                 if (trans_vdiv_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 11100101 1....... ........ */
-                /* ../target/loongarch/insns.decode:809 */
+                /* ./insns.decode:895 */
                 if (trans_vdiv_du(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 11100110 0....... ........ */
-                /* ../target/loongarch/insns.decode:814 */
+                /* ./insns.decode:900 */
                 if (trans_vmod_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 11100110 1....... ........ */
-                /* ../target/loongarch/insns.decode:815 */
+                /* ./insns.decode:901 */
                 if (trans_vmod_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 11100111 0....... ........ */
-                /* ../target/loongarch/insns.decode:816 */
+                /* ./insns.decode:902 */
                 if (trans_vmod_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 11100111 1....... ........ */
-                /* ../target/loongarch/insns.decode:817 */
+                /* ./insns.decode:903 */
                 if (trans_vmod_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8189,42 +10250,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 11101000 0....... ........ */
-                /* ../target/loongarch/insns.decode:863 */
+                /* ./insns.decode:949 */
                 if (trans_vsll_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 11101000 1....... ........ */
-                /* ../target/loongarch/insns.decode:864 */
+                /* ./insns.decode:950 */
                 if (trans_vsll_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 11101001 0....... ........ */
-                /* ../target/loongarch/insns.decode:865 */
+                /* ./insns.decode:951 */
                 if (trans_vsll_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 11101001 1....... ........ */
-                /* ../target/loongarch/insns.decode:866 */
+                /* ./insns.decode:952 */
                 if (trans_vsll_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 11101010 0....... ........ */
-                /* ../target/loongarch/insns.decode:872 */
+                /* ./insns.decode:958 */
                 if (trans_vsrl_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 11101010 1....... ........ */
-                /* ../target/loongarch/insns.decode:873 */
+                /* ./insns.decode:959 */
                 if (trans_vsrl_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 11101011 0....... ........ */
-                /* ../target/loongarch/insns.decode:874 */
+                /* ./insns.decode:960 */
                 if (trans_vsrl_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 11101011 1....... ........ */
-                /* ../target/loongarch/insns.decode:875 */
+                /* ./insns.decode:961 */
                 if (trans_vsrl_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8235,42 +10296,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 11101100 0....... ........ */
-                /* ../target/loongarch/insns.decode:881 */
+                /* ./insns.decode:967 */
                 if (trans_vsra_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 11101100 1....... ........ */
-                /* ../target/loongarch/insns.decode:882 */
+                /* ./insns.decode:968 */
                 if (trans_vsra_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 11101101 0....... ........ */
-                /* ../target/loongarch/insns.decode:883 */
+                /* ./insns.decode:969 */
                 if (trans_vsra_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 11101101 1....... ........ */
-                /* ../target/loongarch/insns.decode:884 */
+                /* ./insns.decode:970 */
                 if (trans_vsra_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 11101110 0....... ........ */
-                /* ../target/loongarch/insns.decode:890 */
+                /* ./insns.decode:976 */
                 if (trans_vrotr_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 11101110 1....... ........ */
-                /* ../target/loongarch/insns.decode:891 */
+                /* ./insns.decode:977 */
                 if (trans_vrotr_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 11101111 0....... ........ */
-                /* ../target/loongarch/insns.decode:892 */
+                /* ./insns.decode:978 */
                 if (trans_vrotr_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 11101111 1....... ........ */
-                /* ../target/loongarch/insns.decode:893 */
+                /* ./insns.decode:979 */
                 if (trans_vrotr_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8281,42 +10342,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110000 11110000 0....... ........ */
-                /* ../target/loongarch/insns.decode:908 */
+                /* ./insns.decode:994 */
                 if (trans_vsrlr_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110000 11110000 1....... ........ */
-                /* ../target/loongarch/insns.decode:909 */
+                /* ./insns.decode:995 */
                 if (trans_vsrlr_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 11110001 0....... ........ */
-                /* ../target/loongarch/insns.decode:910 */
+                /* ./insns.decode:996 */
                 if (trans_vsrlr_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 11110001 1....... ........ */
-                /* ../target/loongarch/insns.decode:911 */
+                /* ./insns.decode:997 */
                 if (trans_vsrlr_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110000 11110010 0....... ........ */
-                /* ../target/loongarch/insns.decode:917 */
+                /* ./insns.decode:1003 */
                 if (trans_vsrar_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 11110010 1....... ........ */
-                /* ../target/loongarch/insns.decode:918 */
+                /* ./insns.decode:1004 */
                 if (trans_vsrar_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 11110011 0....... ........ */
-                /* ../target/loongarch/insns.decode:919 */
+                /* ./insns.decode:1005 */
                 if (trans_vsrar_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 11110011 1....... ........ */
-                /* ../target/loongarch/insns.decode:920 */
+                /* ./insns.decode:1006 */
                 if (trans_vsrar_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8327,32 +10388,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110000 11110100 1....... ........ */
-                /* ../target/loongarch/insns.decode:926 */
+                /* ./insns.decode:1012 */
                 if (trans_vsrln_b_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 11110101 0....... ........ */
-                /* ../target/loongarch/insns.decode:927 */
+                /* ./insns.decode:1013 */
                 if (trans_vsrln_h_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 11110101 1....... ........ */
-                /* ../target/loongarch/insns.decode:928 */
+                /* ./insns.decode:1014 */
                 if (trans_vsrln_w_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 11110110 1....... ........ */
-                /* ../target/loongarch/insns.decode:929 */
+                /* ./insns.decode:1015 */
                 if (trans_vsran_b_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 11110111 0....... ........ */
-                /* ../target/loongarch/insns.decode:930 */
+                /* ./insns.decode:1016 */
                 if (trans_vsran_h_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 11110111 1....... ........ */
-                /* ../target/loongarch/insns.decode:931 */
+                /* ./insns.decode:1017 */
                 if (trans_vsran_w_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8363,32 +10424,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110000 11111000 1....... ........ */
-                /* ../target/loongarch/insns.decode:942 */
+                /* ./insns.decode:1028 */
                 if (trans_vsrlrn_b_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 11111001 0....... ........ */
-                /* ../target/loongarch/insns.decode:943 */
+                /* ./insns.decode:1029 */
                 if (trans_vsrlrn_h_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 11111001 1....... ........ */
-                /* ../target/loongarch/insns.decode:944 */
+                /* ./insns.decode:1030 */
                 if (trans_vsrlrn_w_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 11111010 1....... ........ */
-                /* ../target/loongarch/insns.decode:945 */
+                /* ./insns.decode:1031 */
                 if (trans_vsrarn_b_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 11111011 0....... ........ */
-                /* ../target/loongarch/insns.decode:946 */
+                /* ./insns.decode:1032 */
                 if (trans_vsrarn_h_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 11111011 1....... ........ */
-                /* ../target/loongarch/insns.decode:947 */
+                /* ./insns.decode:1033 */
                 if (trans_vsrarn_w_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8399,32 +10460,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110000 11111100 1....... ........ */
-                /* ../target/loongarch/insns.decode:958 */
+                /* ./insns.decode:1044 */
                 if (trans_vssrln_b_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110000 11111101 0....... ........ */
-                /* ../target/loongarch/insns.decode:959 */
+                /* ./insns.decode:1045 */
                 if (trans_vssrln_h_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110000 11111101 1....... ........ */
-                /* ../target/loongarch/insns.decode:960 */
+                /* ./insns.decode:1046 */
                 if (trans_vssrln_w_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110000 11111110 1....... ........ */
-                /* ../target/loongarch/insns.decode:961 */
+                /* ./insns.decode:1047 */
                 if (trans_vssran_b_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110000 11111111 0....... ........ */
-                /* ../target/loongarch/insns.decode:962 */
+                /* ./insns.decode:1048 */
                 if (trans_vssran_h_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110000 11111111 1....... ........ */
-                /* ../target/loongarch/insns.decode:963 */
+                /* ./insns.decode:1049 */
                 if (trans_vssran_w_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8435,32 +10496,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110001 00000000 1....... ........ */
-                /* ../target/loongarch/insns.decode:988 */
+                /* ./insns.decode:1074 */
                 if (trans_vssrlrn_b_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110001 00000001 0....... ........ */
-                /* ../target/loongarch/insns.decode:989 */
+                /* ./insns.decode:1075 */
                 if (trans_vssrlrn_h_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110001 00000001 1....... ........ */
-                /* ../target/loongarch/insns.decode:990 */
+                /* ./insns.decode:1076 */
                 if (trans_vssrlrn_w_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110001 00000010 1....... ........ */
-                /* ../target/loongarch/insns.decode:991 */
+                /* ./insns.decode:1077 */
                 if (trans_vssrarn_b_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110001 00000011 0....... ........ */
-                /* ../target/loongarch/insns.decode:992 */
+                /* ./insns.decode:1078 */
                 if (trans_vssrarn_h_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110001 00000011 1....... ........ */
-                /* ../target/loongarch/insns.decode:993 */
+                /* ./insns.decode:1079 */
                 if (trans_vssrarn_w_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8471,32 +10532,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110001 00000100 1....... ........ */
-                /* ../target/loongarch/insns.decode:964 */
+                /* ./insns.decode:1050 */
                 if (trans_vssrln_bu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110001 00000101 0....... ........ */
-                /* ../target/loongarch/insns.decode:965 */
+                /* ./insns.decode:1051 */
                 if (trans_vssrln_hu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110001 00000101 1....... ........ */
-                /* ../target/loongarch/insns.decode:966 */
+                /* ./insns.decode:1052 */
                 if (trans_vssrln_wu_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110001 00000110 1....... ........ */
-                /* ../target/loongarch/insns.decode:967 */
+                /* ./insns.decode:1053 */
                 if (trans_vssran_bu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110001 00000111 0....... ........ */
-                /* ../target/loongarch/insns.decode:968 */
+                /* ./insns.decode:1054 */
                 if (trans_vssran_hu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110001 00000111 1....... ........ */
-                /* ../target/loongarch/insns.decode:969 */
+                /* ./insns.decode:1055 */
                 if (trans_vssran_wu_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8507,32 +10568,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110001 00001000 1....... ........ */
-                /* ../target/loongarch/insns.decode:994 */
+                /* ./insns.decode:1080 */
                 if (trans_vssrlrn_bu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110001 00001001 0....... ........ */
-                /* ../target/loongarch/insns.decode:995 */
+                /* ./insns.decode:1081 */
                 if (trans_vssrlrn_hu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110001 00001001 1....... ........ */
-                /* ../target/loongarch/insns.decode:996 */
+                /* ./insns.decode:1082 */
                 if (trans_vssrlrn_wu_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110001 00001010 1....... ........ */
-                /* ../target/loongarch/insns.decode:997 */
+                /* ./insns.decode:1083 */
                 if (trans_vssrarn_bu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110001 00001011 0....... ........ */
-                /* ../target/loongarch/insns.decode:998 */
+                /* ./insns.decode:1084 */
                 if (trans_vssrarn_hu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110001 00001011 1....... ........ */
-                /* ../target/loongarch/insns.decode:999 */
+                /* ./insns.decode:1085 */
                 if (trans_vssrarn_wu_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8543,42 +10604,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110001 00001100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1032 */
+                /* ./insns.decode:1118 */
                 if (trans_vbitclr_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110001 00001100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1033 */
+                /* ./insns.decode:1119 */
                 if (trans_vbitclr_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110001 00001101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1034 */
+                /* ./insns.decode:1120 */
                 if (trans_vbitclr_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110001 00001101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1035 */
+                /* ./insns.decode:1121 */
                 if (trans_vbitclr_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110001 00001110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1040 */
+                /* ./insns.decode:1126 */
                 if (trans_vbitset_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110001 00001110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1041 */
+                /* ./insns.decode:1127 */
                 if (trans_vbitset_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110001 00001111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1042 */
+                /* ./insns.decode:1128 */
                 if (trans_vbitset_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110001 00001111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1043 */
+                /* ./insns.decode:1129 */
                 if (trans_vbitset_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8589,22 +10650,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110001 00010000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1048 */
+                /* ./insns.decode:1134 */
                 if (trans_vbitrev_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110001 00010000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1049 */
+                /* ./insns.decode:1135 */
                 if (trans_vbitrev_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110001 00010001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1050 */
+                /* ./insns.decode:1136 */
                 if (trans_vbitrev_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110001 00010001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1051 */
+                /* ./insns.decode:1137 */
                 if (trans_vbitrev_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8615,22 +10676,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x4:
                 /* 01110001 00010110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1250 */
+                /* ./insns.decode:1352 */
                 if (trans_vpackev_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110001 00010110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1251 */
+                /* ./insns.decode:1353 */
                 if (trans_vpackev_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110001 00010111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1252 */
+                /* ./insns.decode:1354 */
                 if (trans_vpackev_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110001 00010111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1253 */
+                /* ./insns.decode:1355 */
                 if (trans_vpackev_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8641,42 +10702,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110001 00011000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1254 */
+                /* ./insns.decode:1356 */
                 if (trans_vpackod_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110001 00011000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1255 */
+                /* ./insns.decode:1357 */
                 if (trans_vpackod_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110001 00011001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1256 */
+                /* ./insns.decode:1358 */
                 if (trans_vpackod_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110001 00011001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1257 */
+                /* ./insns.decode:1359 */
                 if (trans_vpackod_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110001 00011010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1268 */
+                /* ./insns.decode:1370 */
                 if (trans_vilvl_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110001 00011010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1269 */
+                /* ./insns.decode:1371 */
                 if (trans_vilvl_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110001 00011011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1270 */
+                /* ./insns.decode:1372 */
                 if (trans_vilvl_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110001 00011011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1271 */
+                /* ./insns.decode:1373 */
                 if (trans_vilvl_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8687,42 +10748,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110001 00011100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1272 */
+                /* ./insns.decode:1374 */
                 if (trans_vilvh_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110001 00011100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1273 */
+                /* ./insns.decode:1375 */
                 if (trans_vilvh_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110001 00011101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1274 */
+                /* ./insns.decode:1376 */
                 if (trans_vilvh_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110001 00011101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1275 */
+                /* ./insns.decode:1377 */
                 if (trans_vilvh_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110001 00011110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1259 */
+                /* ./insns.decode:1361 */
                 if (trans_vpickev_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110001 00011110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1260 */
+                /* ./insns.decode:1362 */
                 if (trans_vpickev_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110001 00011111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1261 */
+                /* ./insns.decode:1363 */
                 if (trans_vpickev_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110001 00011111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1262 */
+                /* ./insns.decode:1364 */
                 if (trans_vpickev_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8732,49 +10793,49 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110001 00100000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1263 */
+                /* ./insns.decode:1365 */
                 decode_extract_vvv(ctx, &u.f_vvv, insn);
                 if (trans_vpickod_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110001 00100000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1264 */
+                /* ./insns.decode:1366 */
                 decode_extract_vvv(ctx, &u.f_vvv, insn);
                 if (trans_vpickod_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110001 00100001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1265 */
+                /* ./insns.decode:1367 */
                 decode_extract_vvv(ctx, &u.f_vvv, insn);
                 if (trans_vpickod_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110001 00100001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1266 */
+                /* ./insns.decode:1368 */
                 decode_extract_vvv(ctx, &u.f_vvv, insn);
                 if (trans_vpickod_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110001 00100010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1238 */
+                /* ./insns.decode:1340 */
                 decode_extract_vvr(ctx, &u.f_vvr, insn);
                 if (trans_vreplve_b(ctx, &u.f_vvr)) return true;
                 break;
             case 0x5:
                 /* 01110001 00100010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1239 */
+                /* ./insns.decode:1341 */
                 decode_extract_vvr(ctx, &u.f_vvr, insn);
                 if (trans_vreplve_h(ctx, &u.f_vvr)) return true;
                 break;
             case 0x6:
                 /* 01110001 00100011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1240 */
+                /* ./insns.decode:1342 */
                 decode_extract_vvr(ctx, &u.f_vvr, insn);
                 if (trans_vreplve_w(ctx, &u.f_vvr)) return true;
                 break;
             case 0x7:
                 /* 01110001 00100011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1241 */
+                /* ./insns.decode:1343 */
                 decode_extract_vvr(ctx, &u.f_vvr, insn);
                 if (trans_vreplve_d(ctx, &u.f_vvr)) return true;
                 break;
@@ -8786,22 +10847,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x4:
                 /* 01110001 00100110 0....... ........ */
-                /* ../target/loongarch/insns.decode:851 */
+                /* ./insns.decode:937 */
                 if (trans_vand_v(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110001 00100110 1....... ........ */
-                /* ../target/loongarch/insns.decode:852 */
+                /* ./insns.decode:938 */
                 if (trans_vor_v(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110001 00100111 0....... ........ */
-                /* ../target/loongarch/insns.decode:853 */
+                /* ./insns.decode:939 */
                 if (trans_vxor_v(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110001 00100111 1....... ........ */
-                /* ../target/loongarch/insns.decode:854 */
+                /* ./insns.decode:940 */
                 if (trans_vnor_v(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8812,22 +10873,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110001 00101000 0....... ........ */
-                /* ../target/loongarch/insns.decode:855 */
+                /* ./insns.decode:941 */
                 if (trans_vandn_v(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110001 00101000 1....... ........ */
-                /* ../target/loongarch/insns.decode:856 */
+                /* ./insns.decode:942 */
                 if (trans_vorn_v(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110001 00101011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1057 */
+                /* ./insns.decode:1143 */
                 if (trans_vfrstp_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110001 00101011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1058 */
+                /* ./insns.decode:1144 */
                 if (trans_vfrstp_h(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8838,32 +10899,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x2:
                 /* 01110001 00101101 0....... ........ */
-                /* ../target/loongarch/insns.decode:567 */
+                /* ./insns.decode:653 */
                 if (trans_vadd_q(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110001 00101101 1....... ........ */
-                /* ../target/loongarch/insns.decode:572 */
+                /* ./insns.decode:658 */
                 if (trans_vsub_q(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110001 00101110 0....... ........ */
-                /* ../target/loongarch/insns.decode:837 */
+                /* ./insns.decode:923 */
                 if (trans_vsigncov_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110001 00101110 1....... ........ */
-                /* ../target/loongarch/insns.decode:838 */
+                /* ./insns.decode:924 */
                 if (trans_vsigncov_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110001 00101111 0....... ........ */
-                /* ../target/loongarch/insns.decode:839 */
+                /* ./insns.decode:925 */
                 if (trans_vsigncov_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110001 00101111 1....... ........ */
-                /* ../target/loongarch/insns.decode:840 */
+                /* ./insns.decode:926 */
                 if (trans_vsigncov_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8874,22 +10935,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110001 00110000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1062 */
+                /* ./insns.decode:1148 */
                 if (trans_vfadd_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110001 00110001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1063 */
+                /* ./insns.decode:1149 */
                 if (trans_vfadd_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110001 00110010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1064 */
+                /* ./insns.decode:1150 */
                 if (trans_vfsub_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110001 00110011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1065 */
+                /* ./insns.decode:1151 */
                 if (trans_vfsub_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8900,22 +10961,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110001 00111000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1066 */
+                /* ./insns.decode:1152 */
                 if (trans_vfmul_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110001 00111001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1067 */
+                /* ./insns.decode:1153 */
                 if (trans_vfmul_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110001 00111010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1068 */
+                /* ./insns.decode:1154 */
                 if (trans_vfdiv_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110001 00111011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1069 */
+                /* ./insns.decode:1155 */
                 if (trans_vfdiv_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8926,22 +10987,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110001 00111100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1080 */
+                /* ./insns.decode:1166 */
                 if (trans_vfmax_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110001 00111101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1081 */
+                /* ./insns.decode:1167 */
                 if (trans_vfmax_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110001 00111110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1082 */
+                /* ./insns.decode:1168 */
                 if (trans_vfmin_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110001 00111111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1083 */
+                /* ./insns.decode:1169 */
                 if (trans_vfmin_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8952,22 +11013,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110001 01000000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1085 */
+                /* ./insns.decode:1175 */
                 if (trans_vfmaxa_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110001 01000001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1086 */
+                /* ./insns.decode:1176 */
                 if (trans_vfmaxa_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110001 01000010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1087 */
+                /* ./insns.decode:1177 */
                 if (trans_vfmina_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110001 01000011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1088 */
+                /* ./insns.decode:1178 */
                 if (trans_vfmina_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8978,12 +11039,12 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x4:
                 /* 01110001 01000110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1107 */
+                /* ./insns.decode:1201 */
                 if (trans_vfcvt_h_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110001 01000110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1108 */
+                /* ./insns.decode:1202 */
                 if (trans_vfcvt_s_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -8994,32 +11055,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110001 01001000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1157 */
+                /* ./insns.decode:1259 */
                 if (trans_vffint_s_l(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110001 01001001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1135 */
+                /* ./insns.decode:1237 */
                 if (trans_vftint_w_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110001 01001010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1136 */
+                /* ./insns.decode:1238 */
                 if (trans_vftintrm_w_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110001 01001010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1137 */
+                /* ./insns.decode:1239 */
                 if (trans_vftintrp_w_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110001 01001011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1138 */
+                /* ./insns.decode:1240 */
                 if (trans_vftintrz_w_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110001 01001011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1139 */
+                /* ./insns.decode:1241 */
                 if (trans_vftintrne_w_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -9030,17 +11091,17 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x5:
                 /* 01110001 01111010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1278 */
+                /* ./insns.decode:1380 */
                 if (trans_vshuf_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110001 01111011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1279 */
+                /* ./insns.decode:1381 */
                 if (trans_vshuf_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110001 01111011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1280 */
+                /* ./insns.decode:1382 */
                 if (trans_vshuf_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -9051,42 +11112,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110010 10000000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1163 */
+                /* ./insns.decode:1265 */
                 if (trans_vseqi_b(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x1:
                 /* 01110010 10000000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1164 */
+                /* ./insns.decode:1266 */
                 if (trans_vseqi_h(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x2:
                 /* 01110010 10000001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1165 */
+                /* ./insns.decode:1267 */
                 if (trans_vseqi_w(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x3:
                 /* 01110010 10000001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1166 */
+                /* ./insns.decode:1268 */
                 if (trans_vseqi_d(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x4:
                 /* 01110010 10000010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1172 */
+                /* ./insns.decode:1274 */
                 if (trans_vslei_b(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x5:
                 /* 01110010 10000010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1173 */
+                /* ./insns.decode:1275 */
                 if (trans_vslei_h(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x6:
                 /* 01110010 10000011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1174 */
+                /* ./insns.decode:1276 */
                 if (trans_vslei_w(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x7:
                 /* 01110010 10000011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1175 */
+                /* ./insns.decode:1277 */
                 if (trans_vslei_d(ctx, &u.f_vv_i)) return true;
                 break;
             }
@@ -9096,49 +11157,49 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110010 10000100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1180 */
+                /* ./insns.decode:1282 */
                 decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                 if (trans_vslei_bu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x1:
                 /* 01110010 10000100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1181 */
+                /* ./insns.decode:1283 */
                 decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                 if (trans_vslei_hu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x2:
                 /* 01110010 10000101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1182 */
+                /* ./insns.decode:1284 */
                 decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                 if (trans_vslei_wu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x3:
                 /* 01110010 10000101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1183 */
+                /* ./insns.decode:1285 */
                 decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                 if (trans_vslei_du(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x4:
                 /* 01110010 10000110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1189 */
+                /* ./insns.decode:1291 */
                 decode_extract_vv_i5(ctx, &u.f_vv_i, insn);
                 if (trans_vslti_b(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x5:
                 /* 01110010 10000110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1190 */
+                /* ./insns.decode:1292 */
                 decode_extract_vv_i5(ctx, &u.f_vv_i, insn);
                 if (trans_vslti_h(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x6:
                 /* 01110010 10000111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1191 */
+                /* ./insns.decode:1293 */
                 decode_extract_vv_i5(ctx, &u.f_vv_i, insn);
                 if (trans_vslti_w(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x7:
                 /* 01110010 10000111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1192 */
+                /* ./insns.decode:1294 */
                 decode_extract_vv_i5(ctx, &u.f_vv_i, insn);
                 if (trans_vslti_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -9150,42 +11211,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110010 10001000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1197 */
+                /* ./insns.decode:1299 */
                 if (trans_vslti_bu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x1:
                 /* 01110010 10001000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1198 */
+                /* ./insns.decode:1300 */
                 if (trans_vslti_hu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x2:
                 /* 01110010 10001001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1199 */
+                /* ./insns.decode:1301 */
                 if (trans_vslti_wu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x3:
                 /* 01110010 10001001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1200 */
+                /* ./insns.decode:1302 */
                 if (trans_vslti_du(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x4:
                 /* 01110010 10001010 0....... ........ */
-                /* ../target/loongarch/insns.decode:574 */
+                /* ./insns.decode:660 */
                 if (trans_vaddi_bu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x5:
                 /* 01110010 10001010 1....... ........ */
-                /* ../target/loongarch/insns.decode:575 */
+                /* ./insns.decode:661 */
                 if (trans_vaddi_hu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x6:
                 /* 01110010 10001011 0....... ........ */
-                /* ../target/loongarch/insns.decode:576 */
+                /* ./insns.decode:662 */
                 if (trans_vaddi_wu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x7:
                 /* 01110010 10001011 1....... ........ */
-                /* ../target/loongarch/insns.decode:577 */
+                /* ./insns.decode:663 */
                 if (trans_vaddi_du(ctx, &u.f_vv_i)) return true;
                 break;
             }
@@ -9196,32 +11257,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110010 10001100 0....... ........ */
-                /* ../target/loongarch/insns.decode:578 */
+                /* ./insns.decode:664 */
                 if (trans_vsubi_bu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x1:
                 /* 01110010 10001100 1....... ........ */
-                /* ../target/loongarch/insns.decode:579 */
+                /* ./insns.decode:665 */
                 if (trans_vsubi_hu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x2:
                 /* 01110010 10001101 0....... ........ */
-                /* ../target/loongarch/insns.decode:580 */
+                /* ./insns.decode:666 */
                 if (trans_vsubi_wu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x3:
                 /* 01110010 10001101 1....... ........ */
-                /* ../target/loongarch/insns.decode:581 */
+                /* ./insns.decode:667 */
                 if (trans_vsubi_du(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x4:
                 /* 01110010 10001110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1247 */
+                /* ./insns.decode:1349 */
                 if (trans_vbsll_v(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x5:
                 /* 01110010 10001110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1248 */
+                /* ./insns.decode:1350 */
                 if (trans_vbsrl_v(ctx, &u.f_vv_i)) return true;
                 break;
             }
@@ -9232,42 +11293,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110010 10010000 0....... ........ */
-                /* ../target/loongarch/insns.decode:700 */
+                /* ./insns.decode:786 */
                 if (trans_vmaxi_b(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x1:
                 /* 01110010 10010000 1....... ........ */
-                /* ../target/loongarch/insns.decode:701 */
+                /* ./insns.decode:787 */
                 if (trans_vmaxi_h(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x2:
                 /* 01110010 10010001 0....... ........ */
-                /* ../target/loongarch/insns.decode:702 */
+                /* ./insns.decode:788 */
                 if (trans_vmaxi_w(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x3:
                 /* 01110010 10010001 1....... ........ */
-                /* ../target/loongarch/insns.decode:703 */
+                /* ./insns.decode:789 */
                 if (trans_vmaxi_d(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x4:
                 /* 01110010 10010010 0....... ........ */
-                /* ../target/loongarch/insns.decode:717 */
+                /* ./insns.decode:803 */
                 if (trans_vmini_b(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x5:
                 /* 01110010 10010010 1....... ........ */
-                /* ../target/loongarch/insns.decode:718 */
+                /* ./insns.decode:804 */
                 if (trans_vmini_h(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x6:
                 /* 01110010 10010011 0....... ........ */
-                /* ../target/loongarch/insns.decode:719 */
+                /* ./insns.decode:805 */
                 if (trans_vmini_w(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x7:
                 /* 01110010 10010011 1....... ........ */
-                /* ../target/loongarch/insns.decode:720 */
+                /* ./insns.decode:806 */
                 if (trans_vmini_d(ctx, &u.f_vv_i)) return true;
                 break;
             }
@@ -9278,42 +11339,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110010 10010100 0....... ........ */
-                /* ../target/loongarch/insns.decode:708 */
+                /* ./insns.decode:794 */
                 if (trans_vmaxi_bu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x1:
                 /* 01110010 10010100 1....... ........ */
-                /* ../target/loongarch/insns.decode:709 */
+                /* ./insns.decode:795 */
                 if (trans_vmaxi_hu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x2:
                 /* 01110010 10010101 0....... ........ */
-                /* ../target/loongarch/insns.decode:710 */
+                /* ./insns.decode:796 */
                 if (trans_vmaxi_wu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x3:
                 /* 01110010 10010101 1....... ........ */
-                /* ../target/loongarch/insns.decode:711 */
+                /* ./insns.decode:797 */
                 if (trans_vmaxi_du(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x4:
                 /* 01110010 10010110 0....... ........ */
-                /* ../target/loongarch/insns.decode:725 */
+                /* ./insns.decode:811 */
                 if (trans_vmini_bu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x5:
                 /* 01110010 10010110 1....... ........ */
-                /* ../target/loongarch/insns.decode:726 */
+                /* ./insns.decode:812 */
                 if (trans_vmini_hu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x6:
                 /* 01110010 10010111 0....... ........ */
-                /* ../target/loongarch/insns.decode:727 */
+                /* ./insns.decode:813 */
                 if (trans_vmini_wu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x7:
                 /* 01110010 10010111 1....... ........ */
-                /* ../target/loongarch/insns.decode:728 */
+                /* ./insns.decode:814 */
                 if (trans_vmini_du(ctx, &u.f_vv_i)) return true;
                 break;
             }
@@ -9324,12 +11385,12 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x4:
                 /* 01110010 10011010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1059 */
+                /* ./insns.decode:1145 */
                 if (trans_vfrstpi_b(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x5:
                 /* 01110010 10011010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1060 */
+                /* ./insns.decode:1146 */
                 if (trans_vfrstpi_h(ctx, &u.f_vv_i)) return true;
                 break;
             }
@@ -9339,133 +11400,133 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 10) & 0xff) {
             case 0x0:
                 /* 01110010 10011100 000000.. ........ */
-                /* ../target/loongarch/insns.decode:1018 */
+                /* ./insns.decode:1104 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vclo_b(ctx, &u.f_vv)) return true;
                 break;
             case 0x1:
                 /* 01110010 10011100 000001.. ........ */
-                /* ../target/loongarch/insns.decode:1019 */
+                /* ./insns.decode:1105 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vclo_h(ctx, &u.f_vv)) return true;
                 break;
             case 0x2:
                 /* 01110010 10011100 000010.. ........ */
-                /* ../target/loongarch/insns.decode:1020 */
+                /* ./insns.decode:1106 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vclo_w(ctx, &u.f_vv)) return true;
                 break;
             case 0x3:
                 /* 01110010 10011100 000011.. ........ */
-                /* ../target/loongarch/insns.decode:1021 */
+                /* ./insns.decode:1107 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vclo_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x4:
                 /* 01110010 10011100 000100.. ........ */
-                /* ../target/loongarch/insns.decode:1022 */
+                /* ./insns.decode:1108 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vclz_b(ctx, &u.f_vv)) return true;
                 break;
             case 0x5:
                 /* 01110010 10011100 000101.. ........ */
-                /* ../target/loongarch/insns.decode:1023 */
+                /* ./insns.decode:1109 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vclz_h(ctx, &u.f_vv)) return true;
                 break;
             case 0x6:
                 /* 01110010 10011100 000110.. ........ */
-                /* ../target/loongarch/insns.decode:1024 */
+                /* ./insns.decode:1110 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vclz_w(ctx, &u.f_vv)) return true;
                 break;
             case 0x7:
                 /* 01110010 10011100 000111.. ........ */
-                /* ../target/loongarch/insns.decode:1025 */
+                /* ./insns.decode:1111 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vclz_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x8:
                 /* 01110010 10011100 001000.. ........ */
-                /* ../target/loongarch/insns.decode:1027 */
+                /* ./insns.decode:1113 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vpcnt_b(ctx, &u.f_vv)) return true;
                 break;
             case 0x9:
                 /* 01110010 10011100 001001.. ........ */
-                /* ../target/loongarch/insns.decode:1028 */
+                /* ./insns.decode:1114 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vpcnt_h(ctx, &u.f_vv)) return true;
                 break;
             case 0xa:
                 /* 01110010 10011100 001010.. ........ */
-                /* ../target/loongarch/insns.decode:1029 */
+                /* ./insns.decode:1115 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vpcnt_w(ctx, &u.f_vv)) return true;
                 break;
             case 0xb:
                 /* 01110010 10011100 001011.. ........ */
-                /* ../target/loongarch/insns.decode:1030 */
+                /* ./insns.decode:1116 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vpcnt_d(ctx, &u.f_vv)) return true;
                 break;
             case 0xc:
                 /* 01110010 10011100 001100.. ........ */
-                /* ../target/loongarch/insns.decode:583 */
+                /* ./insns.decode:669 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vneg_b(ctx, &u.f_vv)) return true;
                 break;
             case 0xd:
                 /* 01110010 10011100 001101.. ........ */
-                /* ../target/loongarch/insns.decode:584 */
+                /* ./insns.decode:670 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vneg_h(ctx, &u.f_vv)) return true;
                 break;
             case 0xe:
                 /* 01110010 10011100 001110.. ........ */
-                /* ../target/loongarch/insns.decode:585 */
+                /* ./insns.decode:671 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vneg_w(ctx, &u.f_vv)) return true;
                 break;
             case 0xf:
                 /* 01110010 10011100 001111.. ........ */
-                /* ../target/loongarch/insns.decode:586 */
+                /* ./insns.decode:672 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vneg_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x10:
                 /* 01110010 10011100 010000.. ........ */
-                /* ../target/loongarch/insns.decode:842 */
+                /* ./insns.decode:928 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vmskltz_b(ctx, &u.f_vv)) return true;
                 break;
             case 0x11:
                 /* 01110010 10011100 010001.. ........ */
-                /* ../target/loongarch/insns.decode:843 */
+                /* ./insns.decode:929 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vmskltz_h(ctx, &u.f_vv)) return true;
                 break;
             case 0x12:
                 /* 01110010 10011100 010010.. ........ */
-                /* ../target/loongarch/insns.decode:844 */
+                /* ./insns.decode:930 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vmskltz_w(ctx, &u.f_vv)) return true;
                 break;
             case 0x13:
                 /* 01110010 10011100 010011.. ........ */
-                /* ../target/loongarch/insns.decode:845 */
+                /* ./insns.decode:931 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vmskltz_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x14:
                 /* 01110010 10011100 010100.. ........ */
-                /* ../target/loongarch/insns.decode:846 */
+                /* ./insns.decode:932 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vmskgez_b(ctx, &u.f_vv)) return true;
                 break;
             case 0x18:
                 /* 01110010 10011100 011000.. ........ */
-                /* ../target/loongarch/insns.decode:847 */
+                /* ./insns.decode:933 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vmsknz_b(ctx, &u.f_vv)) return true;
                 break;
@@ -9475,7 +11536,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110010 10011100 100110.. ...00... */
-                    /* ../target/loongarch/insns.decode:1209 */
+                    /* ./insns.decode:1311 */
                     if (trans_vseteqz_v(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -9486,7 +11547,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110010 10011100 100111.. ...00... */
-                    /* ../target/loongarch/insns.decode:1210 */
+                    /* ./insns.decode:1312 */
                     if (trans_vsetnez_v(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -9497,7 +11558,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110010 10011100 101000.. ...00... */
-                    /* ../target/loongarch/insns.decode:1211 */
+                    /* ./insns.decode:1313 */
                     if (trans_vsetanyeqz_b(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -9508,7 +11569,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110010 10011100 101001.. ...00... */
-                    /* ../target/loongarch/insns.decode:1212 */
+                    /* ./insns.decode:1314 */
                     if (trans_vsetanyeqz_h(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -9519,7 +11580,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110010 10011100 101010.. ...00... */
-                    /* ../target/loongarch/insns.decode:1213 */
+                    /* ./insns.decode:1315 */
                     if (trans_vsetanyeqz_w(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -9530,7 +11591,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110010 10011100 101011.. ...00... */
-                    /* ../target/loongarch/insns.decode:1214 */
+                    /* ./insns.decode:1316 */
                     if (trans_vsetanyeqz_d(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -9541,7 +11602,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110010 10011100 101100.. ...00... */
-                    /* ../target/loongarch/insns.decode:1215 */
+                    /* ./insns.decode:1317 */
                     if (trans_vsetallnez_b(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -9552,7 +11613,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110010 10011100 101101.. ...00... */
-                    /* ../target/loongarch/insns.decode:1216 */
+                    /* ./insns.decode:1318 */
                     if (trans_vsetallnez_h(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -9563,7 +11624,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110010 10011100 101110.. ...00... */
-                    /* ../target/loongarch/insns.decode:1217 */
+                    /* ./insns.decode:1319 */
                     if (trans_vsetallnez_w(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -9574,404 +11635,452 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110010 10011100 101111.. ...00... */
-                    /* ../target/loongarch/insns.decode:1218 */
+                    /* ./insns.decode:1320 */
                     if (trans_vsetallnez_d(ctx, &u.f_cv)) return true;
                     break;
                 }
                 break;
             case 0x31:
                 /* 01110010 10011100 110001.. ........ */
-                /* ../target/loongarch/insns.decode:1090 */
+                /* ./insns.decode:1180 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vflogb_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x32:
                 /* 01110010 10011100 110010.. ........ */
-                /* ../target/loongarch/insns.decode:1091 */
+                /* ./insns.decode:1181 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vflogb_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x35:
                 /* 01110010 10011100 110101.. ........ */
-                /* ../target/loongarch/insns.decode:1093 */
+                /* ./insns.decode:1183 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfclass_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x36:
                 /* 01110010 10011100 110110.. ........ */
-                /* ../target/loongarch/insns.decode:1094 */
+                /* ./insns.decode:1184 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfclass_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x39:
                 /* 01110010 10011100 111001.. ........ */
-                /* ../target/loongarch/insns.decode:1096 */
+                /* ./insns.decode:1186 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfsqrt_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x3a:
                 /* 01110010 10011100 111010.. ........ */
-                /* ../target/loongarch/insns.decode:1097 */
+                /* ./insns.decode:1187 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfsqrt_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x3d:
                 /* 01110010 10011100 111101.. ........ */
-                /* ../target/loongarch/insns.decode:1098 */
+                /* ./insns.decode:1188 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfrecip_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x3e:
                 /* 01110010 10011100 111110.. ........ */
-                /* ../target/loongarch/insns.decode:1099 */
+                /* ./insns.decode:1189 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfrecip_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x41:
                 /* 01110010 10011101 000001.. ........ */
-                /* ../target/loongarch/insns.decode:1100 */
+                /* ./insns.decode:1190 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfrsqrt_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x42:
                 /* 01110010 10011101 000010.. ........ */
-                /* ../target/loongarch/insns.decode:1101 */
+                /* ./insns.decode:1191 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfrsqrt_d(ctx, &u.f_vv)) return true;
                 break;
+            case 0x45:
+                /* 01110010 10011101 000101.. ........ */
+                /* ./insns.decode:1192 */
+                decode_extract_vv(ctx, &u.f_vv, insn);
+                if (trans_vfrecipe_s(ctx, &u.f_vv)) return true;
+                break;
+            case 0x46:
+                /* 01110010 10011101 000110.. ........ */
+                /* ./insns.decode:1193 */
+                decode_extract_vv(ctx, &u.f_vv, insn);
+                if (trans_vfrecipe_d(ctx, &u.f_vv)) return true;
+                break;
+            case 0x49:
+                /* 01110010 10011101 001001.. ........ */
+                /* ./insns.decode:1194 */
+                decode_extract_vv(ctx, &u.f_vv, insn);
+                if (trans_vfrsqrte_s(ctx, &u.f_vv)) return true;
+                break;
+            case 0x4a:
+                /* 01110010 10011101 001010.. ........ */
+                /* ./insns.decode:1195 */
+                decode_extract_vv(ctx, &u.f_vv, insn);
+                if (trans_vfrsqrte_d(ctx, &u.f_vv)) return true;
+                break;
             case 0x4d:
                 /* 01110010 10011101 001101.. ........ */
-                /* ../target/loongarch/insns.decode:1110 */
+                /* ./insns.decode:1204 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfrint_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x4e:
                 /* 01110010 10011101 001110.. ........ */
-                /* ../target/loongarch/insns.decode:1111 */
+                /* ./insns.decode:1205 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfrint_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x51:
                 /* 01110010 10011101 010001.. ........ */
-                /* ../target/loongarch/insns.decode:1112 */
+                /* ./insns.decode:1206 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfrintrm_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x52:
                 /* 01110010 10011101 010010.. ........ */
-                /* ../target/loongarch/insns.decode:1113 */
+                /* ./insns.decode:1207 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfrintrm_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x55:
                 /* 01110010 10011101 010101.. ........ */
-                /* ../target/loongarch/insns.decode:1114 */
+                /* ./insns.decode:1208 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfrintrp_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x56:
                 /* 01110010 10011101 010110.. ........ */
-                /* ../target/loongarch/insns.decode:1115 */
+                /* ./insns.decode:1209 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfrintrp_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x59:
                 /* 01110010 10011101 011001.. ........ */
-                /* ../target/loongarch/insns.decode:1116 */
+                /* ./insns.decode:1210 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfrintrz_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x5a:
                 /* 01110010 10011101 011010.. ........ */
-                /* ../target/loongarch/insns.decode:1117 */
+                /* ./insns.decode:1211 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfrintrz_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x5d:
                 /* 01110010 10011101 011101.. ........ */
-                /* ../target/loongarch/insns.decode:1118 */
+                /* ./insns.decode:1212 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfrintrne_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x5e:
                 /* 01110010 10011101 011110.. ........ */
-                /* ../target/loongarch/insns.decode:1119 */
+                /* ./insns.decode:1213 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfrintrne_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x7a:
                 /* 01110010 10011101 111010.. ........ */
-                /* ../target/loongarch/insns.decode:1103 */
+                /* ./insns.decode:1197 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfcvtl_s_h(ctx, &u.f_vv)) return true;
                 break;
             case 0x7b:
                 /* 01110010 10011101 111011.. ........ */
-                /* ../target/loongarch/insns.decode:1104 */
+                /* ./insns.decode:1198 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfcvth_s_h(ctx, &u.f_vv)) return true;
                 break;
             case 0x7c:
                 /* 01110010 10011101 111100.. ........ */
-                /* ../target/loongarch/insns.decode:1105 */
+                /* ./insns.decode:1199 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfcvtl_d_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x7d:
                 /* 01110010 10011101 111101.. ........ */
-                /* ../target/loongarch/insns.decode:1106 */
+                /* ./insns.decode:1200 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vfcvth_d_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x80:
                 /* 01110010 10011110 000000.. ........ */
-                /* ../target/loongarch/insns.decode:1151 */
+                /* ./insns.decode:1253 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vffint_s_w(ctx, &u.f_vv)) return true;
                 break;
             case 0x81:
                 /* 01110010 10011110 000001.. ........ */
-                /* ../target/loongarch/insns.decode:1152 */
+                /* ./insns.decode:1254 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vffint_s_wu(ctx, &u.f_vv)) return true;
                 break;
             case 0x82:
                 /* 01110010 10011110 000010.. ........ */
-                /* ../target/loongarch/insns.decode:1153 */
+                /* ./insns.decode:1255 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vffint_d_l(ctx, &u.f_vv)) return true;
                 break;
             case 0x83:
                 /* 01110010 10011110 000011.. ........ */
-                /* ../target/loongarch/insns.decode:1154 */
+                /* ./insns.decode:1256 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vffint_d_lu(ctx, &u.f_vv)) return true;
                 break;
             case 0x84:
                 /* 01110010 10011110 000100.. ........ */
-                /* ../target/loongarch/insns.decode:1155 */
+                /* ./insns.decode:1257 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vffintl_d_w(ctx, &u.f_vv)) return true;
                 break;
             case 0x85:
                 /* 01110010 10011110 000101.. ........ */
-                /* ../target/loongarch/insns.decode:1156 */
+                /* ./insns.decode:1258 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vffinth_d_w(ctx, &u.f_vv)) return true;
                 break;
             case 0x8c:
                 /* 01110010 10011110 001100.. ........ */
-                /* ../target/loongarch/insns.decode:1121 */
+                /* ./insns.decode:1223 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftint_w_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x8d:
                 /* 01110010 10011110 001101.. ........ */
-                /* ../target/loongarch/insns.decode:1122 */
+                /* ./insns.decode:1224 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftint_l_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x8e:
                 /* 01110010 10011110 001110.. ........ */
-                /* ../target/loongarch/insns.decode:1123 */
+                /* ./insns.decode:1225 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrm_w_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x8f:
                 /* 01110010 10011110 001111.. ........ */
-                /* ../target/loongarch/insns.decode:1124 */
+                /* ./insns.decode:1226 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrm_l_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x90:
                 /* 01110010 10011110 010000.. ........ */
-                /* ../target/loongarch/insns.decode:1125 */
+                /* ./insns.decode:1227 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrp_w_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x91:
                 /* 01110010 10011110 010001.. ........ */
-                /* ../target/loongarch/insns.decode:1126 */
+                /* ./insns.decode:1228 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrp_l_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x92:
                 /* 01110010 10011110 010010.. ........ */
-                /* ../target/loongarch/insns.decode:1127 */
+                /* ./insns.decode:1229 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrz_w_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x93:
                 /* 01110010 10011110 010011.. ........ */
-                /* ../target/loongarch/insns.decode:1128 */
+                /* ./insns.decode:1230 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrz_l_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x94:
                 /* 01110010 10011110 010100.. ........ */
-                /* ../target/loongarch/insns.decode:1129 */
+                /* ./insns.decode:1231 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrne_w_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x95:
                 /* 01110010 10011110 010101.. ........ */
-                /* ../target/loongarch/insns.decode:1130 */
+                /* ./insns.decode:1232 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrne_l_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x96:
                 /* 01110010 10011110 010110.. ........ */
-                /* ../target/loongarch/insns.decode:1131 */
+                /* ./insns.decode:1233 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftint_wu_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x97:
                 /* 01110010 10011110 010111.. ........ */
-                /* ../target/loongarch/insns.decode:1132 */
+                /* ./insns.decode:1234 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftint_lu_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x9c:
                 /* 01110010 10011110 011100.. ........ */
-                /* ../target/loongarch/insns.decode:1133 */
+                /* ./insns.decode:1235 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrz_wu_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x9d:
                 /* 01110010 10011110 011101.. ........ */
-                /* ../target/loongarch/insns.decode:1134 */
+                /* ./insns.decode:1236 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrz_lu_d(ctx, &u.f_vv)) return true;
                 break;
             case 0xa0:
                 /* 01110010 10011110 100000.. ........ */
-                /* ../target/loongarch/insns.decode:1140 */
+                /* ./insns.decode:1242 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintl_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa1:
                 /* 01110010 10011110 100001.. ........ */
-                /* ../target/loongarch/insns.decode:1141 */
+                /* ./insns.decode:1243 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftinth_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa2:
                 /* 01110010 10011110 100010.. ........ */
-                /* ../target/loongarch/insns.decode:1142 */
+                /* ./insns.decode:1244 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrml_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa3:
                 /* 01110010 10011110 100011.. ........ */
-                /* ../target/loongarch/insns.decode:1143 */
+                /* ./insns.decode:1245 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrmh_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa4:
                 /* 01110010 10011110 100100.. ........ */
-                /* ../target/loongarch/insns.decode:1144 */
+                /* ./insns.decode:1246 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrpl_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa5:
                 /* 01110010 10011110 100101.. ........ */
-                /* ../target/loongarch/insns.decode:1145 */
+                /* ./insns.decode:1247 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrph_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa6:
                 /* 01110010 10011110 100110.. ........ */
-                /* ../target/loongarch/insns.decode:1146 */
+                /* ./insns.decode:1248 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrzl_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa7:
                 /* 01110010 10011110 100111.. ........ */
-                /* ../target/loongarch/insns.decode:1147 */
+                /* ./insns.decode:1249 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrzh_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa8:
                 /* 01110010 10011110 101000.. ........ */
-                /* ../target/loongarch/insns.decode:1148 */
+                /* ./insns.decode:1250 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrnel_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa9:
                 /* 01110010 10011110 101001.. ........ */
-                /* ../target/loongarch/insns.decode:1149 */
+                /* ./insns.decode:1251 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vftintrneh_l_s(ctx, &u.f_vv)) return true;
                 break;
+            case 0xb4:
+                /* 01110010 10011110 110100.. ........ */
+                /* ./insns.decode:1170 */
+                decode_extract_vv(ctx, &u.f_vv, insn);
+                if (trans_vfmaxn_s(ctx, &u.f_vv)) return true;
+                break;
+            case 0xb5:
+                /* 01110010 10011110 110101.. ........ */
+                /* ./insns.decode:1171 */
+                decode_extract_vv(ctx, &u.f_vv, insn);
+                if (trans_vfmaxn_d(ctx, &u.f_vv)) return true;
+                break;
+            case 0xb6:
+                /* 01110010 10011110 110110.. ........ */
+                /* ./insns.decode:1172 */
+                decode_extract_vv(ctx, &u.f_vv, insn);
+                if (trans_vfminn_s(ctx, &u.f_vv)) return true;
+                break;
+            case 0xb7:
+                /* 01110010 10011110 110111.. ........ */
+                /* ./insns.decode:1173 */
+                decode_extract_vv(ctx, &u.f_vv, insn);
+                if (trans_vfminn_d(ctx, &u.f_vv)) return true;
+                break;
             case 0xb8:
                 /* 01110010 10011110 111000.. ........ */
-                /* ../target/loongarch/insns.decode:828 */
+                /* ./insns.decode:914 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vexth_h_b(ctx, &u.f_vv)) return true;
                 break;
             case 0xb9:
                 /* 01110010 10011110 111001.. ........ */
-                /* ../target/loongarch/insns.decode:829 */
+                /* ./insns.decode:915 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vexth_w_h(ctx, &u.f_vv)) return true;
                 break;
             case 0xba:
                 /* 01110010 10011110 111010.. ........ */
-                /* ../target/loongarch/insns.decode:830 */
+                /* ./insns.decode:916 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vexth_d_w(ctx, &u.f_vv)) return true;
                 break;
             case 0xbb:
                 /* 01110010 10011110 111011.. ........ */
-                /* ../target/loongarch/insns.decode:831 */
+                /* ./insns.decode:917 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vexth_q_d(ctx, &u.f_vv)) return true;
                 break;
             case 0xbc:
                 /* 01110010 10011110 111100.. ........ */
-                /* ../target/loongarch/insns.decode:832 */
+                /* ./insns.decode:918 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vexth_hu_bu(ctx, &u.f_vv)) return true;
                 break;
             case 0xbd:
                 /* 01110010 10011110 111101.. ........ */
-                /* ../target/loongarch/insns.decode:833 */
+                /* ./insns.decode:919 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vexth_wu_hu(ctx, &u.f_vv)) return true;
                 break;
             case 0xbe:
                 /* 01110010 10011110 111110.. ........ */
-                /* ../target/loongarch/insns.decode:834 */
+                /* ./insns.decode:920 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vexth_du_wu(ctx, &u.f_vv)) return true;
                 break;
             case 0xbf:
                 /* 01110010 10011110 111111.. ........ */
-                /* ../target/loongarch/insns.decode:835 */
+                /* ./insns.decode:921 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vexth_qu_du(ctx, &u.f_vv)) return true;
                 break;
             case 0xc0:
                 /* 01110010 10011111 000000.. ........ */
-                /* ../target/loongarch/insns.decode:1233 */
+                /* ./insns.decode:1335 */
                 decode_extract_vr(ctx, &u.f_vr, insn);
                 if (trans_vreplgr2vr_b(ctx, &u.f_vr)) return true;
                 break;
             case 0xc1:
                 /* 01110010 10011111 000001.. ........ */
-                /* ../target/loongarch/insns.decode:1234 */
+                /* ./insns.decode:1336 */
                 decode_extract_vr(ctx, &u.f_vr, insn);
                 if (trans_vreplgr2vr_h(ctx, &u.f_vr)) return true;
                 break;
             case 0xc2:
                 /* 01110010 10011111 000010.. ........ */
-                /* ../target/loongarch/insns.decode:1235 */
+                /* ./insns.decode:1337 */
                 decode_extract_vr(ctx, &u.f_vr, insn);
                 if (trans_vreplgr2vr_w(ctx, &u.f_vr)) return true;
                 break;
             case 0xc3:
                 /* 01110010 10011111 000011.. ........ */
-                /* ../target/loongarch/insns.decode:1236 */
+                /* ./insns.decode:1338 */
                 decode_extract_vr(ctx, &u.f_vr, insn);
                 if (trans_vreplgr2vr_d(ctx, &u.f_vr)) return true;
                 break;
@@ -9992,14 +12101,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110010 10100000 001..... ........ */
-                            /* ../target/loongarch/insns.decode:894 */
+                            /* ./insns.decode:980 */
                             if (trans_vrotri_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110010 10100000 01...... ........ */
-                        /* ../target/loongarch/insns.decode:895 */
+                        /* ./insns.decode:981 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_vrotri_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10007,7 +12116,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110010 10100000 1....... ........ */
-                    /* ../target/loongarch/insns.decode:896 */
+                    /* ./insns.decode:982 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_vrotri_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10015,7 +12124,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110010 10100001 ........ ........ */
-                /* ../target/loongarch/insns.decode:897 */
+                /* ./insns.decode:983 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_vrotri_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10036,14 +12145,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110010 10100100 001..... ........ */
-                            /* ../target/loongarch/insns.decode:912 */
+                            /* ./insns.decode:998 */
                             if (trans_vsrlri_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110010 10100100 01...... ........ */
-                        /* ../target/loongarch/insns.decode:913 */
+                        /* ./insns.decode:999 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_vsrlri_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10051,7 +12160,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110010 10100100 1....... ........ */
-                    /* ../target/loongarch/insns.decode:914 */
+                    /* ./insns.decode:1000 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_vsrlri_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10059,7 +12168,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110010 10100101 ........ ........ */
-                /* ../target/loongarch/insns.decode:915 */
+                /* ./insns.decode:1001 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_vsrlri_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10080,14 +12189,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110010 10101000 001..... ........ */
-                            /* ../target/loongarch/insns.decode:921 */
+                            /* ./insns.decode:1007 */
                             if (trans_vsrari_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110010 10101000 01...... ........ */
-                        /* ../target/loongarch/insns.decode:922 */
+                        /* ./insns.decode:1008 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_vsrari_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10095,7 +12204,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110010 10101000 1....... ........ */
-                    /* ../target/loongarch/insns.decode:923 */
+                    /* ./insns.decode:1009 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_vsrari_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10103,9 +12212,55 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110010 10101001 ........ ........ */
-                /* ../target/loongarch/insns.decode:924 */
+                /* ./insns.decode:1010 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_vsrari_d(ctx, &u.f_vv_i)) return true;
+                break;
+            }
+            break;
+        case 0xab:
+            /* 01110010 101011.. ........ ........ */
+            decode_extract_vv(ctx, &u.f_vv, insn);
+            switch ((insn >> 10) & 0xff) {
+            case 0x1:
+                /* 01110010 10101100 000001.. ........ */
+                /* ./insns.decode:1214 */
+                if (trans_vfrintirm_s(ctx, &u.f_vv)) return true;
+                break;
+            case 0x2:
+                /* 01110010 10101100 000010.. ........ */
+                /* ./insns.decode:1215 */
+                if (trans_vfrintirm_d(ctx, &u.f_vv)) return true;
+                break;
+            case 0x5:
+                /* 01110010 10101100 000101.. ........ */
+                /* ./insns.decode:1216 */
+                if (trans_vfrintirp_s(ctx, &u.f_vv)) return true;
+                break;
+            case 0x6:
+                /* 01110010 10101100 000110.. ........ */
+                /* ./insns.decode:1217 */
+                if (trans_vfrintirp_d(ctx, &u.f_vv)) return true;
+                break;
+            case 0x9:
+                /* 01110010 10101100 001001.. ........ */
+                /* ./insns.decode:1218 */
+                if (trans_vfrintirz_s(ctx, &u.f_vv)) return true;
+                break;
+            case 0xa:
+                /* 01110010 10101100 001010.. ........ */
+                /* ./insns.decode:1219 */
+                if (trans_vfrintirz_d(ctx, &u.f_vv)) return true;
+                break;
+            case 0xd:
+                /* 01110010 10101100 001101.. ........ */
+                /* ./insns.decode:1220 */
+                if (trans_vfrintirne_s(ctx, &u.f_vv)) return true;
+                break;
+            case 0xe:
+                /* 01110010 10101100 001110.. ........ */
+                /* ./insns.decode:1221 */
+                if (trans_vfrintirne_d(ctx, &u.f_vv)) return true;
                 break;
             }
             break;
@@ -10114,7 +12269,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 14) & 0xf) {
             case 0xe:
                 /* 01110010 11101011 10...... ........ */
-                /* ../target/loongarch/insns.decode:1220 */
+                /* ./insns.decode:1322 */
                 decode_extract_vr_ui4(ctx, &u.f_vr_i, insn);
                 if (trans_vinsgr2vr_b(ctx, &u.f_vr_i)) return true;
                 break;
@@ -10123,7 +12278,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 13) & 0x1) {
                 case 0x0:
                     /* 01110010 11101011 110..... ........ */
-                    /* ../target/loongarch/insns.decode:1221 */
+                    /* ./insns.decode:1323 */
                     decode_extract_vr_ui3(ctx, &u.f_vr_i, insn);
                     if (trans_vinsgr2vr_h(ctx, &u.f_vr_i)) return true;
                     break;
@@ -10132,7 +12287,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 12) & 0x1) {
                     case 0x0:
                         /* 01110010 11101011 1110.... ........ */
-                        /* ../target/loongarch/insns.decode:1222 */
+                        /* ./insns.decode:1324 */
                         decode_extract_vr_ui2(ctx, &u.f_vr_i, insn);
                         if (trans_vinsgr2vr_w(ctx, &u.f_vr_i)) return true;
                         break;
@@ -10142,7 +12297,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 11) & 0x1) {
                         case 0x0:
                             /* 01110010 11101011 11110... ........ */
-                            /* ../target/loongarch/insns.decode:1223 */
+                            /* ./insns.decode:1325 */
                             if (trans_vinsgr2vr_d(ctx, &u.f_vr_i)) return true;
                             break;
                         }
@@ -10158,7 +12313,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 14) & 0xf) {
             case 0xe:
                 /* 01110010 11101111 10...... ........ */
-                /* ../target/loongarch/insns.decode:1224 */
+                /* ./insns.decode:1326 */
                 decode_extract_rv_ui4(ctx, &u.f_rv_i, insn);
                 if (trans_vpickve2gr_b(ctx, &u.f_rv_i)) return true;
                 break;
@@ -10167,7 +12322,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 13) & 0x1) {
                 case 0x0:
                     /* 01110010 11101111 110..... ........ */
-                    /* ../target/loongarch/insns.decode:1225 */
+                    /* ./insns.decode:1327 */
                     decode_extract_rv_ui3(ctx, &u.f_rv_i, insn);
                     if (trans_vpickve2gr_h(ctx, &u.f_rv_i)) return true;
                     break;
@@ -10176,7 +12331,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 12) & 0x1) {
                     case 0x0:
                         /* 01110010 11101111 1110.... ........ */
-                        /* ../target/loongarch/insns.decode:1226 */
+                        /* ./insns.decode:1328 */
                         decode_extract_rv_ui2(ctx, &u.f_rv_i, insn);
                         if (trans_vpickve2gr_w(ctx, &u.f_rv_i)) return true;
                         break;
@@ -10186,7 +12341,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 11) & 0x1) {
                         case 0x0:
                             /* 01110010 11101111 11110... ........ */
-                            /* ../target/loongarch/insns.decode:1227 */
+                            /* ./insns.decode:1329 */
                             if (trans_vpickve2gr_d(ctx, &u.f_rv_i)) return true;
                             break;
                         }
@@ -10202,7 +12357,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 14) & 0xf) {
             case 0xe:
                 /* 01110010 11110011 10...... ........ */
-                /* ../target/loongarch/insns.decode:1228 */
+                /* ./insns.decode:1330 */
                 decode_extract_rv_ui4(ctx, &u.f_rv_i, insn);
                 if (trans_vpickve2gr_bu(ctx, &u.f_rv_i)) return true;
                 break;
@@ -10211,7 +12366,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 13) & 0x1) {
                 case 0x0:
                     /* 01110010 11110011 110..... ........ */
-                    /* ../target/loongarch/insns.decode:1229 */
+                    /* ./insns.decode:1331 */
                     decode_extract_rv_ui3(ctx, &u.f_rv_i, insn);
                     if (trans_vpickve2gr_hu(ctx, &u.f_rv_i)) return true;
                     break;
@@ -10220,7 +12375,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 12) & 0x1) {
                     case 0x0:
                         /* 01110010 11110011 1110.... ........ */
-                        /* ../target/loongarch/insns.decode:1230 */
+                        /* ./insns.decode:1332 */
                         decode_extract_rv_ui2(ctx, &u.f_rv_i, insn);
                         if (trans_vpickve2gr_wu(ctx, &u.f_rv_i)) return true;
                         break;
@@ -10230,7 +12385,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 11) & 0x1) {
                         case 0x0:
                             /* 01110010 11110011 11110... ........ */
-                            /* ../target/loongarch/insns.decode:1231 */
+                            /* ./insns.decode:1333 */
                             if (trans_vpickve2gr_du(ctx, &u.f_rv_i)) return true;
                             break;
                         }
@@ -10246,7 +12401,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 14) & 0xf) {
             case 0xe:
                 /* 01110010 11110111 10...... ........ */
-                /* ../target/loongarch/insns.decode:1242 */
+                /* ./insns.decode:1344 */
                 decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                 if (trans_vreplvei_b(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10255,7 +12410,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 13) & 0x1) {
                 case 0x0:
                     /* 01110010 11110111 110..... ........ */
-                    /* ../target/loongarch/insns.decode:1243 */
+                    /* ./insns.decode:1345 */
                     decode_extract_vv_ui3(ctx, &u.f_vv_i, insn);
                     if (trans_vreplvei_h(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10264,7 +12419,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 12) & 0x1) {
                     case 0x0:
                         /* 01110010 11110111 1110.... ........ */
-                        /* ../target/loongarch/insns.decode:1244 */
+                        /* ./insns.decode:1346 */
                         decode_extract_vv_ui2(ctx, &u.f_vv_i, insn);
                         if (trans_vreplvei_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10274,7 +12429,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 11) & 0x1) {
                         case 0x0:
                             /* 01110010 11110111 11110... ........ */
-                            /* ../target/loongarch/insns.decode:1245 */
+                            /* ./insns.decode:1347 */
                             if (trans_vreplvei_d(ctx, &u.f_vv_i)) return true;
                             break;
                         }
@@ -10297,14 +12452,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 13) & 0x1) {
                     case 0x1:
                         /* 01110011 00001000 001..... ........ */
-                        /* ../target/loongarch/insns.decode:899 */
+                        /* ./insns.decode:985 */
                         if (trans_vsllwil_h_b(ctx, &u.f_vv_i)) return true;
                         break;
                     }
                     break;
                 case 0x1:
                     /* 01110011 00001000 01...... ........ */
-                    /* ../target/loongarch/insns.decode:900 */
+                    /* ./insns.decode:986 */
                     decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                     if (trans_vsllwil_w_h(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10312,7 +12467,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 00001000 1....... ........ */
-                /* ../target/loongarch/insns.decode:901 */
+                /* ./insns.decode:987 */
                 decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                 if (trans_vsllwil_d_w(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10322,7 +12477,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 10) & 0x1f) {
                 case 0x0:
                     /* 01110011 00001001 000000.. ........ */
-                    /* ../target/loongarch/insns.decode:902 */
+                    /* ./insns.decode:988 */
                     if (trans_vextl_q_d(ctx, &u.f_vv)) return true;
                     break;
                 }
@@ -10341,14 +12496,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 13) & 0x1) {
                     case 0x1:
                         /* 01110011 00001100 001..... ........ */
-                        /* ../target/loongarch/insns.decode:903 */
+                        /* ./insns.decode:989 */
                         if (trans_vsllwil_hu_bu(ctx, &u.f_vv_i)) return true;
                         break;
                     }
                     break;
                 case 0x1:
                     /* 01110011 00001100 01...... ........ */
-                    /* ../target/loongarch/insns.decode:904 */
+                    /* ./insns.decode:990 */
                     decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                     if (trans_vsllwil_wu_hu(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10356,7 +12511,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 00001100 1....... ........ */
-                /* ../target/loongarch/insns.decode:905 */
+                /* ./insns.decode:991 */
                 decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                 if (trans_vsllwil_du_wu(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10366,7 +12521,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 10) & 0x1f) {
                 case 0x0:
                     /* 01110011 00001101 000000.. ........ */
-                    /* ../target/loongarch/insns.decode:906 */
+                    /* ./insns.decode:992 */
                     if (trans_vextl_qu_du(ctx, &u.f_vv)) return true;
                     break;
                 }
@@ -10388,14 +12543,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110011 00010000 001..... ........ */
-                            /* ../target/loongarch/insns.decode:1036 */
+                            /* ./insns.decode:1122 */
                             if (trans_vbitclri_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 00010000 01...... ........ */
-                        /* ../target/loongarch/insns.decode:1037 */
+                        /* ./insns.decode:1123 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_vbitclri_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10403,7 +12558,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 00010000 1....... ........ */
-                    /* ../target/loongarch/insns.decode:1038 */
+                    /* ./insns.decode:1124 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_vbitclri_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10411,7 +12566,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 00010001 ........ ........ */
-                /* ../target/loongarch/insns.decode:1039 */
+                /* ./insns.decode:1125 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_vbitclri_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10432,14 +12587,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110011 00010100 001..... ........ */
-                            /* ../target/loongarch/insns.decode:1044 */
+                            /* ./insns.decode:1130 */
                             if (trans_vbitseti_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 00010100 01...... ........ */
-                        /* ../target/loongarch/insns.decode:1045 */
+                        /* ./insns.decode:1131 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_vbitseti_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10447,7 +12602,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 00010100 1....... ........ */
-                    /* ../target/loongarch/insns.decode:1046 */
+                    /* ./insns.decode:1132 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_vbitseti_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10455,7 +12610,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 00010101 ........ ........ */
-                /* ../target/loongarch/insns.decode:1047 */
+                /* ./insns.decode:1133 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_vbitseti_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10476,14 +12631,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110011 00011000 001..... ........ */
-                            /* ../target/loongarch/insns.decode:1052 */
+                            /* ./insns.decode:1138 */
                             if (trans_vbitrevi_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 00011000 01...... ........ */
-                        /* ../target/loongarch/insns.decode:1053 */
+                        /* ./insns.decode:1139 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_vbitrevi_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10491,7 +12646,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 00011000 1....... ........ */
-                    /* ../target/loongarch/insns.decode:1054 */
+                    /* ./insns.decode:1140 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_vbitrevi_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10499,7 +12654,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 00011001 ........ ........ */
-                /* ../target/loongarch/insns.decode:1055 */
+                /* ./insns.decode:1141 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_vbitrevi_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10520,14 +12675,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110011 00100100 001..... ........ */
-                            /* ../target/loongarch/insns.decode:819 */
+                            /* ./insns.decode:905 */
                             if (trans_vsat_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 00100100 01...... ........ */
-                        /* ../target/loongarch/insns.decode:820 */
+                        /* ./insns.decode:906 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_vsat_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10535,7 +12690,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 00100100 1....... ........ */
-                    /* ../target/loongarch/insns.decode:821 */
+                    /* ./insns.decode:907 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_vsat_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10543,7 +12698,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 00100101 ........ ........ */
-                /* ../target/loongarch/insns.decode:822 */
+                /* ./insns.decode:908 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_vsat_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10564,14 +12719,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110011 00101000 001..... ........ */
-                            /* ../target/loongarch/insns.decode:823 */
+                            /* ./insns.decode:909 */
                             if (trans_vsat_bu(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 00101000 01...... ........ */
-                        /* ../target/loongarch/insns.decode:824 */
+                        /* ./insns.decode:910 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_vsat_hu(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10579,7 +12734,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 00101000 1....... ........ */
-                    /* ../target/loongarch/insns.decode:825 */
+                    /* ./insns.decode:911 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_vsat_wu(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10587,7 +12742,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 00101001 ........ ........ */
-                /* ../target/loongarch/insns.decode:826 */
+                /* ./insns.decode:912 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_vsat_du(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10608,14 +12763,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110011 00101100 001..... ........ */
-                            /* ../target/loongarch/insns.decode:867 */
+                            /* ./insns.decode:953 */
                             if (trans_vslli_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 00101100 01...... ........ */
-                        /* ../target/loongarch/insns.decode:868 */
+                        /* ./insns.decode:954 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_vslli_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10623,7 +12778,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 00101100 1....... ........ */
-                    /* ../target/loongarch/insns.decode:869 */
+                    /* ./insns.decode:955 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_vslli_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10631,7 +12786,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 00101101 ........ ........ */
-                /* ../target/loongarch/insns.decode:870 */
+                /* ./insns.decode:956 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_vslli_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10652,14 +12807,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110011 00110000 001..... ........ */
-                            /* ../target/loongarch/insns.decode:876 */
+                            /* ./insns.decode:962 */
                             if (trans_vsrli_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 00110000 01...... ........ */
-                        /* ../target/loongarch/insns.decode:877 */
+                        /* ./insns.decode:963 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_vsrli_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10667,7 +12822,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 00110000 1....... ........ */
-                    /* ../target/loongarch/insns.decode:878 */
+                    /* ./insns.decode:964 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_vsrli_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10675,7 +12830,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 00110001 ........ ........ */
-                /* ../target/loongarch/insns.decode:879 */
+                /* ./insns.decode:965 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_vsrli_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10696,14 +12851,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110011 00110100 001..... ........ */
-                            /* ../target/loongarch/insns.decode:885 */
+                            /* ./insns.decode:971 */
                             if (trans_vsrai_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 00110100 01...... ........ */
-                        /* ../target/loongarch/insns.decode:886 */
+                        /* ./insns.decode:972 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_vsrai_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10711,7 +12866,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 00110100 1....... ........ */
-                    /* ../target/loongarch/insns.decode:887 */
+                    /* ./insns.decode:973 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_vsrai_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10719,7 +12874,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 00110101 ........ ........ */
-                /* ../target/loongarch/insns.decode:888 */
+                /* ./insns.decode:974 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_vsrai_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10740,14 +12895,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110011 01000000 01...... ........ */
-                            /* ../target/loongarch/insns.decode:933 */
+                            /* ./insns.decode:1019 */
                             if (trans_vsrlni_b_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 01000000 1....... ........ */
-                        /* ../target/loongarch/insns.decode:934 */
+                        /* ./insns.decode:1020 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_vsrlni_h_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10755,7 +12910,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 01000001 ........ ........ */
-                    /* ../target/loongarch/insns.decode:935 */
+                    /* ./insns.decode:1021 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_vsrlni_w_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10763,7 +12918,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 0100001. ........ ........ */
-                /* ../target/loongarch/insns.decode:936 */
+                /* ./insns.decode:1022 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_vsrlni_d_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10784,14 +12939,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110011 01000100 01...... ........ */
-                            /* ../target/loongarch/insns.decode:949 */
+                            /* ./insns.decode:1035 */
                             if (trans_vsrlrni_b_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 01000100 1....... ........ */
-                        /* ../target/loongarch/insns.decode:950 */
+                        /* ./insns.decode:1036 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_vsrlrni_h_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10799,7 +12954,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 01000101 ........ ........ */
-                    /* ../target/loongarch/insns.decode:951 */
+                    /* ./insns.decode:1037 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_vsrlrni_w_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10807,7 +12962,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 0100011. ........ ........ */
-                /* ../target/loongarch/insns.decode:952 */
+                /* ./insns.decode:1038 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_vsrlrni_d_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10828,14 +12983,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110011 01001000 01...... ........ */
-                            /* ../target/loongarch/insns.decode:971 */
+                            /* ./insns.decode:1057 */
                             if (trans_vssrlni_b_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 01001000 1....... ........ */
-                        /* ../target/loongarch/insns.decode:972 */
+                        /* ./insns.decode:1058 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_vssrlni_h_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10843,7 +12998,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 01001001 ........ ........ */
-                    /* ../target/loongarch/insns.decode:973 */
+                    /* ./insns.decode:1059 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_vssrlni_w_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10851,7 +13006,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 0100101. ........ ........ */
-                /* ../target/loongarch/insns.decode:974 */
+                /* ./insns.decode:1060 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_vssrlni_d_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10872,14 +13027,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110011 01001100 01...... ........ */
-                            /* ../target/loongarch/insns.decode:979 */
+                            /* ./insns.decode:1065 */
                             if (trans_vssrlni_bu_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 01001100 1....... ........ */
-                        /* ../target/loongarch/insns.decode:980 */
+                        /* ./insns.decode:1066 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_vssrlni_hu_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10887,7 +13042,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 01001101 ........ ........ */
-                    /* ../target/loongarch/insns.decode:981 */
+                    /* ./insns.decode:1067 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_vssrlni_wu_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10895,7 +13050,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 0100111. ........ ........ */
-                /* ../target/loongarch/insns.decode:982 */
+                /* ./insns.decode:1068 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_vssrlni_du_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10916,14 +13071,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110011 01010000 01...... ........ */
-                            /* ../target/loongarch/insns.decode:1001 */
+                            /* ./insns.decode:1087 */
                             if (trans_vssrlrni_b_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 01010000 1....... ........ */
-                        /* ../target/loongarch/insns.decode:1002 */
+                        /* ./insns.decode:1088 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_vssrlrni_h_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10931,7 +13086,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 01010001 ........ ........ */
-                    /* ../target/loongarch/insns.decode:1003 */
+                    /* ./insns.decode:1089 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_vssrlrni_w_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10939,7 +13094,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 0101001. ........ ........ */
-                /* ../target/loongarch/insns.decode:1004 */
+                /* ./insns.decode:1090 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_vssrlrni_d_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -10960,14 +13115,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110011 01010100 01...... ........ */
-                            /* ../target/loongarch/insns.decode:1009 */
+                            /* ./insns.decode:1095 */
                             if (trans_vssrlrni_bu_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 01010100 1....... ........ */
-                        /* ../target/loongarch/insns.decode:1010 */
+                        /* ./insns.decode:1096 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_vssrlrni_hu_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -10975,7 +13130,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 01010101 ........ ........ */
-                    /* ../target/loongarch/insns.decode:1011 */
+                    /* ./insns.decode:1097 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_vssrlrni_wu_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -10983,7 +13138,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 0101011. ........ ........ */
-                /* ../target/loongarch/insns.decode:1012 */
+                /* ./insns.decode:1098 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_vssrlrni_du_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -11004,14 +13159,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110011 01011000 01...... ........ */
-                            /* ../target/loongarch/insns.decode:937 */
+                            /* ./insns.decode:1023 */
                             if (trans_vsrani_b_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 01011000 1....... ........ */
-                        /* ../target/loongarch/insns.decode:938 */
+                        /* ./insns.decode:1024 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_vsrani_h_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -11019,7 +13174,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 01011001 ........ ........ */
-                    /* ../target/loongarch/insns.decode:939 */
+                    /* ./insns.decode:1025 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_vsrani_w_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -11027,7 +13182,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 0101101. ........ ........ */
-                /* ../target/loongarch/insns.decode:940 */
+                /* ./insns.decode:1026 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_vsrani_d_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -11048,14 +13203,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110011 01011100 01...... ........ */
-                            /* ../target/loongarch/insns.decode:953 */
+                            /* ./insns.decode:1039 */
                             if (trans_vsrarni_b_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 01011100 1....... ........ */
-                        /* ../target/loongarch/insns.decode:954 */
+                        /* ./insns.decode:1040 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_vsrarni_h_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -11063,7 +13218,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 01011101 ........ ........ */
-                    /* ../target/loongarch/insns.decode:955 */
+                    /* ./insns.decode:1041 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_vsrarni_w_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -11071,7 +13226,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 0101111. ........ ........ */
-                /* ../target/loongarch/insns.decode:956 */
+                /* ./insns.decode:1042 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_vsrarni_d_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -11092,14 +13247,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110011 01100000 01...... ........ */
-                            /* ../target/loongarch/insns.decode:975 */
+                            /* ./insns.decode:1061 */
                             if (trans_vssrani_b_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 01100000 1....... ........ */
-                        /* ../target/loongarch/insns.decode:976 */
+                        /* ./insns.decode:1062 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_vssrani_h_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -11107,7 +13262,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 01100001 ........ ........ */
-                    /* ../target/loongarch/insns.decode:977 */
+                    /* ./insns.decode:1063 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_vssrani_w_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -11115,7 +13270,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 0110001. ........ ........ */
-                /* ../target/loongarch/insns.decode:978 */
+                /* ./insns.decode:1064 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_vssrani_d_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -11136,14 +13291,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110011 01100100 01...... ........ */
-                            /* ../target/loongarch/insns.decode:983 */
+                            /* ./insns.decode:1069 */
                             if (trans_vssrani_bu_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 01100100 1....... ........ */
-                        /* ../target/loongarch/insns.decode:984 */
+                        /* ./insns.decode:1070 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_vssrani_hu_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -11151,7 +13306,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 01100101 ........ ........ */
-                    /* ../target/loongarch/insns.decode:985 */
+                    /* ./insns.decode:1071 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_vssrani_wu_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -11159,7 +13314,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 0110011. ........ ........ */
-                /* ../target/loongarch/insns.decode:986 */
+                /* ./insns.decode:1072 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_vssrani_du_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -11180,14 +13335,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110011 01101000 01...... ........ */
-                            /* ../target/loongarch/insns.decode:1005 */
+                            /* ./insns.decode:1091 */
                             if (trans_vssrarni_b_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 01101000 1....... ........ */
-                        /* ../target/loongarch/insns.decode:1006 */
+                        /* ./insns.decode:1092 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_vssrarni_h_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -11195,7 +13350,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 01101001 ........ ........ */
-                    /* ../target/loongarch/insns.decode:1007 */
+                    /* ./insns.decode:1093 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_vssrarni_w_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -11203,7 +13358,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 0110101. ........ ........ */
-                /* ../target/loongarch/insns.decode:1008 */
+                /* ./insns.decode:1094 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_vssrarni_d_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -11224,14 +13379,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110011 01101100 01...... ........ */
-                            /* ../target/loongarch/insns.decode:1013 */
+                            /* ./insns.decode:1099 */
                             if (trans_vssrarni_bu_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110011 01101100 1....... ........ */
-                        /* ../target/loongarch/insns.decode:1014 */
+                        /* ./insns.decode:1100 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_vssrarni_hu_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -11239,7 +13394,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110011 01101101 ........ ........ */
-                    /* ../target/loongarch/insns.decode:1015 */
+                    /* ./insns.decode:1101 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_vssrarni_wu_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -11247,7 +13402,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110011 0110111. ........ ........ */
-                /* ../target/loongarch/insns.decode:1016 */
+                /* ./insns.decode:1102 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_vssrarni_du_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -11255,91 +13410,91 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             break;
         case 0xe0:
             /* 01110011 100000.. ........ ........ */
-            /* ../target/loongarch/insns.decode:1288 */
+            /* ./insns.decode:1390 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_vextrins_d(ctx, &u.f_vv_i)) return true;
             break;
         case 0xe1:
             /* 01110011 100001.. ........ ........ */
-            /* ../target/loongarch/insns.decode:1289 */
+            /* ./insns.decode:1391 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_vextrins_w(ctx, &u.f_vv_i)) return true;
             break;
         case 0xe2:
             /* 01110011 100010.. ........ ........ */
-            /* ../target/loongarch/insns.decode:1290 */
+            /* ./insns.decode:1392 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_vextrins_h(ctx, &u.f_vv_i)) return true;
             break;
         case 0xe3:
             /* 01110011 100011.. ........ ........ */
-            /* ../target/loongarch/insns.decode:1291 */
+            /* ./insns.decode:1393 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_vextrins_b(ctx, &u.f_vv_i)) return true;
             break;
         case 0xe4:
             /* 01110011 100100.. ........ ........ */
-            /* ../target/loongarch/insns.decode:1281 */
+            /* ./insns.decode:1383 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_vshuf4i_b(ctx, &u.f_vv_i)) return true;
             break;
         case 0xe5:
             /* 01110011 100101.. ........ ........ */
-            /* ../target/loongarch/insns.decode:1282 */
+            /* ./insns.decode:1384 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_vshuf4i_h(ctx, &u.f_vv_i)) return true;
             break;
         case 0xe6:
             /* 01110011 100110.. ........ ........ */
-            /* ../target/loongarch/insns.decode:1283 */
+            /* ./insns.decode:1385 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_vshuf4i_w(ctx, &u.f_vv_i)) return true;
             break;
         case 0xe7:
             /* 01110011 100111.. ........ ........ */
-            /* ../target/loongarch/insns.decode:1284 */
+            /* ./insns.decode:1386 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_vshuf4i_d(ctx, &u.f_vv_i)) return true;
             break;
         case 0xf1:
             /* 01110011 110001.. ........ ........ */
-            /* ../target/loongarch/insns.decode:1207 */
+            /* ./insns.decode:1309 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_vbitseli_b(ctx, &u.f_vv_i)) return true;
             break;
         case 0xf4:
             /* 01110011 110100.. ........ ........ */
-            /* ../target/loongarch/insns.decode:858 */
+            /* ./insns.decode:944 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_vandi_b(ctx, &u.f_vv_i)) return true;
             break;
         case 0xf5:
             /* 01110011 110101.. ........ ........ */
-            /* ../target/loongarch/insns.decode:859 */
+            /* ./insns.decode:945 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_vori_b(ctx, &u.f_vv_i)) return true;
             break;
         case 0xf6:
             /* 01110011 110110.. ........ ........ */
-            /* ../target/loongarch/insns.decode:860 */
+            /* ./insns.decode:946 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_vxori_b(ctx, &u.f_vv_i)) return true;
             break;
         case 0xf7:
             /* 01110011 110111.. ........ ........ */
-            /* ../target/loongarch/insns.decode:861 */
+            /* ./insns.decode:947 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_vnori_b(ctx, &u.f_vv_i)) return true;
             break;
         case 0xf8:
             /* 01110011 111000.. ........ ........ */
-            /* ../target/loongarch/insns.decode:849 */
+            /* ./insns.decode:935 */
             decode_extract_v_i13(ctx, &u.f_v_i, insn);
             if (trans_vldi(ctx, &u.f_v_i)) return true;
             break;
         case 0xf9:
             /* 01110011 111001.. ........ ........ */
-            /* ../target/loongarch/insns.decode:1286 */
+            /* ./insns.decode:1388 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_vpermi_w(ctx, &u.f_vv_i)) return true;
             break;
@@ -11354,42 +13509,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 00000000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1925 */
+                /* ./insns.decode:2043 */
                 if (trans_xvseq_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 00000000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1926 */
+                /* ./insns.decode:2044 */
                 if (trans_xvseq_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 00000001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1927 */
+                /* ./insns.decode:2045 */
                 if (trans_xvseq_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 00000001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1928 */
+                /* ./insns.decode:2046 */
                 if (trans_xvseq_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 00000010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1934 */
+                /* ./insns.decode:2052 */
                 if (trans_xvsle_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 00000010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1935 */
+                /* ./insns.decode:2053 */
                 if (trans_xvsle_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 00000011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1936 */
+                /* ./insns.decode:2054 */
                 if (trans_xvsle_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 00000011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1937 */
+                /* ./insns.decode:2055 */
                 if (trans_xvsle_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11400,42 +13555,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 00000100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1942 */
+                /* ./insns.decode:2060 */
                 if (trans_xvsle_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 00000100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1943 */
+                /* ./insns.decode:2061 */
                 if (trans_xvsle_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 00000101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1944 */
+                /* ./insns.decode:2062 */
                 if (trans_xvsle_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 00000101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1945 */
+                /* ./insns.decode:2063 */
                 if (trans_xvsle_du(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 00000110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1951 */
+                /* ./insns.decode:2069 */
                 if (trans_xvslt_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 00000110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1952 */
+                /* ./insns.decode:2070 */
                 if (trans_xvslt_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 00000111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1953 */
+                /* ./insns.decode:2071 */
                 if (trans_xvslt_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 00000111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1954 */
+                /* ./insns.decode:2072 */
                 if (trans_xvslt_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11446,42 +13601,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 00001000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1959 */
+                /* ./insns.decode:2077 */
                 if (trans_xvslt_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 00001000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1960 */
+                /* ./insns.decode:2078 */
                 if (trans_xvslt_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 00001001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1961 */
+                /* ./insns.decode:2079 */
                 if (trans_xvslt_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 00001001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1962 */
+                /* ./insns.decode:2080 */
                 if (trans_xvslt_du(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 00001010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1310 */
+                /* ./insns.decode:1412 */
                 if (trans_xvadd_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 00001010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1311 */
+                /* ./insns.decode:1413 */
                 if (trans_xvadd_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 00001011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1312 */
+                /* ./insns.decode:1414 */
                 if (trans_xvadd_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 00001011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1313 */
+                /* ./insns.decode:1415 */
                 if (trans_xvadd_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11492,22 +13647,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 00001100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1315 */
+                /* ./insns.decode:1417 */
                 if (trans_xvsub_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 00001100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1316 */
+                /* ./insns.decode:1418 */
                 if (trans_xvsub_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 00001101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1317 */
+                /* ./insns.decode:1419 */
                 if (trans_xvsub_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 00001101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1318 */
+                /* ./insns.decode:1420 */
                 if (trans_xvsub_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11518,22 +13673,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x4:
                 /* 01110100 00011110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1371 */
+                /* ./insns.decode:1473 */
                 if (trans_xvaddwev_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 00011110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1372 */
+                /* ./insns.decode:1474 */
                 if (trans_xvaddwev_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 00011111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1373 */
+                /* ./insns.decode:1475 */
                 if (trans_xvaddwev_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 00011111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1374 */
+                /* ./insns.decode:1476 */
                 if (trans_xvaddwev_q_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11544,42 +13699,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 00100000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1380 */
+                /* ./insns.decode:1482 */
                 if (trans_xvsubwev_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 00100000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1381 */
+                /* ./insns.decode:1483 */
                 if (trans_xvsubwev_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 00100001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1382 */
+                /* ./insns.decode:1484 */
                 if (trans_xvsubwev_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 00100001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1383 */
+                /* ./insns.decode:1485 */
                 if (trans_xvsubwev_q_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 00100010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1375 */
+                /* ./insns.decode:1477 */
                 if (trans_xvaddwod_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 00100010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1376 */
+                /* ./insns.decode:1478 */
                 if (trans_xvaddwod_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 00100011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1377 */
+                /* ./insns.decode:1479 */
                 if (trans_xvaddwod_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 00100011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1378 */
+                /* ./insns.decode:1480 */
                 if (trans_xvaddwod_q_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11590,22 +13745,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 00100100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1384 */
+                /* ./insns.decode:1486 */
                 if (trans_xvsubwod_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 00100100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1385 */
+                /* ./insns.decode:1487 */
                 if (trans_xvsubwod_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 00100101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1386 */
+                /* ./insns.decode:1488 */
                 if (trans_xvsubwod_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 00100101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1387 */
+                /* ./insns.decode:1489 */
                 if (trans_xvsubwod_q_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11616,22 +13771,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x4:
                 /* 01110100 00101110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1389 */
+                /* ./insns.decode:1491 */
                 if (trans_xvaddwev_h_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 00101110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1390 */
+                /* ./insns.decode:1492 */
                 if (trans_xvaddwev_w_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 00101111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1391 */
+                /* ./insns.decode:1493 */
                 if (trans_xvaddwev_d_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 00101111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1392 */
+                /* ./insns.decode:1494 */
                 if (trans_xvaddwev_q_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11642,42 +13797,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 00110000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1398 */
+                /* ./insns.decode:1500 */
                 if (trans_xvsubwev_h_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 00110000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1399 */
+                /* ./insns.decode:1501 */
                 if (trans_xvsubwev_w_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 00110001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1400 */
+                /* ./insns.decode:1502 */
                 if (trans_xvsubwev_d_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 00110001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1401 */
+                /* ./insns.decode:1503 */
                 if (trans_xvsubwev_q_du(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 00110010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1393 */
+                /* ./insns.decode:1495 */
                 if (trans_xvaddwod_h_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 00110010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1394 */
+                /* ./insns.decode:1496 */
                 if (trans_xvaddwod_w_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 00110011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1395 */
+                /* ./insns.decode:1497 */
                 if (trans_xvaddwod_d_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 00110011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1396 */
+                /* ./insns.decode:1498 */
                 if (trans_xvaddwod_q_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11688,22 +13843,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 00110100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1402 */
+                /* ./insns.decode:1504 */
                 if (trans_xvsubwod_h_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 00110100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1403 */
+                /* ./insns.decode:1505 */
                 if (trans_xvsubwod_w_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 00110101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1404 */
+                /* ./insns.decode:1506 */
                 if (trans_xvsubwod_d_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 00110101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1405 */
+                /* ./insns.decode:1507 */
                 if (trans_xvsubwod_q_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11714,22 +13869,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x4:
                 /* 01110100 00111110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1407 */
+                /* ./insns.decode:1509 */
                 if (trans_xvaddwev_h_bu_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 00111110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1408 */
+                /* ./insns.decode:1510 */
                 if (trans_xvaddwev_w_hu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 00111111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1409 */
+                /* ./insns.decode:1511 */
                 if (trans_xvaddwev_d_wu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 00111111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1410 */
+                /* ./insns.decode:1512 */
                 if (trans_xvaddwev_q_du_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11740,22 +13895,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 01000000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1411 */
+                /* ./insns.decode:1513 */
                 if (trans_xvaddwod_h_bu_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 01000000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1412 */
+                /* ./insns.decode:1514 */
                 if (trans_xvaddwod_w_hu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 01000001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1413 */
+                /* ./insns.decode:1515 */
                 if (trans_xvaddwod_d_wu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 01000001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1414 */
+                /* ./insns.decode:1516 */
                 if (trans_xvaddwod_q_du_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11766,22 +13921,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x4:
                 /* 01110100 01000110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1335 */
+                /* ./insns.decode:1437 */
                 if (trans_xvsadd_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 01000110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1336 */
+                /* ./insns.decode:1438 */
                 if (trans_xvsadd_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 01000111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1337 */
+                /* ./insns.decode:1439 */
                 if (trans_xvsadd_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 01000111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1338 */
+                /* ./insns.decode:1440 */
                 if (trans_xvsadd_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11792,42 +13947,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 01001000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1344 */
+                /* ./insns.decode:1446 */
                 if (trans_xvssub_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 01001000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1345 */
+                /* ./insns.decode:1447 */
                 if (trans_xvssub_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 01001001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1346 */
+                /* ./insns.decode:1448 */
                 if (trans_xvssub_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 01001001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1347 */
+                /* ./insns.decode:1449 */
                 if (trans_xvssub_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 01001010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1339 */
+                /* ./insns.decode:1441 */
                 if (trans_xvsadd_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 01001010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1340 */
+                /* ./insns.decode:1442 */
                 if (trans_xvsadd_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 01001011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1341 */
+                /* ./insns.decode:1443 */
                 if (trans_xvsadd_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 01001011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1342 */
+                /* ./insns.decode:1444 */
                 if (trans_xvsadd_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11838,22 +13993,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 01001100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1348 */
+                /* ./insns.decode:1450 */
                 if (trans_xvssub_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 01001100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1349 */
+                /* ./insns.decode:1451 */
                 if (trans_xvssub_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 01001101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1350 */
+                /* ./insns.decode:1452 */
                 if (trans_xvssub_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 01001101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1351 */
+                /* ./insns.decode:1453 */
                 if (trans_xvssub_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11864,42 +14019,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 01010100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1353 */
+                /* ./insns.decode:1455 */
                 if (trans_xvhaddw_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 01010100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1354 */
+                /* ./insns.decode:1456 */
                 if (trans_xvhaddw_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 01010101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1355 */
+                /* ./insns.decode:1457 */
                 if (trans_xvhaddw_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 01010101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1356 */
+                /* ./insns.decode:1458 */
                 if (trans_xvhaddw_q_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 01010110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1362 */
+                /* ./insns.decode:1464 */
                 if (trans_xvhsubw_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 01010110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1363 */
+                /* ./insns.decode:1465 */
                 if (trans_xvhsubw_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 01010111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1364 */
+                /* ./insns.decode:1466 */
                 if (trans_xvhsubw_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 01010111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1365 */
+                /* ./insns.decode:1467 */
                 if (trans_xvhsubw_q_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11910,42 +14065,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 01011000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1357 */
+                /* ./insns.decode:1459 */
                 if (trans_xvhaddw_hu_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 01011000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1358 */
+                /* ./insns.decode:1460 */
                 if (trans_xvhaddw_wu_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 01011001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1359 */
+                /* ./insns.decode:1461 */
                 if (trans_xvhaddw_du_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 01011001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1360 */
+                /* ./insns.decode:1462 */
                 if (trans_xvhaddw_qu_du(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 01011010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1366 */
+                /* ./insns.decode:1468 */
                 if (trans_xvhsubw_hu_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 01011010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1367 */
+                /* ./insns.decode:1469 */
                 if (trans_xvhsubw_wu_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 01011011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1368 */
+                /* ./insns.decode:1470 */
                 if (trans_xvhsubw_du_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 01011011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1369 */
+                /* ./insns.decode:1471 */
                 if (trans_xvhsubw_qu_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11956,22 +14111,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 01011100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1442 */
+                /* ./insns.decode:1544 */
                 if (trans_xvadda_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 01011100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1443 */
+                /* ./insns.decode:1545 */
                 if (trans_xvadda_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 01011101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1444 */
+                /* ./insns.decode:1546 */
                 if (trans_xvadda_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 01011101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1445 */
+                /* ./insns.decode:1547 */
                 if (trans_xvadda_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -11982,42 +14137,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 01100000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1433 */
+                /* ./insns.decode:1535 */
                 if (trans_xvabsd_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 01100000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1434 */
+                /* ./insns.decode:1536 */
                 if (trans_xvabsd_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 01100001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1435 */
+                /* ./insns.decode:1537 */
                 if (trans_xvabsd_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 01100001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1436 */
+                /* ./insns.decode:1538 */
                 if (trans_xvabsd_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 01100010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1437 */
+                /* ./insns.decode:1539 */
                 if (trans_xvabsd_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 01100010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1438 */
+                /* ./insns.decode:1540 */
                 if (trans_xvabsd_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 01100011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1439 */
+                /* ./insns.decode:1541 */
                 if (trans_xvabsd_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 01100011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1440 */
+                /* ./insns.decode:1542 */
                 if (trans_xvabsd_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12028,42 +14183,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 01100100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1416 */
+                /* ./insns.decode:1518 */
                 if (trans_xvavg_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 01100100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1417 */
+                /* ./insns.decode:1519 */
                 if (trans_xvavg_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 01100101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1418 */
+                /* ./insns.decode:1520 */
                 if (trans_xvavg_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 01100101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1419 */
+                /* ./insns.decode:1521 */
                 if (trans_xvavg_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 01100110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1420 */
+                /* ./insns.decode:1522 */
                 if (trans_xvavg_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 01100110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1421 */
+                /* ./insns.decode:1523 */
                 if (trans_xvavg_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 01100111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1422 */
+                /* ./insns.decode:1524 */
                 if (trans_xvavg_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 01100111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1423 */
+                /* ./insns.decode:1525 */
                 if (trans_xvavg_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12074,42 +14229,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 01101000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1424 */
+                /* ./insns.decode:1526 */
                 if (trans_xvavgr_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 01101000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1425 */
+                /* ./insns.decode:1527 */
                 if (trans_xvavgr_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 01101001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1426 */
+                /* ./insns.decode:1528 */
                 if (trans_xvavgr_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 01101001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1427 */
+                /* ./insns.decode:1529 */
                 if (trans_xvavgr_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 01101010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1428 */
+                /* ./insns.decode:1530 */
                 if (trans_xvavgr_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 01101010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1429 */
+                /* ./insns.decode:1531 */
                 if (trans_xvavgr_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 01101011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1430 */
+                /* ./insns.decode:1532 */
                 if (trans_xvavgr_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 01101011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1431 */
+                /* ./insns.decode:1533 */
                 if (trans_xvavgr_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12120,42 +14275,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 01110000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1447 */
+                /* ./insns.decode:1549 */
                 if (trans_xvmax_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 01110000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1448 */
+                /* ./insns.decode:1550 */
                 if (trans_xvmax_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 01110001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1449 */
+                /* ./insns.decode:1551 */
                 if (trans_xvmax_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 01110001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1450 */
+                /* ./insns.decode:1552 */
                 if (trans_xvmax_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 01110010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1465 */
+                /* ./insns.decode:1567 */
                 if (trans_xvmin_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 01110010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1466 */
+                /* ./insns.decode:1568 */
                 if (trans_xvmin_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 01110011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1467 */
+                /* ./insns.decode:1569 */
                 if (trans_xvmin_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 01110011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1468 */
+                /* ./insns.decode:1570 */
                 if (trans_xvmin_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12166,42 +14321,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 01110100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1451 */
+                /* ./insns.decode:1553 */
                 if (trans_xvmax_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 01110100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1452 */
+                /* ./insns.decode:1554 */
                 if (trans_xvmax_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 01110101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1453 */
+                /* ./insns.decode:1555 */
                 if (trans_xvmax_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 01110101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1454 */
+                /* ./insns.decode:1556 */
                 if (trans_xvmax_du(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 01110110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1469 */
+                /* ./insns.decode:1571 */
                 if (trans_xvmin_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 01110110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1470 */
+                /* ./insns.decode:1572 */
                 if (trans_xvmin_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 01110111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1471 */
+                /* ./insns.decode:1573 */
                 if (trans_xvmin_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 01110111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1472 */
+                /* ./insns.decode:1574 */
                 if (trans_xvmin_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12212,42 +14367,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 10000100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1483 */
+                /* ./insns.decode:1585 */
                 if (trans_xvmul_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 10000100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1484 */
+                /* ./insns.decode:1586 */
                 if (trans_xvmul_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 10000101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1485 */
+                /* ./insns.decode:1587 */
                 if (trans_xvmul_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 10000101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1486 */
+                /* ./insns.decode:1588 */
                 if (trans_xvmul_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 10000110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1487 */
+                /* ./insns.decode:1589 */
                 if (trans_xvmuh_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 10000110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1488 */
+                /* ./insns.decode:1590 */
                 if (trans_xvmuh_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 10000111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1489 */
+                /* ./insns.decode:1591 */
                 if (trans_xvmuh_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 10000111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1490 */
+                /* ./insns.decode:1592 */
                 if (trans_xvmuh_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12258,22 +14413,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 10001000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1491 */
+                /* ./insns.decode:1593 */
                 if (trans_xvmuh_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 10001000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1492 */
+                /* ./insns.decode:1594 */
                 if (trans_xvmuh_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 10001001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1493 */
+                /* ./insns.decode:1595 */
                 if (trans_xvmuh_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 10001001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1494 */
+                /* ./insns.decode:1596 */
                 if (trans_xvmuh_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12284,42 +14439,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 10010000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1496 */
+                /* ./insns.decode:1598 */
                 if (trans_xvmulwev_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 10010000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1497 */
+                /* ./insns.decode:1599 */
                 if (trans_xvmulwev_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 10010001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1498 */
+                /* ./insns.decode:1600 */
                 if (trans_xvmulwev_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 10010001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1499 */
+                /* ./insns.decode:1601 */
                 if (trans_xvmulwev_q_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 10010010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1500 */
+                /* ./insns.decode:1602 */
                 if (trans_xvmulwod_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 10010010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1501 */
+                /* ./insns.decode:1603 */
                 if (trans_xvmulwod_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 10010011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1502 */
+                /* ./insns.decode:1604 */
                 if (trans_xvmulwod_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 10010011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1503 */
+                /* ./insns.decode:1605 */
                 if (trans_xvmulwod_q_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12330,42 +14485,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 10011000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1504 */
+                /* ./insns.decode:1606 */
                 if (trans_xvmulwev_h_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 10011000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1505 */
+                /* ./insns.decode:1607 */
                 if (trans_xvmulwev_w_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 10011001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1506 */
+                /* ./insns.decode:1608 */
                 if (trans_xvmulwev_d_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 10011001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1507 */
+                /* ./insns.decode:1609 */
                 if (trans_xvmulwev_q_du(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 10011010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1508 */
+                /* ./insns.decode:1610 */
                 if (trans_xvmulwod_h_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 10011010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1509 */
+                /* ./insns.decode:1611 */
                 if (trans_xvmulwod_w_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 10011011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1510 */
+                /* ./insns.decode:1612 */
                 if (trans_xvmulwod_d_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 10011011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1511 */
+                /* ./insns.decode:1613 */
                 if (trans_xvmulwod_q_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12376,42 +14531,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 10100000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1512 */
+                /* ./insns.decode:1614 */
                 if (trans_xvmulwev_h_bu_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 10100000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1513 */
+                /* ./insns.decode:1615 */
                 if (trans_xvmulwev_w_hu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 10100001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1514 */
+                /* ./insns.decode:1616 */
                 if (trans_xvmulwev_d_wu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 10100001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1515 */
+                /* ./insns.decode:1617 */
                 if (trans_xvmulwev_q_du_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 10100010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1516 */
+                /* ./insns.decode:1618 */
                 if (trans_xvmulwod_h_bu_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 10100010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1517 */
+                /* ./insns.decode:1619 */
                 if (trans_xvmulwod_w_hu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 10100011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1518 */
+                /* ./insns.decode:1620 */
                 if (trans_xvmulwod_d_wu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 10100011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1519 */
+                /* ./insns.decode:1621 */
                 if (trans_xvmulwod_q_du_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12422,42 +14577,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 10101000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1521 */
+                /* ./insns.decode:1623 */
                 if (trans_xvmadd_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 10101000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1522 */
+                /* ./insns.decode:1624 */
                 if (trans_xvmadd_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 10101001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1523 */
+                /* ./insns.decode:1625 */
                 if (trans_xvmadd_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 10101001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1524 */
+                /* ./insns.decode:1626 */
                 if (trans_xvmadd_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 10101010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1525 */
+                /* ./insns.decode:1627 */
                 if (trans_xvmsub_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 10101010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1526 */
+                /* ./insns.decode:1628 */
                 if (trans_xvmsub_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 10101011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1527 */
+                /* ./insns.decode:1629 */
                 if (trans_xvmsub_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 10101011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1528 */
+                /* ./insns.decode:1630 */
                 if (trans_xvmsub_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12468,42 +14623,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 10101100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1530 */
+                /* ./insns.decode:1632 */
                 if (trans_xvmaddwev_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 10101100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1531 */
+                /* ./insns.decode:1633 */
                 if (trans_xvmaddwev_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 10101101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1532 */
+                /* ./insns.decode:1634 */
                 if (trans_xvmaddwev_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 10101101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1533 */
+                /* ./insns.decode:1635 */
                 if (trans_xvmaddwev_q_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 10101110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1534 */
+                /* ./insns.decode:1636 */
                 if (trans_xvmaddwod_h_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 10101110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1535 */
+                /* ./insns.decode:1637 */
                 if (trans_xvmaddwod_w_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 10101111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1536 */
+                /* ./insns.decode:1638 */
                 if (trans_xvmaddwod_d_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 10101111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1537 */
+                /* ./insns.decode:1639 */
                 if (trans_xvmaddwod_q_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12514,42 +14669,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 10110100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1538 */
+                /* ./insns.decode:1640 */
                 if (trans_xvmaddwev_h_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 10110100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1539 */
+                /* ./insns.decode:1641 */
                 if (trans_xvmaddwev_w_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 10110101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1540 */
+                /* ./insns.decode:1642 */
                 if (trans_xvmaddwev_d_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 10110101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1541 */
+                /* ./insns.decode:1643 */
                 if (trans_xvmaddwev_q_du(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 10110110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1542 */
+                /* ./insns.decode:1644 */
                 if (trans_xvmaddwod_h_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 10110110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1543 */
+                /* ./insns.decode:1645 */
                 if (trans_xvmaddwod_w_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 10110111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1544 */
+                /* ./insns.decode:1646 */
                 if (trans_xvmaddwod_d_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 10110111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1545 */
+                /* ./insns.decode:1647 */
                 if (trans_xvmaddwod_q_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12560,42 +14715,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 10111100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1546 */
+                /* ./insns.decode:1648 */
                 if (trans_xvmaddwev_h_bu_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 10111100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1547 */
+                /* ./insns.decode:1649 */
                 if (trans_xvmaddwev_w_hu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 10111101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1548 */
+                /* ./insns.decode:1650 */
                 if (trans_xvmaddwev_d_wu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 10111101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1549 */
+                /* ./insns.decode:1651 */
                 if (trans_xvmaddwev_q_du_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 10111110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1550 */
+                /* ./insns.decode:1652 */
                 if (trans_xvmaddwod_h_bu_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 10111110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1551 */
+                /* ./insns.decode:1653 */
                 if (trans_xvmaddwod_w_hu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 10111111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1552 */
+                /* ./insns.decode:1654 */
                 if (trans_xvmaddwod_d_wu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 10111111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1553 */
+                /* ./insns.decode:1655 */
                 if (trans_xvmaddwod_q_du_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12606,42 +14761,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 11100000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1555 */
+                /* ./insns.decode:1657 */
                 if (trans_xvdiv_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 11100000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1556 */
+                /* ./insns.decode:1658 */
                 if (trans_xvdiv_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 11100001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1557 */
+                /* ./insns.decode:1659 */
                 if (trans_xvdiv_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 11100001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1558 */
+                /* ./insns.decode:1660 */
                 if (trans_xvdiv_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 11100010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1559 */
+                /* ./insns.decode:1661 */
                 if (trans_xvmod_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 11100010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1560 */
+                /* ./insns.decode:1662 */
                 if (trans_xvmod_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 11100011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1561 */
+                /* ./insns.decode:1663 */
                 if (trans_xvmod_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 11100011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1562 */
+                /* ./insns.decode:1664 */
                 if (trans_xvmod_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12652,42 +14807,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 11100100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1563 */
+                /* ./insns.decode:1665 */
                 if (trans_xvdiv_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 11100100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1564 */
+                /* ./insns.decode:1666 */
                 if (trans_xvdiv_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 11100101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1565 */
+                /* ./insns.decode:1667 */
                 if (trans_xvdiv_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 11100101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1566 */
+                /* ./insns.decode:1668 */
                 if (trans_xvdiv_du(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 11100110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1567 */
+                /* ./insns.decode:1669 */
                 if (trans_xvmod_bu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 11100110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1568 */
+                /* ./insns.decode:1670 */
                 if (trans_xvmod_hu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 11100111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1569 */
+                /* ./insns.decode:1671 */
                 if (trans_xvmod_wu(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 11100111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1570 */
+                /* ./insns.decode:1672 */
                 if (trans_xvmod_du(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12698,42 +14853,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 11101000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1629 */
+                /* ./insns.decode:1731 */
                 if (trans_xvsll_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 11101000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1630 */
+                /* ./insns.decode:1732 */
                 if (trans_xvsll_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 11101001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1631 */
+                /* ./insns.decode:1733 */
                 if (trans_xvsll_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 11101001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1632 */
+                /* ./insns.decode:1734 */
                 if (trans_xvsll_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 11101010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1637 */
+                /* ./insns.decode:1739 */
                 if (trans_xvsrl_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 11101010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1638 */
+                /* ./insns.decode:1740 */
                 if (trans_xvsrl_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 11101011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1639 */
+                /* ./insns.decode:1741 */
                 if (trans_xvsrl_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 11101011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1640 */
+                /* ./insns.decode:1742 */
                 if (trans_xvsrl_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12744,42 +14899,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 11101100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1645 */
+                /* ./insns.decode:1747 */
                 if (trans_xvsra_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 11101100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1646 */
+                /* ./insns.decode:1748 */
                 if (trans_xvsra_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 11101101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1647 */
+                /* ./insns.decode:1749 */
                 if (trans_xvsra_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 11101101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1648 */
+                /* ./insns.decode:1750 */
                 if (trans_xvsra_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 11101110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1653 */
+                /* ./insns.decode:1755 */
                 if (trans_xvrotr_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 11101110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1654 */
+                /* ./insns.decode:1756 */
                 if (trans_xvrotr_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 11101111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1655 */
+                /* ./insns.decode:1757 */
                 if (trans_xvrotr_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 11101111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1656 */
+                /* ./insns.decode:1758 */
                 if (trans_xvrotr_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12790,42 +14945,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110100 11110000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1671 */
+                /* ./insns.decode:1773 */
                 if (trans_xvsrlr_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110100 11110000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1672 */
+                /* ./insns.decode:1774 */
                 if (trans_xvsrlr_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 11110001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1673 */
+                /* ./insns.decode:1775 */
                 if (trans_xvsrlr_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 11110001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1674 */
+                /* ./insns.decode:1776 */
                 if (trans_xvsrlr_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110100 11110010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1679 */
+                /* ./insns.decode:1781 */
                 if (trans_xvsrar_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 11110010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1680 */
+                /* ./insns.decode:1782 */
                 if (trans_xvsrar_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 11110011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1681 */
+                /* ./insns.decode:1783 */
                 if (trans_xvsrar_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 11110011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1682 */
+                /* ./insns.decode:1784 */
                 if (trans_xvsrar_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12836,32 +14991,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110100 11110100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1688 */
+                /* ./insns.decode:1790 */
                 if (trans_xvsrln_b_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 11110101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1689 */
+                /* ./insns.decode:1791 */
                 if (trans_xvsrln_h_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 11110101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1690 */
+                /* ./insns.decode:1792 */
                 if (trans_xvsrln_w_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 11110110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1691 */
+                /* ./insns.decode:1793 */
                 if (trans_xvsran_b_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 11110111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1692 */
+                /* ./insns.decode:1794 */
                 if (trans_xvsran_h_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 11110111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1693 */
+                /* ./insns.decode:1795 */
                 if (trans_xvsran_w_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12872,32 +15027,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110100 11111000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1704 */
+                /* ./insns.decode:1806 */
                 if (trans_xvsrlrn_b_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 11111001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1705 */
+                /* ./insns.decode:1807 */
                 if (trans_xvsrlrn_h_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 11111001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1706 */
+                /* ./insns.decode:1808 */
                 if (trans_xvsrlrn_w_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 11111010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1707 */
+                /* ./insns.decode:1809 */
                 if (trans_xvsrarn_b_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 11111011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1708 */
+                /* ./insns.decode:1810 */
                 if (trans_xvsrarn_h_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 11111011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1709 */
+                /* ./insns.decode:1811 */
                 if (trans_xvsrarn_w_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12908,32 +15063,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110100 11111100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1720 */
+                /* ./insns.decode:1822 */
                 if (trans_xvssrln_b_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110100 11111101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1721 */
+                /* ./insns.decode:1823 */
                 if (trans_xvssrln_h_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110100 11111101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1722 */
+                /* ./insns.decode:1824 */
                 if (trans_xvssrln_w_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110100 11111110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1723 */
+                /* ./insns.decode:1825 */
                 if (trans_xvssran_b_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110100 11111111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1724 */
+                /* ./insns.decode:1826 */
                 if (trans_xvssran_h_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110100 11111111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1725 */
+                /* ./insns.decode:1827 */
                 if (trans_xvssran_w_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12944,32 +15099,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110101 00000000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1750 */
+                /* ./insns.decode:1852 */
                 if (trans_xvssrlrn_b_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110101 00000001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1751 */
+                /* ./insns.decode:1853 */
                 if (trans_xvssrlrn_h_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110101 00000001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1752 */
+                /* ./insns.decode:1854 */
                 if (trans_xvssrlrn_w_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110101 00000010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1753 */
+                /* ./insns.decode:1855 */
                 if (trans_xvssrarn_b_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110101 00000011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1754 */
+                /* ./insns.decode:1856 */
                 if (trans_xvssrarn_h_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110101 00000011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1755 */
+                /* ./insns.decode:1857 */
                 if (trans_xvssrarn_w_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -12980,32 +15135,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110101 00000100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1726 */
+                /* ./insns.decode:1828 */
                 if (trans_xvssrln_bu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110101 00000101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1727 */
+                /* ./insns.decode:1829 */
                 if (trans_xvssrln_hu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110101 00000101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1728 */
+                /* ./insns.decode:1830 */
                 if (trans_xvssrln_wu_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110101 00000110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1729 */
+                /* ./insns.decode:1831 */
                 if (trans_xvssran_bu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110101 00000111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1730 */
+                /* ./insns.decode:1832 */
                 if (trans_xvssran_hu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110101 00000111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1731 */
+                /* ./insns.decode:1833 */
                 if (trans_xvssran_wu_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13016,32 +15171,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110101 00001000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1756 */
+                /* ./insns.decode:1858 */
                 if (trans_xvssrlrn_bu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110101 00001001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1757 */
+                /* ./insns.decode:1859 */
                 if (trans_xvssrlrn_hu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110101 00001001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1758 */
+                /* ./insns.decode:1860 */
                 if (trans_xvssrlrn_wu_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110101 00001010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1759 */
+                /* ./insns.decode:1861 */
                 if (trans_xvssrarn_bu_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110101 00001011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1760 */
+                /* ./insns.decode:1862 */
                 if (trans_xvssrarn_hu_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110101 00001011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1761 */
+                /* ./insns.decode:1863 */
                 if (trans_xvssrarn_wu_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13052,42 +15207,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110101 00001100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1794 */
+                /* ./insns.decode:1896 */
                 if (trans_xvbitclr_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110101 00001100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1795 */
+                /* ./insns.decode:1897 */
                 if (trans_xvbitclr_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110101 00001101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1796 */
+                /* ./insns.decode:1898 */
                 if (trans_xvbitclr_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110101 00001101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1797 */
+                /* ./insns.decode:1899 */
                 if (trans_xvbitclr_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110101 00001110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1803 */
+                /* ./insns.decode:1905 */
                 if (trans_xvbitset_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110101 00001110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1804 */
+                /* ./insns.decode:1906 */
                 if (trans_xvbitset_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110101 00001111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1805 */
+                /* ./insns.decode:1907 */
                 if (trans_xvbitset_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110101 00001111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1806 */
+                /* ./insns.decode:1908 */
                 if (trans_xvbitset_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13098,22 +15253,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110101 00010000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1812 */
+                /* ./insns.decode:1914 */
                 if (trans_xvbitrev_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110101 00010000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1813 */
+                /* ./insns.decode:1915 */
                 if (trans_xvbitrev_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110101 00010001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1814 */
+                /* ./insns.decode:1916 */
                 if (trans_xvbitrev_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110101 00010001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1815 */
+                /* ./insns.decode:1917 */
                 if (trans_xvbitrev_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13124,22 +15279,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x4:
                 /* 01110101 00010110 0....... ........ */
-                /* ../target/loongarch/insns.decode:2023 */
+                /* ./insns.decode:2141 */
                 if (trans_xvpackev_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110101 00010110 1....... ........ */
-                /* ../target/loongarch/insns.decode:2024 */
+                /* ./insns.decode:2142 */
                 if (trans_xvpackev_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110101 00010111 0....... ........ */
-                /* ../target/loongarch/insns.decode:2025 */
+                /* ./insns.decode:2143 */
                 if (trans_xvpackev_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110101 00010111 1....... ........ */
-                /* ../target/loongarch/insns.decode:2026 */
+                /* ./insns.decode:2144 */
                 if (trans_xvpackev_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13150,42 +15305,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110101 00011000 0....... ........ */
-                /* ../target/loongarch/insns.decode:2027 */
+                /* ./insns.decode:2145 */
                 if (trans_xvpackod_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110101 00011000 1....... ........ */
-                /* ../target/loongarch/insns.decode:2028 */
+                /* ./insns.decode:2146 */
                 if (trans_xvpackod_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110101 00011001 0....... ........ */
-                /* ../target/loongarch/insns.decode:2029 */
+                /* ./insns.decode:2147 */
                 if (trans_xvpackod_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110101 00011001 1....... ........ */
-                /* ../target/loongarch/insns.decode:2030 */
+                /* ./insns.decode:2148 */
                 if (trans_xvpackod_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110101 00011010 0....... ........ */
-                /* ../target/loongarch/insns.decode:2041 */
+                /* ./insns.decode:2159 */
                 if (trans_xvilvl_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110101 00011010 1....... ........ */
-                /* ../target/loongarch/insns.decode:2042 */
+                /* ./insns.decode:2160 */
                 if (trans_xvilvl_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110101 00011011 0....... ........ */
-                /* ../target/loongarch/insns.decode:2043 */
+                /* ./insns.decode:2161 */
                 if (trans_xvilvl_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110101 00011011 1....... ........ */
-                /* ../target/loongarch/insns.decode:2044 */
+                /* ./insns.decode:2162 */
                 if (trans_xvilvl_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13196,42 +15351,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110101 00011100 0....... ........ */
-                /* ../target/loongarch/insns.decode:2045 */
+                /* ./insns.decode:2163 */
                 if (trans_xvilvh_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110101 00011100 1....... ........ */
-                /* ../target/loongarch/insns.decode:2046 */
+                /* ./insns.decode:2164 */
                 if (trans_xvilvh_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110101 00011101 0....... ........ */
-                /* ../target/loongarch/insns.decode:2047 */
+                /* ./insns.decode:2165 */
                 if (trans_xvilvh_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110101 00011101 1....... ........ */
-                /* ../target/loongarch/insns.decode:2048 */
+                /* ./insns.decode:2166 */
                 if (trans_xvilvh_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110101 00011110 0....... ........ */
-                /* ../target/loongarch/insns.decode:2032 */
+                /* ./insns.decode:2150 */
                 if (trans_xvpickev_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110101 00011110 1....... ........ */
-                /* ../target/loongarch/insns.decode:2033 */
+                /* ./insns.decode:2151 */
                 if (trans_xvpickev_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110101 00011111 0....... ........ */
-                /* ../target/loongarch/insns.decode:2034 */
+                /* ./insns.decode:2152 */
                 if (trans_xvpickev_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110101 00011111 1....... ........ */
-                /* ../target/loongarch/insns.decode:2035 */
+                /* ./insns.decode:2153 */
                 if (trans_xvpickev_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13241,49 +15396,49 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110101 00100000 0....... ........ */
-                /* ../target/loongarch/insns.decode:2036 */
+                /* ./insns.decode:2154 */
                 decode_extract_vvv(ctx, &u.f_vvv, insn);
                 if (trans_xvpickod_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110101 00100000 1....... ........ */
-                /* ../target/loongarch/insns.decode:2037 */
+                /* ./insns.decode:2155 */
                 decode_extract_vvv(ctx, &u.f_vvv, insn);
                 if (trans_xvpickod_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110101 00100001 0....... ........ */
-                /* ../target/loongarch/insns.decode:2038 */
+                /* ./insns.decode:2156 */
                 decode_extract_vvv(ctx, &u.f_vvv, insn);
                 if (trans_xvpickod_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110101 00100001 1....... ........ */
-                /* ../target/loongarch/insns.decode:2039 */
+                /* ./insns.decode:2157 */
                 decode_extract_vvv(ctx, &u.f_vvv, insn);
                 if (trans_xvpickod_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110101 00100010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1998 */
+                /* ./insns.decode:2116 */
                 decode_extract_vvr(ctx, &u.f_vvr, insn);
                 if (trans_xvreplve_b(ctx, &u.f_vvr)) return true;
                 break;
             case 0x5:
                 /* 01110101 00100010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1999 */
+                /* ./insns.decode:2117 */
                 decode_extract_vvr(ctx, &u.f_vvr, insn);
                 if (trans_xvreplve_h(ctx, &u.f_vvr)) return true;
                 break;
             case 0x6:
                 /* 01110101 00100011 0....... ........ */
-                /* ../target/loongarch/insns.decode:2000 */
+                /* ./insns.decode:2118 */
                 decode_extract_vvr(ctx, &u.f_vvr, insn);
                 if (trans_xvreplve_w(ctx, &u.f_vvr)) return true;
                 break;
             case 0x7:
                 /* 01110101 00100011 1....... ........ */
-                /* ../target/loongarch/insns.decode:2001 */
+                /* ./insns.decode:2119 */
                 decode_extract_vvr(ctx, &u.f_vvr, insn);
                 if (trans_xvreplve_d(ctx, &u.f_vvr)) return true;
                 break;
@@ -13295,22 +15450,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x4:
                 /* 01110101 00100110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1617 */
+                /* ./insns.decode:1719 */
                 if (trans_xvand_v(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110101 00100110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1618 */
+                /* ./insns.decode:1720 */
                 if (trans_xvor_v(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110101 00100111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1619 */
+                /* ./insns.decode:1721 */
                 if (trans_xvxor_v(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110101 00100111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1620 */
+                /* ./insns.decode:1722 */
                 if (trans_xvnor_v(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13321,22 +15476,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110101 00101000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1621 */
+                /* ./insns.decode:1723 */
                 if (trans_xvandn_v(ctx, &u.f_vvv)) return true;
                 break;
             case 0x1:
                 /* 01110101 00101000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1622 */
+                /* ./insns.decode:1724 */
                 if (trans_xvorn_v(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110101 00101011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1821 */
+                /* ./insns.decode:1923 */
                 if (trans_xvfrstp_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110101 00101011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1822 */
+                /* ./insns.decode:1924 */
                 if (trans_xvfrstp_h(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13347,32 +15502,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x2:
                 /* 01110101 00101101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1314 */
+                /* ./insns.decode:1416 */
                 if (trans_xvadd_q(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110101 00101101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1319 */
+                /* ./insns.decode:1421 */
                 if (trans_xvsub_q(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110101 00101110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1603 */
+                /* ./insns.decode:1705 */
                 if (trans_xvsigncov_b(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110101 00101110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1604 */
+                /* ./insns.decode:1706 */
                 if (trans_xvsigncov_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110101 00101111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1605 */
+                /* ./insns.decode:1707 */
                 if (trans_xvsigncov_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110101 00101111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1606 */
+                /* ./insns.decode:1708 */
                 if (trans_xvsigncov_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13383,22 +15538,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110101 00110000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1826 */
+                /* ./insns.decode:1928 */
                 if (trans_xvfadd_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110101 00110001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1827 */
+                /* ./insns.decode:1929 */
                 if (trans_xvfadd_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110101 00110010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1828 */
+                /* ./insns.decode:1930 */
                 if (trans_xvfsub_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110101 00110011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1829 */
+                /* ./insns.decode:1931 */
                 if (trans_xvfsub_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13409,22 +15564,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110101 00111000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1830 */
+                /* ./insns.decode:1932 */
                 if (trans_xvfmul_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110101 00111001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1831 */
+                /* ./insns.decode:1933 */
                 if (trans_xvfmul_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110101 00111010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1832 */
+                /* ./insns.decode:1934 */
                 if (trans_xvfdiv_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110101 00111011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1833 */
+                /* ./insns.decode:1935 */
                 if (trans_xvfdiv_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13435,22 +15590,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110101 00111100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1844 */
+                /* ./insns.decode:1946 */
                 if (trans_xvfmax_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110101 00111101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1845 */
+                /* ./insns.decode:1947 */
                 if (trans_xvfmax_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110101 00111110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1846 */
+                /* ./insns.decode:1948 */
                 if (trans_xvfmin_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110101 00111111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1847 */
+                /* ./insns.decode:1949 */
                 if (trans_xvfmin_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13461,22 +15616,22 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x1:
                 /* 01110101 01000000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1849 */
+                /* ./insns.decode:1955 */
                 if (trans_xvfmaxa_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x2:
                 /* 01110101 01000001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1850 */
+                /* ./insns.decode:1956 */
                 if (trans_xvfmaxa_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110101 01000010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1851 */
+                /* ./insns.decode:1957 */
                 if (trans_xvfmina_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110101 01000011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1852 */
+                /* ./insns.decode:1958 */
                 if (trans_xvfmina_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13487,12 +15642,12 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x4:
                 /* 01110101 01000110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1871 */
+                /* ./insns.decode:1981 */
                 if (trans_xvfcvt_h_s(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110101 01000110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1872 */
+                /* ./insns.decode:1982 */
                 if (trans_xvfcvt_s_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13503,32 +15658,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110101 01001000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1923 */
+                /* ./insns.decode:2041 */
                 if (trans_xvffint_s_l(ctx, &u.f_vvv)) return true;
                 break;
             case 0x3:
                 /* 01110101 01001001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1904 */
+                /* ./insns.decode:2022 */
                 if (trans_xvftint_w_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x4:
                 /* 01110101 01001010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1903 */
+                /* ./insns.decode:2021 */
                 if (trans_xvftintrm_w_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x5:
                 /* 01110101 01001010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1902 */
+                /* ./insns.decode:2020 */
                 if (trans_xvftintrp_w_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110101 01001011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1901 */
+                /* ./insns.decode:2019 */
                 if (trans_xvftintrz_w_d(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110101 01001011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1900 */
+                /* ./insns.decode:2018 */
                 if (trans_xvftintrne_w_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13539,17 +15694,17 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x5:
                 /* 01110101 01111010 1....... ........ */
-                /* ../target/loongarch/insns.decode:2051 */
+                /* ./insns.decode:2169 */
                 if (trans_xvshuf_h(ctx, &u.f_vvv)) return true;
                 break;
             case 0x6:
                 /* 01110101 01111011 0....... ........ */
-                /* ../target/loongarch/insns.decode:2052 */
+                /* ./insns.decode:2170 */
                 if (trans_xvshuf_w(ctx, &u.f_vvv)) return true;
                 break;
             case 0x7:
                 /* 01110101 01111011 1....... ........ */
-                /* ../target/loongarch/insns.decode:2053 */
+                /* ./insns.decode:2171 */
                 if (trans_xvshuf_d(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13560,7 +15715,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x2:
                 /* 01110101 01111101 0....... ........ */
-                /* ../target/loongarch/insns.decode:2055 */
+                /* ./insns.decode:2173 */
                 if (trans_xvperm_w(ctx, &u.f_vvv)) return true;
                 break;
             }
@@ -13571,42 +15726,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110110 10000000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1929 */
+                /* ./insns.decode:2047 */
                 if (trans_xvseqi_b(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x1:
                 /* 01110110 10000000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1930 */
+                /* ./insns.decode:2048 */
                 if (trans_xvseqi_h(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x2:
                 /* 01110110 10000001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1931 */
+                /* ./insns.decode:2049 */
                 if (trans_xvseqi_w(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x3:
                 /* 01110110 10000001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1932 */
+                /* ./insns.decode:2050 */
                 if (trans_xvseqi_d(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x4:
                 /* 01110110 10000010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1938 */
+                /* ./insns.decode:2056 */
                 if (trans_xvslei_b(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x5:
                 /* 01110110 10000010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1939 */
+                /* ./insns.decode:2057 */
                 if (trans_xvslei_h(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x6:
                 /* 01110110 10000011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1940 */
+                /* ./insns.decode:2058 */
                 if (trans_xvslei_w(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x7:
                 /* 01110110 10000011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1941 */
+                /* ./insns.decode:2059 */
                 if (trans_xvslei_d(ctx, &u.f_vv_i)) return true;
                 break;
             }
@@ -13616,49 +15771,49 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110110 10000100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1946 */
+                /* ./insns.decode:2064 */
                 decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                 if (trans_xvslei_bu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x1:
                 /* 01110110 10000100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1947 */
+                /* ./insns.decode:2065 */
                 decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                 if (trans_xvslei_hu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x2:
                 /* 01110110 10000101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1948 */
+                /* ./insns.decode:2066 */
                 decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                 if (trans_xvslei_wu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x3:
                 /* 01110110 10000101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1949 */
+                /* ./insns.decode:2067 */
                 decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                 if (trans_xvslei_du(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x4:
                 /* 01110110 10000110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1955 */
+                /* ./insns.decode:2073 */
                 decode_extract_vv_i5(ctx, &u.f_vv_i, insn);
                 if (trans_xvslti_b(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x5:
                 /* 01110110 10000110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1956 */
+                /* ./insns.decode:2074 */
                 decode_extract_vv_i5(ctx, &u.f_vv_i, insn);
                 if (trans_xvslti_h(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x6:
                 /* 01110110 10000111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1957 */
+                /* ./insns.decode:2075 */
                 decode_extract_vv_i5(ctx, &u.f_vv_i, insn);
                 if (trans_xvslti_w(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x7:
                 /* 01110110 10000111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1958 */
+                /* ./insns.decode:2076 */
                 decode_extract_vv_i5(ctx, &u.f_vv_i, insn);
                 if (trans_xvslti_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -13670,42 +15825,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110110 10001000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1963 */
+                /* ./insns.decode:2081 */
                 if (trans_xvslti_bu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x1:
                 /* 01110110 10001000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1964 */
+                /* ./insns.decode:2082 */
                 if (trans_xvslti_hu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x2:
                 /* 01110110 10001001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1965 */
+                /* ./insns.decode:2083 */
                 if (trans_xvslti_wu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x3:
                 /* 01110110 10001001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1966 */
+                /* ./insns.decode:2084 */
                 if (trans_xvslti_du(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x4:
                 /* 01110110 10001010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1321 */
+                /* ./insns.decode:1423 */
                 if (trans_xvaddi_bu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x5:
                 /* 01110110 10001010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1322 */
+                /* ./insns.decode:1424 */
                 if (trans_xvaddi_hu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x6:
                 /* 01110110 10001011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1323 */
+                /* ./insns.decode:1425 */
                 if (trans_xvaddi_wu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x7:
                 /* 01110110 10001011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1324 */
+                /* ./insns.decode:1426 */
                 if (trans_xvaddi_du(ctx, &u.f_vv_i)) return true;
                 break;
             }
@@ -13716,32 +15871,32 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110110 10001100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1325 */
+                /* ./insns.decode:1427 */
                 if (trans_xvsubi_bu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x1:
                 /* 01110110 10001100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1326 */
+                /* ./insns.decode:1428 */
                 if (trans_xvsubi_hu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x2:
                 /* 01110110 10001101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1327 */
+                /* ./insns.decode:1429 */
                 if (trans_xvsubi_wu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x3:
                 /* 01110110 10001101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1328 */
+                /* ./insns.decode:1430 */
                 if (trans_xvsubi_du(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x4:
                 /* 01110110 10001110 0....... ........ */
-                /* ../target/loongarch/insns.decode:2020 */
+                /* ./insns.decode:2138 */
                 if (trans_xvbsll_v(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x5:
                 /* 01110110 10001110 1....... ........ */
-                /* ../target/loongarch/insns.decode:2021 */
+                /* ./insns.decode:2139 */
                 if (trans_xvbsrl_v(ctx, &u.f_vv_i)) return true;
                 break;
             }
@@ -13752,42 +15907,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110110 10010000 0....... ........ */
-                /* ../target/loongarch/insns.decode:1456 */
+                /* ./insns.decode:1558 */
                 if (trans_xvmaxi_b(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x1:
                 /* 01110110 10010000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1457 */
+                /* ./insns.decode:1559 */
                 if (trans_xvmaxi_h(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x2:
                 /* 01110110 10010001 0....... ........ */
-                /* ../target/loongarch/insns.decode:1458 */
+                /* ./insns.decode:1560 */
                 if (trans_xvmaxi_w(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x3:
                 /* 01110110 10010001 1....... ........ */
-                /* ../target/loongarch/insns.decode:1459 */
+                /* ./insns.decode:1561 */
                 if (trans_xvmaxi_d(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x4:
                 /* 01110110 10010010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1474 */
+                /* ./insns.decode:1576 */
                 if (trans_xvmini_b(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x5:
                 /* 01110110 10010010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1475 */
+                /* ./insns.decode:1577 */
                 if (trans_xvmini_h(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x6:
                 /* 01110110 10010011 0....... ........ */
-                /* ../target/loongarch/insns.decode:1476 */
+                /* ./insns.decode:1578 */
                 if (trans_xvmini_w(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x7:
                 /* 01110110 10010011 1....... ........ */
-                /* ../target/loongarch/insns.decode:1477 */
+                /* ./insns.decode:1579 */
                 if (trans_xvmini_d(ctx, &u.f_vv_i)) return true;
                 break;
             }
@@ -13798,42 +15953,42 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x0:
                 /* 01110110 10010100 0....... ........ */
-                /* ../target/loongarch/insns.decode:1460 */
+                /* ./insns.decode:1562 */
                 if (trans_xvmaxi_bu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x1:
                 /* 01110110 10010100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1461 */
+                /* ./insns.decode:1563 */
                 if (trans_xvmaxi_hu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x2:
                 /* 01110110 10010101 0....... ........ */
-                /* ../target/loongarch/insns.decode:1462 */
+                /* ./insns.decode:1564 */
                 if (trans_xvmaxi_wu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x3:
                 /* 01110110 10010101 1....... ........ */
-                /* ../target/loongarch/insns.decode:1463 */
+                /* ./insns.decode:1565 */
                 if (trans_xvmaxi_du(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x4:
                 /* 01110110 10010110 0....... ........ */
-                /* ../target/loongarch/insns.decode:1478 */
+                /* ./insns.decode:1580 */
                 if (trans_xvmini_bu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x5:
                 /* 01110110 10010110 1....... ........ */
-                /* ../target/loongarch/insns.decode:1479 */
+                /* ./insns.decode:1581 */
                 if (trans_xvmini_hu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x6:
                 /* 01110110 10010111 0....... ........ */
-                /* ../target/loongarch/insns.decode:1480 */
+                /* ./insns.decode:1582 */
                 if (trans_xvmini_wu(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x7:
                 /* 01110110 10010111 1....... ........ */
-                /* ../target/loongarch/insns.decode:1481 */
+                /* ./insns.decode:1583 */
                 if (trans_xvmini_du(ctx, &u.f_vv_i)) return true;
                 break;
             }
@@ -13844,12 +15999,12 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 15) & 0x7) {
             case 0x4:
                 /* 01110110 10011010 0....... ........ */
-                /* ../target/loongarch/insns.decode:1823 */
+                /* ./insns.decode:1925 */
                 if (trans_xvfrstpi_b(ctx, &u.f_vv_i)) return true;
                 break;
             case 0x5:
                 /* 01110110 10011010 1....... ........ */
-                /* ../target/loongarch/insns.decode:1824 */
+                /* ./insns.decode:1926 */
                 if (trans_xvfrstpi_h(ctx, &u.f_vv_i)) return true;
                 break;
             }
@@ -13859,133 +16014,133 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 10) & 0xff) {
             case 0x0:
                 /* 01110110 10011100 000000.. ........ */
-                /* ../target/loongarch/insns.decode:1780 */
+                /* ./insns.decode:1882 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvclo_b(ctx, &u.f_vv)) return true;
                 break;
             case 0x1:
                 /* 01110110 10011100 000001.. ........ */
-                /* ../target/loongarch/insns.decode:1781 */
+                /* ./insns.decode:1883 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvclo_h(ctx, &u.f_vv)) return true;
                 break;
             case 0x2:
                 /* 01110110 10011100 000010.. ........ */
-                /* ../target/loongarch/insns.decode:1782 */
+                /* ./insns.decode:1884 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvclo_w(ctx, &u.f_vv)) return true;
                 break;
             case 0x3:
                 /* 01110110 10011100 000011.. ........ */
-                /* ../target/loongarch/insns.decode:1783 */
+                /* ./insns.decode:1885 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvclo_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x4:
                 /* 01110110 10011100 000100.. ........ */
-                /* ../target/loongarch/insns.decode:1784 */
+                /* ./insns.decode:1886 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvclz_b(ctx, &u.f_vv)) return true;
                 break;
             case 0x5:
                 /* 01110110 10011100 000101.. ........ */
-                /* ../target/loongarch/insns.decode:1785 */
+                /* ./insns.decode:1887 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvclz_h(ctx, &u.f_vv)) return true;
                 break;
             case 0x6:
                 /* 01110110 10011100 000110.. ........ */
-                /* ../target/loongarch/insns.decode:1786 */
+                /* ./insns.decode:1888 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvclz_w(ctx, &u.f_vv)) return true;
                 break;
             case 0x7:
                 /* 01110110 10011100 000111.. ........ */
-                /* ../target/loongarch/insns.decode:1787 */
+                /* ./insns.decode:1889 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvclz_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x8:
                 /* 01110110 10011100 001000.. ........ */
-                /* ../target/loongarch/insns.decode:1789 */
+                /* ./insns.decode:1891 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvpcnt_b(ctx, &u.f_vv)) return true;
                 break;
             case 0x9:
                 /* 01110110 10011100 001001.. ........ */
-                /* ../target/loongarch/insns.decode:1790 */
+                /* ./insns.decode:1892 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvpcnt_h(ctx, &u.f_vv)) return true;
                 break;
             case 0xa:
                 /* 01110110 10011100 001010.. ........ */
-                /* ../target/loongarch/insns.decode:1791 */
+                /* ./insns.decode:1893 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvpcnt_w(ctx, &u.f_vv)) return true;
                 break;
             case 0xb:
                 /* 01110110 10011100 001011.. ........ */
-                /* ../target/loongarch/insns.decode:1792 */
+                /* ./insns.decode:1894 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvpcnt_d(ctx, &u.f_vv)) return true;
                 break;
             case 0xc:
                 /* 01110110 10011100 001100.. ........ */
-                /* ../target/loongarch/insns.decode:1330 */
+                /* ./insns.decode:1432 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvneg_b(ctx, &u.f_vv)) return true;
                 break;
             case 0xd:
                 /* 01110110 10011100 001101.. ........ */
-                /* ../target/loongarch/insns.decode:1331 */
+                /* ./insns.decode:1433 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvneg_h(ctx, &u.f_vv)) return true;
                 break;
             case 0xe:
                 /* 01110110 10011100 001110.. ........ */
-                /* ../target/loongarch/insns.decode:1332 */
+                /* ./insns.decode:1434 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvneg_w(ctx, &u.f_vv)) return true;
                 break;
             case 0xf:
                 /* 01110110 10011100 001111.. ........ */
-                /* ../target/loongarch/insns.decode:1333 */
+                /* ./insns.decode:1435 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvneg_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x10:
                 /* 01110110 10011100 010000.. ........ */
-                /* ../target/loongarch/insns.decode:1608 */
+                /* ./insns.decode:1710 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvmskltz_b(ctx, &u.f_vv)) return true;
                 break;
             case 0x11:
                 /* 01110110 10011100 010001.. ........ */
-                /* ../target/loongarch/insns.decode:1609 */
+                /* ./insns.decode:1711 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvmskltz_h(ctx, &u.f_vv)) return true;
                 break;
             case 0x12:
                 /* 01110110 10011100 010010.. ........ */
-                /* ../target/loongarch/insns.decode:1610 */
+                /* ./insns.decode:1712 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvmskltz_w(ctx, &u.f_vv)) return true;
                 break;
             case 0x13:
                 /* 01110110 10011100 010011.. ........ */
-                /* ../target/loongarch/insns.decode:1611 */
+                /* ./insns.decode:1713 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvmskltz_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x14:
                 /* 01110110 10011100 010100.. ........ */
-                /* ../target/loongarch/insns.decode:1612 */
+                /* ./insns.decode:1714 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvmskgez_b(ctx, &u.f_vv)) return true;
                 break;
             case 0x18:
                 /* 01110110 10011100 011000.. ........ */
-                /* ../target/loongarch/insns.decode:1613 */
+                /* ./insns.decode:1715 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvmsknz_b(ctx, &u.f_vv)) return true;
                 break;
@@ -13995,7 +16150,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110110 10011100 100110.. ...00... */
-                    /* ../target/loongarch/insns.decode:1975 */
+                    /* ./insns.decode:2093 */
                     if (trans_xvseteqz_v(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -14006,7 +16161,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110110 10011100 100111.. ...00... */
-                    /* ../target/loongarch/insns.decode:1976 */
+                    /* ./insns.decode:2094 */
                     if (trans_xvsetnez_v(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -14017,7 +16172,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110110 10011100 101000.. ...00... */
-                    /* ../target/loongarch/insns.decode:1977 */
+                    /* ./insns.decode:2095 */
                     if (trans_xvsetanyeqz_b(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -14028,7 +16183,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110110 10011100 101001.. ...00... */
-                    /* ../target/loongarch/insns.decode:1978 */
+                    /* ./insns.decode:2096 */
                     if (trans_xvsetanyeqz_h(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -14039,7 +16194,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110110 10011100 101010.. ...00... */
-                    /* ../target/loongarch/insns.decode:1979 */
+                    /* ./insns.decode:2097 */
                     if (trans_xvsetanyeqz_w(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -14050,7 +16205,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110110 10011100 101011.. ...00... */
-                    /* ../target/loongarch/insns.decode:1980 */
+                    /* ./insns.decode:2098 */
                     if (trans_xvsetanyeqz_d(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -14061,7 +16216,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110110 10011100 101100.. ...00... */
-                    /* ../target/loongarch/insns.decode:1981 */
+                    /* ./insns.decode:2099 */
                     if (trans_xvsetallnez_b(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -14072,7 +16227,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110110 10011100 101101.. ...00... */
-                    /* ../target/loongarch/insns.decode:1982 */
+                    /* ./insns.decode:2100 */
                     if (trans_xvsetallnez_h(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -14083,7 +16238,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110110 10011100 101110.. ...00... */
-                    /* ../target/loongarch/insns.decode:1983 */
+                    /* ./insns.decode:2101 */
                     if (trans_xvsetallnez_w(ctx, &u.f_cv)) return true;
                     break;
                 }
@@ -14094,476 +16249,524 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 3) & 0x3) {
                 case 0x0:
                     /* 01110110 10011100 101111.. ...00... */
-                    /* ../target/loongarch/insns.decode:1984 */
+                    /* ./insns.decode:2102 */
                     if (trans_xvsetallnez_d(ctx, &u.f_cv)) return true;
                     break;
                 }
                 break;
             case 0x31:
                 /* 01110110 10011100 110001.. ........ */
-                /* ../target/loongarch/insns.decode:1854 */
+                /* ./insns.decode:1960 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvflogb_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x32:
                 /* 01110110 10011100 110010.. ........ */
-                /* ../target/loongarch/insns.decode:1855 */
+                /* ./insns.decode:1961 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvflogb_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x35:
                 /* 01110110 10011100 110101.. ........ */
-                /* ../target/loongarch/insns.decode:1857 */
+                /* ./insns.decode:1963 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfclass_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x36:
                 /* 01110110 10011100 110110.. ........ */
-                /* ../target/loongarch/insns.decode:1858 */
+                /* ./insns.decode:1964 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfclass_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x39:
                 /* 01110110 10011100 111001.. ........ */
-                /* ../target/loongarch/insns.decode:1860 */
+                /* ./insns.decode:1966 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfsqrt_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x3a:
                 /* 01110110 10011100 111010.. ........ */
-                /* ../target/loongarch/insns.decode:1861 */
+                /* ./insns.decode:1967 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfsqrt_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x3d:
                 /* 01110110 10011100 111101.. ........ */
-                /* ../target/loongarch/insns.decode:1862 */
+                /* ./insns.decode:1968 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfrecip_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x3e:
                 /* 01110110 10011100 111110.. ........ */
-                /* ../target/loongarch/insns.decode:1863 */
+                /* ./insns.decode:1969 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfrecip_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x41:
                 /* 01110110 10011101 000001.. ........ */
-                /* ../target/loongarch/insns.decode:1864 */
+                /* ./insns.decode:1970 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfrsqrt_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x42:
                 /* 01110110 10011101 000010.. ........ */
-                /* ../target/loongarch/insns.decode:1865 */
+                /* ./insns.decode:1971 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfrsqrt_d(ctx, &u.f_vv)) return true;
                 break;
+            case 0x45:
+                /* 01110110 10011101 000101.. ........ */
+                /* ./insns.decode:1972 */
+                decode_extract_vv(ctx, &u.f_vv, insn);
+                if (trans_xvfrecipe_s(ctx, &u.f_vv)) return true;
+                break;
+            case 0x46:
+                /* 01110110 10011101 000110.. ........ */
+                /* ./insns.decode:1973 */
+                decode_extract_vv(ctx, &u.f_vv, insn);
+                if (trans_xvfrecipe_d(ctx, &u.f_vv)) return true;
+                break;
+            case 0x49:
+                /* 01110110 10011101 001001.. ........ */
+                /* ./insns.decode:1974 */
+                decode_extract_vv(ctx, &u.f_vv, insn);
+                if (trans_xvfrsqrte_s(ctx, &u.f_vv)) return true;
+                break;
+            case 0x4a:
+                /* 01110110 10011101 001010.. ........ */
+                /* ./insns.decode:1975 */
+                decode_extract_vv(ctx, &u.f_vv, insn);
+                if (trans_xvfrsqrte_d(ctx, &u.f_vv)) return true;
+                break;
             case 0x4d:
                 /* 01110110 10011101 001101.. ........ */
-                /* ../target/loongarch/insns.decode:1882 */
+                /* ./insns.decode:1992 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfrint_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x4e:
                 /* 01110110 10011101 001110.. ........ */
-                /* ../target/loongarch/insns.decode:1883 */
+                /* ./insns.decode:1993 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfrint_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x51:
                 /* 01110110 10011101 010001.. ........ */
-                /* ../target/loongarch/insns.decode:1880 */
+                /* ./insns.decode:1990 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfrintrm_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x52:
                 /* 01110110 10011101 010010.. ........ */
-                /* ../target/loongarch/insns.decode:1881 */
+                /* ./insns.decode:1991 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfrintrm_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x55:
                 /* 01110110 10011101 010101.. ........ */
-                /* ../target/loongarch/insns.decode:1878 */
+                /* ./insns.decode:1988 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfrintrp_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x56:
                 /* 01110110 10011101 010110.. ........ */
-                /* ../target/loongarch/insns.decode:1879 */
+                /* ./insns.decode:1989 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfrintrp_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x59:
                 /* 01110110 10011101 011001.. ........ */
-                /* ../target/loongarch/insns.decode:1876 */
+                /* ./insns.decode:1986 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfrintrz_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x5a:
                 /* 01110110 10011101 011010.. ........ */
-                /* ../target/loongarch/insns.decode:1877 */
+                /* ./insns.decode:1987 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfrintrz_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x5d:
                 /* 01110110 10011101 011101.. ........ */
-                /* ../target/loongarch/insns.decode:1874 */
+                /* ./insns.decode:1984 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfrintrne_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x5e:
                 /* 01110110 10011101 011110.. ........ */
-                /* ../target/loongarch/insns.decode:1875 */
+                /* ./insns.decode:1985 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfrintrne_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x7a:
                 /* 01110110 10011101 111010.. ........ */
-                /* ../target/loongarch/insns.decode:1867 */
+                /* ./insns.decode:1977 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfcvtl_s_h(ctx, &u.f_vv)) return true;
                 break;
             case 0x7b:
                 /* 01110110 10011101 111011.. ........ */
-                /* ../target/loongarch/insns.decode:1868 */
+                /* ./insns.decode:1978 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfcvth_s_h(ctx, &u.f_vv)) return true;
                 break;
             case 0x7c:
                 /* 01110110 10011101 111100.. ........ */
-                /* ../target/loongarch/insns.decode:1869 */
+                /* ./insns.decode:1979 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfcvtl_d_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x7d:
                 /* 01110110 10011101 111101.. ........ */
-                /* ../target/loongarch/insns.decode:1870 */
+                /* ./insns.decode:1980 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvfcvth_d_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x80:
                 /* 01110110 10011110 000000.. ........ */
-                /* ../target/loongarch/insns.decode:1917 */
+                /* ./insns.decode:2035 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvffint_s_w(ctx, &u.f_vv)) return true;
                 break;
             case 0x81:
                 /* 01110110 10011110 000001.. ........ */
-                /* ../target/loongarch/insns.decode:1919 */
+                /* ./insns.decode:2037 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvffint_s_wu(ctx, &u.f_vv)) return true;
                 break;
             case 0x82:
                 /* 01110110 10011110 000010.. ........ */
-                /* ../target/loongarch/insns.decode:1918 */
+                /* ./insns.decode:2036 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvffint_d_l(ctx, &u.f_vv)) return true;
                 break;
             case 0x83:
                 /* 01110110 10011110 000011.. ........ */
-                /* ../target/loongarch/insns.decode:1920 */
+                /* ./insns.decode:2038 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvffint_d_lu(ctx, &u.f_vv)) return true;
                 break;
             case 0x84:
                 /* 01110110 10011110 000100.. ........ */
-                /* ../target/loongarch/insns.decode:1921 */
+                /* ./insns.decode:2039 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvffintl_d_w(ctx, &u.f_vv)) return true;
                 break;
             case 0x85:
                 /* 01110110 10011110 000101.. ........ */
-                /* ../target/loongarch/insns.decode:1922 */
+                /* ./insns.decode:2040 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvffinth_d_w(ctx, &u.f_vv)) return true;
                 break;
             case 0x8c:
                 /* 01110110 10011110 001100.. ........ */
-                /* ../target/loongarch/insns.decode:1893 */
+                /* ./insns.decode:2011 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftint_w_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x8d:
                 /* 01110110 10011110 001101.. ........ */
-                /* ../target/loongarch/insns.decode:1894 */
+                /* ./insns.decode:2012 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftint_l_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x8e:
                 /* 01110110 10011110 001110.. ........ */
-                /* ../target/loongarch/insns.decode:1891 */
+                /* ./insns.decode:2009 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrm_w_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x8f:
                 /* 01110110 10011110 001111.. ........ */
-                /* ../target/loongarch/insns.decode:1892 */
+                /* ./insns.decode:2010 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrm_l_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x90:
                 /* 01110110 10011110 010000.. ........ */
-                /* ../target/loongarch/insns.decode:1889 */
+                /* ./insns.decode:2007 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrp_w_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x91:
                 /* 01110110 10011110 010001.. ........ */
-                /* ../target/loongarch/insns.decode:1890 */
+                /* ./insns.decode:2008 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrp_l_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x92:
                 /* 01110110 10011110 010010.. ........ */
-                /* ../target/loongarch/insns.decode:1887 */
+                /* ./insns.decode:2005 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrz_w_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x93:
                 /* 01110110 10011110 010011.. ........ */
-                /* ../target/loongarch/insns.decode:1888 */
+                /* ./insns.decode:2006 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrz_l_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x94:
                 /* 01110110 10011110 010100.. ........ */
-                /* ../target/loongarch/insns.decode:1885 */
+                /* ./insns.decode:2003 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrne_w_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x95:
                 /* 01110110 10011110 010101.. ........ */
-                /* ../target/loongarch/insns.decode:1886 */
+                /* ./insns.decode:2004 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrne_l_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x96:
                 /* 01110110 10011110 010110.. ........ */
-                /* ../target/loongarch/insns.decode:1897 */
+                /* ./insns.decode:2015 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftint_wu_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x97:
                 /* 01110110 10011110 010111.. ........ */
-                /* ../target/loongarch/insns.decode:1898 */
+                /* ./insns.decode:2016 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftint_lu_d(ctx, &u.f_vv)) return true;
                 break;
             case 0x9c:
                 /* 01110110 10011110 011100.. ........ */
-                /* ../target/loongarch/insns.decode:1895 */
+                /* ./insns.decode:2013 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrz_wu_s(ctx, &u.f_vv)) return true;
                 break;
             case 0x9d:
                 /* 01110110 10011110 011101.. ........ */
-                /* ../target/loongarch/insns.decode:1896 */
+                /* ./insns.decode:2014 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrz_lu_d(ctx, &u.f_vv)) return true;
                 break;
             case 0xa0:
                 /* 01110110 10011110 100000.. ........ */
-                /* ../target/loongarch/insns.decode:1914 */
+                /* ./insns.decode:2032 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintl_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa1:
                 /* 01110110 10011110 100001.. ........ */
-                /* ../target/loongarch/insns.decode:1915 */
+                /* ./insns.decode:2033 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftinth_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa2:
                 /* 01110110 10011110 100010.. ........ */
-                /* ../target/loongarch/insns.decode:1912 */
+                /* ./insns.decode:2030 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrml_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa3:
                 /* 01110110 10011110 100011.. ........ */
-                /* ../target/loongarch/insns.decode:1913 */
+                /* ./insns.decode:2031 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrmh_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa4:
                 /* 01110110 10011110 100100.. ........ */
-                /* ../target/loongarch/insns.decode:1910 */
+                /* ./insns.decode:2028 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrpl_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa5:
                 /* 01110110 10011110 100101.. ........ */
-                /* ../target/loongarch/insns.decode:1911 */
+                /* ./insns.decode:2029 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrph_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa6:
                 /* 01110110 10011110 100110.. ........ */
-                /* ../target/loongarch/insns.decode:1908 */
+                /* ./insns.decode:2026 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrzl_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa7:
                 /* 01110110 10011110 100111.. ........ */
-                /* ../target/loongarch/insns.decode:1909 */
+                /* ./insns.decode:2027 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrzh_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa8:
                 /* 01110110 10011110 101000.. ........ */
-                /* ../target/loongarch/insns.decode:1906 */
+                /* ./insns.decode:2024 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrnel_l_s(ctx, &u.f_vv)) return true;
                 break;
             case 0xa9:
                 /* 01110110 10011110 101001.. ........ */
-                /* ../target/loongarch/insns.decode:1907 */
+                /* ./insns.decode:2025 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvftintrneh_l_s(ctx, &u.f_vv)) return true;
                 break;
+            case 0xb4:
+                /* 01110110 10011110 110100.. ........ */
+                /* ./insns.decode:1950 */
+                decode_extract_vv(ctx, &u.f_vv, insn);
+                if (trans_xvfmaxn_s(ctx, &u.f_vv)) return true;
+                break;
+            case 0xb5:
+                /* 01110110 10011110 110101.. ........ */
+                /* ./insns.decode:1951 */
+                decode_extract_vv(ctx, &u.f_vv, insn);
+                if (trans_xvfmaxn_d(ctx, &u.f_vv)) return true;
+                break;
+            case 0xb6:
+                /* 01110110 10011110 110110.. ........ */
+                /* ./insns.decode:1952 */
+                decode_extract_vv(ctx, &u.f_vv, insn);
+                if (trans_xvfminn_s(ctx, &u.f_vv)) return true;
+                break;
+            case 0xb7:
+                /* 01110110 10011110 110111.. ........ */
+                /* ./insns.decode:1953 */
+                decode_extract_vv(ctx, &u.f_vv, insn);
+                if (trans_xvfminn_d(ctx, &u.f_vv)) return true;
+                break;
             case 0xb8:
                 /* 01110110 10011110 111000.. ........ */
-                /* ../target/loongarch/insns.decode:1581 */
+                /* ./insns.decode:1683 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvexth_h_b(ctx, &u.f_vv)) return true;
                 break;
             case 0xb9:
                 /* 01110110 10011110 111001.. ........ */
-                /* ../target/loongarch/insns.decode:1582 */
+                /* ./insns.decode:1684 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvexth_w_h(ctx, &u.f_vv)) return true;
                 break;
             case 0xba:
                 /* 01110110 10011110 111010.. ........ */
-                /* ../target/loongarch/insns.decode:1583 */
+                /* ./insns.decode:1685 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvexth_d_w(ctx, &u.f_vv)) return true;
                 break;
             case 0xbb:
                 /* 01110110 10011110 111011.. ........ */
-                /* ../target/loongarch/insns.decode:1584 */
+                /* ./insns.decode:1686 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvexth_q_d(ctx, &u.f_vv)) return true;
                 break;
             case 0xbc:
                 /* 01110110 10011110 111100.. ........ */
-                /* ../target/loongarch/insns.decode:1585 */
+                /* ./insns.decode:1687 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvexth_hu_bu(ctx, &u.f_vv)) return true;
                 break;
             case 0xbd:
                 /* 01110110 10011110 111101.. ........ */
-                /* ../target/loongarch/insns.decode:1586 */
+                /* ./insns.decode:1688 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvexth_wu_hu(ctx, &u.f_vv)) return true;
                 break;
             case 0xbe:
                 /* 01110110 10011110 111110.. ........ */
-                /* ../target/loongarch/insns.decode:1587 */
+                /* ./insns.decode:1689 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvexth_du_wu(ctx, &u.f_vv)) return true;
                 break;
             case 0xbf:
                 /* 01110110 10011110 111111.. ........ */
-                /* ../target/loongarch/insns.decode:1588 */
+                /* ./insns.decode:1690 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_xvexth_qu_du(ctx, &u.f_vv)) return true;
                 break;
             case 0xc0:
                 /* 01110110 10011111 000000.. ........ */
-                /* ../target/loongarch/insns.decode:1993 */
+                /* ./insns.decode:2111 */
                 decode_extract_vr(ctx, &u.f_vr, insn);
                 if (trans_xvreplgr2vr_b(ctx, &u.f_vr)) return true;
                 break;
             case 0xc1:
                 /* 01110110 10011111 000001.. ........ */
-                /* ../target/loongarch/insns.decode:1994 */
+                /* ./insns.decode:2112 */
                 decode_extract_vr(ctx, &u.f_vr, insn);
                 if (trans_xvreplgr2vr_h(ctx, &u.f_vr)) return true;
                 break;
             case 0xc2:
                 /* 01110110 10011111 000010.. ........ */
-                /* ../target/loongarch/insns.decode:1995 */
+                /* ./insns.decode:2113 */
                 decode_extract_vr(ctx, &u.f_vr, insn);
                 if (trans_xvreplgr2vr_w(ctx, &u.f_vr)) return true;
                 break;
             case 0xc3:
                 /* 01110110 10011111 000011.. ........ */
-                /* ../target/loongarch/insns.decode:1996 */
+                /* ./insns.decode:2114 */
                 decode_extract_vr(ctx, &u.f_vr, insn);
                 if (trans_xvreplgr2vr_d(ctx, &u.f_vr)) return true;
                 break;
             case 0xc4:
                 /* 01110110 10011111 000100.. ........ */
-                /* ../target/loongarch/insns.decode:1590 */
+                /* ./insns.decode:1692 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vext2xv_h_b(ctx, &u.f_vv)) return true;
                 break;
             case 0xc5:
                 /* 01110110 10011111 000101.. ........ */
-                /* ../target/loongarch/insns.decode:1591 */
+                /* ./insns.decode:1693 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vext2xv_w_b(ctx, &u.f_vv)) return true;
                 break;
             case 0xc6:
                 /* 01110110 10011111 000110.. ........ */
-                /* ../target/loongarch/insns.decode:1592 */
+                /* ./insns.decode:1694 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vext2xv_d_b(ctx, &u.f_vv)) return true;
                 break;
             case 0xc7:
                 /* 01110110 10011111 000111.. ........ */
-                /* ../target/loongarch/insns.decode:1593 */
+                /* ./insns.decode:1695 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vext2xv_w_h(ctx, &u.f_vv)) return true;
                 break;
             case 0xc8:
                 /* 01110110 10011111 001000.. ........ */
-                /* ../target/loongarch/insns.decode:1594 */
+                /* ./insns.decode:1696 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vext2xv_d_h(ctx, &u.f_vv)) return true;
                 break;
             case 0xc9:
                 /* 01110110 10011111 001001.. ........ */
-                /* ../target/loongarch/insns.decode:1595 */
+                /* ./insns.decode:1697 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vext2xv_d_w(ctx, &u.f_vv)) return true;
                 break;
             case 0xca:
                 /* 01110110 10011111 001010.. ........ */
-                /* ../target/loongarch/insns.decode:1596 */
+                /* ./insns.decode:1698 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vext2xv_hu_bu(ctx, &u.f_vv)) return true;
                 break;
             case 0xcb:
                 /* 01110110 10011111 001011.. ........ */
-                /* ../target/loongarch/insns.decode:1597 */
+                /* ./insns.decode:1699 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vext2xv_wu_bu(ctx, &u.f_vv)) return true;
                 break;
             case 0xcc:
                 /* 01110110 10011111 001100.. ........ */
-                /* ../target/loongarch/insns.decode:1598 */
+                /* ./insns.decode:1700 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vext2xv_du_bu(ctx, &u.f_vv)) return true;
                 break;
             case 0xcd:
                 /* 01110110 10011111 001101.. ........ */
-                /* ../target/loongarch/insns.decode:1599 */
+                /* ./insns.decode:1701 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vext2xv_wu_hu(ctx, &u.f_vv)) return true;
                 break;
             case 0xce:
                 /* 01110110 10011111 001110.. ........ */
-                /* ../target/loongarch/insns.decode:1600 */
+                /* ./insns.decode:1702 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vext2xv_du_hu(ctx, &u.f_vv)) return true;
                 break;
             case 0xcf:
                 /* 01110110 10011111 001111.. ........ */
-                /* ../target/loongarch/insns.decode:1601 */
+                /* ./insns.decode:1703 */
                 decode_extract_vv(ctx, &u.f_vv, insn);
                 if (trans_vext2xv_du_wu(ctx, &u.f_vv)) return true;
                 break;
@@ -14584,14 +16787,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110110 10100000 001..... ........ */
-                            /* ../target/loongarch/insns.decode:1657 */
+                            /* ./insns.decode:1759 */
                             if (trans_xvrotri_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110110 10100000 01...... ........ */
-                        /* ../target/loongarch/insns.decode:1658 */
+                        /* ./insns.decode:1760 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_xvrotri_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -14599,7 +16802,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110110 10100000 1....... ........ */
-                    /* ../target/loongarch/insns.decode:1659 */
+                    /* ./insns.decode:1761 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_xvrotri_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -14607,7 +16810,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110110 10100001 ........ ........ */
-                /* ../target/loongarch/insns.decode:1660 */
+                /* ./insns.decode:1762 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_xvrotri_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -14628,14 +16831,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110110 10100100 001..... ........ */
-                            /* ../target/loongarch/insns.decode:1675 */
+                            /* ./insns.decode:1777 */
                             if (trans_xvsrlri_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110110 10100100 01...... ........ */
-                        /* ../target/loongarch/insns.decode:1676 */
+                        /* ./insns.decode:1778 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_xvsrlri_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -14643,7 +16846,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110110 10100100 1....... ........ */
-                    /* ../target/loongarch/insns.decode:1677 */
+                    /* ./insns.decode:1779 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_xvsrlri_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -14651,7 +16854,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110110 10100101 ........ ........ */
-                /* ../target/loongarch/insns.decode:1678 */
+                /* ./insns.decode:1780 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_xvsrlri_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -14672,14 +16875,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110110 10101000 001..... ........ */
-                            /* ../target/loongarch/insns.decode:1683 */
+                            /* ./insns.decode:1785 */
                             if (trans_xvsrari_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110110 10101000 01...... ........ */
-                        /* ../target/loongarch/insns.decode:1684 */
+                        /* ./insns.decode:1786 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_xvsrari_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -14687,7 +16890,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110110 10101000 1....... ........ */
-                    /* ../target/loongarch/insns.decode:1685 */
+                    /* ./insns.decode:1787 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_xvsrari_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -14695,9 +16898,55 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110110 10101001 ........ ........ */
-                /* ../target/loongarch/insns.decode:1686 */
+                /* ./insns.decode:1788 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_xvsrari_d(ctx, &u.f_vv_i)) return true;
+                break;
+            }
+            break;
+        case 0xab:
+            /* 01110110 101011.. ........ ........ */
+            decode_extract_vv(ctx, &u.f_vv, insn);
+            switch ((insn >> 10) & 0xff) {
+            case 0x1:
+                /* 01110110 10101100 000001.. ........ */
+                /* ./insns.decode:1994 */
+                if (trans_xvfrintirm_s(ctx, &u.f_vv)) return true;
+                break;
+            case 0x2:
+                /* 01110110 10101100 000010.. ........ */
+                /* ./insns.decode:1995 */
+                if (trans_xvfrintirm_d(ctx, &u.f_vv)) return true;
+                break;
+            case 0x5:
+                /* 01110110 10101100 000101.. ........ */
+                /* ./insns.decode:1996 */
+                if (trans_xvfrintirp_s(ctx, &u.f_vv)) return true;
+                break;
+            case 0x6:
+                /* 01110110 10101100 000110.. ........ */
+                /* ./insns.decode:1997 */
+                if (trans_xvfrintirp_d(ctx, &u.f_vv)) return true;
+                break;
+            case 0x9:
+                /* 01110110 10101100 001001.. ........ */
+                /* ./insns.decode:1998 */
+                if (trans_xvfrintirz_s(ctx, &u.f_vv)) return true;
+                break;
+            case 0xa:
+                /* 01110110 10101100 001010.. ........ */
+                /* ./insns.decode:1999 */
+                if (trans_xvfrintirz_d(ctx, &u.f_vv)) return true;
+                break;
+            case 0xd:
+                /* 01110110 10101100 001101.. ........ */
+                /* ./insns.decode:2000 */
+                if (trans_xvfrintirne_s(ctx, &u.f_vv)) return true;
+                break;
+            case 0xe:
+                /* 01110110 10101100 001110.. ........ */
+                /* ./insns.decode:2001 */
+                if (trans_xvfrintirne_d(ctx, &u.f_vv)) return true;
                 break;
             }
             break;
@@ -14706,7 +16955,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 13) & 0x1f) {
             case 0x1e:
                 /* 01110110 11101011 110..... ........ */
-                /* ../target/loongarch/insns.decode:1986 */
+                /* ./insns.decode:2104 */
                 decode_extract_vr_ui3(ctx, &u.f_vr_i, insn);
                 if (trans_xvinsgr2vr_w(ctx, &u.f_vr_i)) return true;
                 break;
@@ -14716,7 +16965,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 12) & 0x1) {
                 case 0x0:
                     /* 01110110 11101011 1110.... ........ */
-                    /* ../target/loongarch/insns.decode:1987 */
+                    /* ./insns.decode:2105 */
                     if (trans_xvinsgr2vr_d(ctx, &u.f_vr_i)) return true;
                     break;
                 }
@@ -14728,7 +16977,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 13) & 0x1f) {
             case 0x1e:
                 /* 01110110 11101111 110..... ........ */
-                /* ../target/loongarch/insns.decode:1988 */
+                /* ./insns.decode:2106 */
                 decode_extract_rv_ui3(ctx, &u.f_rv_i, insn);
                 if (trans_xvpickve2gr_w(ctx, &u.f_rv_i)) return true;
                 break;
@@ -14738,7 +16987,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 12) & 0x1) {
                 case 0x0:
                     /* 01110110 11101111 1110.... ........ */
-                    /* ../target/loongarch/insns.decode:1989 */
+                    /* ./insns.decode:2107 */
                     if (trans_xvpickve2gr_d(ctx, &u.f_rv_i)) return true;
                     break;
                 }
@@ -14750,7 +16999,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 13) & 0x1f) {
             case 0x1e:
                 /* 01110110 11110011 110..... ........ */
-                /* ../target/loongarch/insns.decode:1990 */
+                /* ./insns.decode:2108 */
                 decode_extract_rv_ui3(ctx, &u.f_rv_i, insn);
                 if (trans_xvpickve2gr_wu(ctx, &u.f_rv_i)) return true;
                 break;
@@ -14760,7 +17009,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 12) & 0x1) {
                 case 0x0:
                     /* 01110110 11110011 1110.... ........ */
-                    /* ../target/loongarch/insns.decode:1991 */
+                    /* ./insns.decode:2109 */
                     if (trans_xvpickve2gr_du(ctx, &u.f_rv_i)) return true;
                     break;
                 }
@@ -14772,7 +17021,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 14) & 0xf) {
             case 0xe:
                 /* 01110110 11110111 10...... ........ */
-                /* ../target/loongarch/insns.decode:2003 */
+                /* ./insns.decode:2121 */
                 decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                 if (trans_xvrepl128vei_b(ctx, &u.f_vv_i)) return true;
                 break;
@@ -14781,7 +17030,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 13) & 0x1) {
                 case 0x0:
                     /* 01110110 11110111 110..... ........ */
-                    /* ../target/loongarch/insns.decode:2004 */
+                    /* ./insns.decode:2122 */
                     decode_extract_vv_ui3(ctx, &u.f_vv_i, insn);
                     if (trans_xvrepl128vei_h(ctx, &u.f_vv_i)) return true;
                     break;
@@ -14790,7 +17039,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 12) & 0x1) {
                     case 0x0:
                         /* 01110110 11110111 1110.... ........ */
-                        /* ../target/loongarch/insns.decode:2005 */
+                        /* ./insns.decode:2123 */
                         decode_extract_vv_ui2(ctx, &u.f_vv_i, insn);
                         if (trans_xvrepl128vei_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -14800,7 +17049,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 11) & 0x1) {
                         case 0x0:
                             /* 01110110 11110111 11110... ........ */
-                            /* ../target/loongarch/insns.decode:2006 */
+                            /* ./insns.decode:2124 */
                             if (trans_xvrepl128vei_d(ctx, &u.f_vv_i)) return true;
                             break;
                         }
@@ -14816,7 +17065,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 13) & 0x1f) {
             case 0x1e:
                 /* 01110110 11111111 110..... ........ */
-                /* ../target/loongarch/insns.decode:2014 */
+                /* ./insns.decode:2132 */
                 decode_extract_vv_ui3(ctx, &u.f_vv_i, insn);
                 if (trans_xvinsve0_w(ctx, &u.f_vv_i)) return true;
                 break;
@@ -14826,7 +17075,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 12) & 0x1) {
                 case 0x0:
                     /* 01110110 11111111 1110.... ........ */
-                    /* ../target/loongarch/insns.decode:2015 */
+                    /* ./insns.decode:2133 */
                     if (trans_xvinsve0_d(ctx, &u.f_vv_i)) return true;
                     break;
                 }
@@ -14838,7 +17087,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 13) & 0x1f) {
             case 0x1e:
                 /* 01110111 00000011 110..... ........ */
-                /* ../target/loongarch/insns.decode:2017 */
+                /* ./insns.decode:2135 */
                 decode_extract_vv_ui3(ctx, &u.f_vv_i, insn);
                 if (trans_xvpickve_w(ctx, &u.f_vv_i)) return true;
                 break;
@@ -14848,7 +17097,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 12) & 0x1) {
                 case 0x0:
                     /* 01110111 00000011 1110.... ........ */
-                    /* ../target/loongarch/insns.decode:2018 */
+                    /* ./insns.decode:2136 */
                     if (trans_xvpickve_d(ctx, &u.f_vv_i)) return true;
                     break;
                 }
@@ -14861,27 +17110,27 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             switch ((insn >> 10) & 0xff) {
             case 0xc0:
                 /* 01110111 00000111 000000.. ........ */
-                /* ../target/loongarch/insns.decode:2008 */
+                /* ./insns.decode:2126 */
                 if (trans_xvreplve0_b(ctx, &u.f_vv)) return true;
                 break;
             case 0xe0:
                 /* 01110111 00000111 100000.. ........ */
-                /* ../target/loongarch/insns.decode:2009 */
+                /* ./insns.decode:2127 */
                 if (trans_xvreplve0_h(ctx, &u.f_vv)) return true;
                 break;
             case 0xf0:
                 /* 01110111 00000111 110000.. ........ */
-                /* ../target/loongarch/insns.decode:2010 */
+                /* ./insns.decode:2128 */
                 if (trans_xvreplve0_w(ctx, &u.f_vv)) return true;
                 break;
             case 0xf8:
                 /* 01110111 00000111 111000.. ........ */
-                /* ../target/loongarch/insns.decode:2011 */
+                /* ./insns.decode:2129 */
                 if (trans_xvreplve0_d(ctx, &u.f_vv)) return true;
                 break;
             case 0xfc:
                 /* 01110111 00000111 111100.. ........ */
-                /* ../target/loongarch/insns.decode:2012 */
+                /* ./insns.decode:2130 */
                 if (trans_xvreplve0_q(ctx, &u.f_vv)) return true;
                 break;
             }
@@ -14898,14 +17147,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 13) & 0x1) {
                     case 0x1:
                         /* 01110111 00001000 001..... ........ */
-                        /* ../target/loongarch/insns.decode:1662 */
+                        /* ./insns.decode:1764 */
                         if (trans_xvsllwil_h_b(ctx, &u.f_vv_i)) return true;
                         break;
                     }
                     break;
                 case 0x1:
                     /* 01110111 00001000 01...... ........ */
-                    /* ../target/loongarch/insns.decode:1663 */
+                    /* ./insns.decode:1765 */
                     decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                     if (trans_xvsllwil_w_h(ctx, &u.f_vv_i)) return true;
                     break;
@@ -14913,7 +17162,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 00001000 1....... ........ */
-                /* ../target/loongarch/insns.decode:1664 */
+                /* ./insns.decode:1766 */
                 decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                 if (trans_xvsllwil_d_w(ctx, &u.f_vv_i)) return true;
                 break;
@@ -14923,7 +17172,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 10) & 0x1f) {
                 case 0x0:
                     /* 01110111 00001001 000000.. ........ */
-                    /* ../target/loongarch/insns.decode:1665 */
+                    /* ./insns.decode:1767 */
                     if (trans_xvextl_q_d(ctx, &u.f_vv)) return true;
                     break;
                 }
@@ -14942,14 +17191,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     switch ((insn >> 13) & 0x1) {
                     case 0x1:
                         /* 01110111 00001100 001..... ........ */
-                        /* ../target/loongarch/insns.decode:1666 */
+                        /* ./insns.decode:1768 */
                         if (trans_xvsllwil_hu_bu(ctx, &u.f_vv_i)) return true;
                         break;
                     }
                     break;
                 case 0x1:
                     /* 01110111 00001100 01...... ........ */
-                    /* ../target/loongarch/insns.decode:1667 */
+                    /* ./insns.decode:1769 */
                     decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                     if (trans_xvsllwil_wu_hu(ctx, &u.f_vv_i)) return true;
                     break;
@@ -14957,7 +17206,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 00001100 1....... ........ */
-                /* ../target/loongarch/insns.decode:1668 */
+                /* ./insns.decode:1770 */
                 decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                 if (trans_xvsllwil_du_wu(ctx, &u.f_vv_i)) return true;
                 break;
@@ -14967,7 +17216,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 switch ((insn >> 10) & 0x1f) {
                 case 0x0:
                     /* 01110111 00001101 000000.. ........ */
-                    /* ../target/loongarch/insns.decode:1669 */
+                    /* ./insns.decode:1771 */
                     if (trans_xvextl_qu_du(ctx, &u.f_vv)) return true;
                     break;
                 }
@@ -14989,14 +17238,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110111 00010000 001..... ........ */
-                            /* ../target/loongarch/insns.decode:1798 */
+                            /* ./insns.decode:1900 */
                             if (trans_xvbitclri_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 00010000 01...... ........ */
-                        /* ../target/loongarch/insns.decode:1799 */
+                        /* ./insns.decode:1901 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_xvbitclri_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15004,7 +17253,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 00010000 1....... ........ */
-                    /* ../target/loongarch/insns.decode:1800 */
+                    /* ./insns.decode:1902 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_xvbitclri_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15012,7 +17261,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 00010001 ........ ........ */
-                /* ../target/loongarch/insns.decode:1801 */
+                /* ./insns.decode:1903 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_xvbitclri_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15033,14 +17282,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110111 00010100 001..... ........ */
-                            /* ../target/loongarch/insns.decode:1807 */
+                            /* ./insns.decode:1909 */
                             if (trans_xvbitseti_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 00010100 01...... ........ */
-                        /* ../target/loongarch/insns.decode:1808 */
+                        /* ./insns.decode:1910 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_xvbitseti_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15048,7 +17297,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 00010100 1....... ........ */
-                    /* ../target/loongarch/insns.decode:1809 */
+                    /* ./insns.decode:1911 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_xvbitseti_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15056,7 +17305,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 00010101 ........ ........ */
-                /* ../target/loongarch/insns.decode:1810 */
+                /* ./insns.decode:1912 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_xvbitseti_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15077,14 +17326,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110111 00011000 001..... ........ */
-                            /* ../target/loongarch/insns.decode:1816 */
+                            /* ./insns.decode:1918 */
                             if (trans_xvbitrevi_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 00011000 01...... ........ */
-                        /* ../target/loongarch/insns.decode:1817 */
+                        /* ./insns.decode:1919 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_xvbitrevi_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15092,7 +17341,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 00011000 1....... ........ */
-                    /* ../target/loongarch/insns.decode:1818 */
+                    /* ./insns.decode:1920 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_xvbitrevi_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15100,7 +17349,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 00011001 ........ ........ */
-                /* ../target/loongarch/insns.decode:1819 */
+                /* ./insns.decode:1921 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_xvbitrevi_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15121,14 +17370,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110111 00100100 001..... ........ */
-                            /* ../target/loongarch/insns.decode:1572 */
+                            /* ./insns.decode:1674 */
                             if (trans_xvsat_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 00100100 01...... ........ */
-                        /* ../target/loongarch/insns.decode:1573 */
+                        /* ./insns.decode:1675 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_xvsat_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15136,7 +17385,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 00100100 1....... ........ */
-                    /* ../target/loongarch/insns.decode:1574 */
+                    /* ./insns.decode:1676 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_xvsat_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15144,7 +17393,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 00100101 ........ ........ */
-                /* ../target/loongarch/insns.decode:1575 */
+                /* ./insns.decode:1677 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_xvsat_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15165,14 +17414,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110111 00101000 001..... ........ */
-                            /* ../target/loongarch/insns.decode:1576 */
+                            /* ./insns.decode:1678 */
                             if (trans_xvsat_bu(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 00101000 01...... ........ */
-                        /* ../target/loongarch/insns.decode:1577 */
+                        /* ./insns.decode:1679 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_xvsat_hu(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15180,7 +17429,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 00101000 1....... ........ */
-                    /* ../target/loongarch/insns.decode:1578 */
+                    /* ./insns.decode:1680 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_xvsat_wu(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15188,7 +17437,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 00101001 ........ ........ */
-                /* ../target/loongarch/insns.decode:1579 */
+                /* ./insns.decode:1681 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_xvsat_du(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15209,14 +17458,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110111 00101100 001..... ........ */
-                            /* ../target/loongarch/insns.decode:1633 */
+                            /* ./insns.decode:1735 */
                             if (trans_xvslli_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 00101100 01...... ........ */
-                        /* ../target/loongarch/insns.decode:1634 */
+                        /* ./insns.decode:1736 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_xvslli_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15224,7 +17473,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 00101100 1....... ........ */
-                    /* ../target/loongarch/insns.decode:1635 */
+                    /* ./insns.decode:1737 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_xvslli_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15232,7 +17481,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 00101101 ........ ........ */
-                /* ../target/loongarch/insns.decode:1636 */
+                /* ./insns.decode:1738 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_xvslli_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15253,14 +17502,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110111 00110000 001..... ........ */
-                            /* ../target/loongarch/insns.decode:1641 */
+                            /* ./insns.decode:1743 */
                             if (trans_xvsrli_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 00110000 01...... ........ */
-                        /* ../target/loongarch/insns.decode:1642 */
+                        /* ./insns.decode:1744 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_xvsrli_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15268,7 +17517,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 00110000 1....... ........ */
-                    /* ../target/loongarch/insns.decode:1643 */
+                    /* ./insns.decode:1745 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_xvsrli_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15276,7 +17525,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 00110001 ........ ........ */
-                /* ../target/loongarch/insns.decode:1644 */
+                /* ./insns.decode:1746 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_xvsrli_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15297,14 +17546,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 13) & 0x1) {
                         case 0x1:
                             /* 01110111 00110100 001..... ........ */
-                            /* ../target/loongarch/insns.decode:1649 */
+                            /* ./insns.decode:1751 */
                             if (trans_xvsrai_b(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 00110100 01...... ........ */
-                        /* ../target/loongarch/insns.decode:1650 */
+                        /* ./insns.decode:1752 */
                         decode_extract_vv_ui4(ctx, &u.f_vv_i, insn);
                         if (trans_xvsrai_h(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15312,7 +17561,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 00110100 1....... ........ */
-                    /* ../target/loongarch/insns.decode:1651 */
+                    /* ./insns.decode:1753 */
                     decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                     if (trans_xvsrai_w(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15320,7 +17569,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 00110101 ........ ........ */
-                /* ../target/loongarch/insns.decode:1652 */
+                /* ./insns.decode:1754 */
                 decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                 if (trans_xvsrai_d(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15341,14 +17590,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110111 01000000 01...... ........ */
-                            /* ../target/loongarch/insns.decode:1695 */
+                            /* ./insns.decode:1797 */
                             if (trans_xvsrlni_b_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 01000000 1....... ........ */
-                        /* ../target/loongarch/insns.decode:1696 */
+                        /* ./insns.decode:1798 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_xvsrlni_h_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15356,7 +17605,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 01000001 ........ ........ */
-                    /* ../target/loongarch/insns.decode:1697 */
+                    /* ./insns.decode:1799 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_xvsrlni_w_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15364,7 +17613,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 0100001. ........ ........ */
-                /* ../target/loongarch/insns.decode:1698 */
+                /* ./insns.decode:1800 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_xvsrlni_d_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15385,14 +17634,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110111 01000100 01...... ........ */
-                            /* ../target/loongarch/insns.decode:1711 */
+                            /* ./insns.decode:1813 */
                             if (trans_xvsrlrni_b_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 01000100 1....... ........ */
-                        /* ../target/loongarch/insns.decode:1712 */
+                        /* ./insns.decode:1814 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_xvsrlrni_h_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15400,7 +17649,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 01000101 ........ ........ */
-                    /* ../target/loongarch/insns.decode:1713 */
+                    /* ./insns.decode:1815 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_xvsrlrni_w_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15408,7 +17657,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 0100011. ........ ........ */
-                /* ../target/loongarch/insns.decode:1714 */
+                /* ./insns.decode:1816 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_xvsrlrni_d_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15429,14 +17678,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110111 01001000 01...... ........ */
-                            /* ../target/loongarch/insns.decode:1733 */
+                            /* ./insns.decode:1835 */
                             if (trans_xvssrlni_b_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 01001000 1....... ........ */
-                        /* ../target/loongarch/insns.decode:1734 */
+                        /* ./insns.decode:1836 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_xvssrlni_h_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15444,7 +17693,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 01001001 ........ ........ */
-                    /* ../target/loongarch/insns.decode:1735 */
+                    /* ./insns.decode:1837 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_xvssrlni_w_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15452,7 +17701,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 0100101. ........ ........ */
-                /* ../target/loongarch/insns.decode:1736 */
+                /* ./insns.decode:1838 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_xvssrlni_d_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15473,14 +17722,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110111 01001100 01...... ........ */
-                            /* ../target/loongarch/insns.decode:1741 */
+                            /* ./insns.decode:1843 */
                             if (trans_xvssrlni_bu_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 01001100 1....... ........ */
-                        /* ../target/loongarch/insns.decode:1742 */
+                        /* ./insns.decode:1844 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_xvssrlni_hu_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15488,7 +17737,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 01001101 ........ ........ */
-                    /* ../target/loongarch/insns.decode:1743 */
+                    /* ./insns.decode:1845 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_xvssrlni_wu_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15496,7 +17745,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 0100111. ........ ........ */
-                /* ../target/loongarch/insns.decode:1744 */
+                /* ./insns.decode:1846 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_xvssrlni_du_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15517,14 +17766,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110111 01010000 01...... ........ */
-                            /* ../target/loongarch/insns.decode:1763 */
+                            /* ./insns.decode:1865 */
                             if (trans_xvssrlrni_b_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 01010000 1....... ........ */
-                        /* ../target/loongarch/insns.decode:1764 */
+                        /* ./insns.decode:1866 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_xvssrlrni_h_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15532,7 +17781,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 01010001 ........ ........ */
-                    /* ../target/loongarch/insns.decode:1765 */
+                    /* ./insns.decode:1867 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_xvssrlrni_w_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15540,7 +17789,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 0101001. ........ ........ */
-                /* ../target/loongarch/insns.decode:1766 */
+                /* ./insns.decode:1868 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_xvssrlrni_d_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15561,14 +17810,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110111 01010100 01...... ........ */
-                            /* ../target/loongarch/insns.decode:1771 */
+                            /* ./insns.decode:1873 */
                             if (trans_xvssrlrni_bu_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 01010100 1....... ........ */
-                        /* ../target/loongarch/insns.decode:1772 */
+                        /* ./insns.decode:1874 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_xvssrlrni_hu_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15576,7 +17825,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 01010101 ........ ........ */
-                    /* ../target/loongarch/insns.decode:1773 */
+                    /* ./insns.decode:1875 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_xvssrlrni_wu_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15584,7 +17833,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 0101011. ........ ........ */
-                /* ../target/loongarch/insns.decode:1774 */
+                /* ./insns.decode:1876 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_xvssrlrni_du_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15605,14 +17854,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110111 01011000 01...... ........ */
-                            /* ../target/loongarch/insns.decode:1699 */
+                            /* ./insns.decode:1801 */
                             if (trans_xvsrani_b_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 01011000 1....... ........ */
-                        /* ../target/loongarch/insns.decode:1700 */
+                        /* ./insns.decode:1802 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_xvsrani_h_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15620,7 +17869,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 01011001 ........ ........ */
-                    /* ../target/loongarch/insns.decode:1701 */
+                    /* ./insns.decode:1803 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_xvsrani_w_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15628,7 +17877,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 0101101. ........ ........ */
-                /* ../target/loongarch/insns.decode:1702 */
+                /* ./insns.decode:1804 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_xvsrani_d_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15649,14 +17898,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110111 01011100 01...... ........ */
-                            /* ../target/loongarch/insns.decode:1715 */
+                            /* ./insns.decode:1817 */
                             if (trans_xvsrarni_b_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 01011100 1....... ........ */
-                        /* ../target/loongarch/insns.decode:1716 */
+                        /* ./insns.decode:1818 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_xvsrarni_h_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15664,7 +17913,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 01011101 ........ ........ */
-                    /* ../target/loongarch/insns.decode:1717 */
+                    /* ./insns.decode:1819 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_xvsrarni_w_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15672,7 +17921,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 0101111. ........ ........ */
-                /* ../target/loongarch/insns.decode:1718 */
+                /* ./insns.decode:1820 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_xvsrarni_d_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15693,14 +17942,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110111 01100000 01...... ........ */
-                            /* ../target/loongarch/insns.decode:1737 */
+                            /* ./insns.decode:1839 */
                             if (trans_xvssrani_b_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 01100000 1....... ........ */
-                        /* ../target/loongarch/insns.decode:1738 */
+                        /* ./insns.decode:1840 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_xvssrani_h_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15708,7 +17957,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 01100001 ........ ........ */
-                    /* ../target/loongarch/insns.decode:1739 */
+                    /* ./insns.decode:1841 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_xvssrani_w_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15716,7 +17965,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 0110001. ........ ........ */
-                /* ../target/loongarch/insns.decode:1740 */
+                /* ./insns.decode:1842 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_xvssrani_d_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15737,14 +17986,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110111 01100100 01...... ........ */
-                            /* ../target/loongarch/insns.decode:1745 */
+                            /* ./insns.decode:1847 */
                             if (trans_xvssrani_bu_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 01100100 1....... ........ */
-                        /* ../target/loongarch/insns.decode:1746 */
+                        /* ./insns.decode:1848 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_xvssrani_hu_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15752,7 +18001,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 01100101 ........ ........ */
-                    /* ../target/loongarch/insns.decode:1747 */
+                    /* ./insns.decode:1849 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_xvssrani_wu_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15760,7 +18009,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 0110011. ........ ........ */
-                /* ../target/loongarch/insns.decode:1748 */
+                /* ./insns.decode:1850 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_xvssrani_du_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15781,14 +18030,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110111 01101000 01...... ........ */
-                            /* ../target/loongarch/insns.decode:1767 */
+                            /* ./insns.decode:1869 */
                             if (trans_xvssrarni_b_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 01101000 1....... ........ */
-                        /* ../target/loongarch/insns.decode:1768 */
+                        /* ./insns.decode:1870 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_xvssrarni_h_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15796,7 +18045,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 01101001 ........ ........ */
-                    /* ../target/loongarch/insns.decode:1769 */
+                    /* ./insns.decode:1871 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_xvssrarni_w_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15804,7 +18053,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 0110101. ........ ........ */
-                /* ../target/loongarch/insns.decode:1770 */
+                /* ./insns.decode:1872 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_xvssrarni_d_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15825,14 +18074,14 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                         switch ((insn >> 14) & 0x1) {
                         case 0x1:
                             /* 01110111 01101100 01...... ........ */
-                            /* ../target/loongarch/insns.decode:1775 */
+                            /* ./insns.decode:1877 */
                             if (trans_xvssrarni_bu_h(ctx, &u.f_vv_i)) return true;
                             break;
                         }
                         break;
                     case 0x1:
                         /* 01110111 01101100 1....... ........ */
-                        /* ../target/loongarch/insns.decode:1776 */
+                        /* ./insns.decode:1878 */
                         decode_extract_vv_ui5(ctx, &u.f_vv_i, insn);
                         if (trans_xvssrarni_hu_w(ctx, &u.f_vv_i)) return true;
                         break;
@@ -15840,7 +18089,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                     break;
                 case 0x1:
                     /* 01110111 01101101 ........ ........ */
-                    /* ../target/loongarch/insns.decode:1777 */
+                    /* ./insns.decode:1879 */
                     decode_extract_vv_ui6(ctx, &u.f_vv_i, insn);
                     if (trans_xvssrarni_wu_d(ctx, &u.f_vv_i)) return true;
                     break;
@@ -15848,7 +18097,7 @@ static bool decode(DisasContext *ctx, uint32_t insn)
                 break;
             case 0x1:
                 /* 01110111 0110111. ........ ........ */
-                /* ../target/loongarch/insns.decode:1778 */
+                /* ./insns.decode:1880 */
                 decode_extract_vv_ui7(ctx, &u.f_vv_i, insn);
                 if (trans_xvssrarni_du_q(ctx, &u.f_vv_i)) return true;
                 break;
@@ -15856,103 +18105,103 @@ static bool decode(DisasContext *ctx, uint32_t insn)
             break;
         case 0xe0:
             /* 01110111 100000.. ........ ........ */
-            /* ../target/loongarch/insns.decode:2066 */
+            /* ./insns.decode:2184 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_xvextrins_d(ctx, &u.f_vv_i)) return true;
             break;
         case 0xe1:
             /* 01110111 100001.. ........ ........ */
-            /* ../target/loongarch/insns.decode:2067 */
+            /* ./insns.decode:2185 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_xvextrins_w(ctx, &u.f_vv_i)) return true;
             break;
         case 0xe2:
             /* 01110111 100010.. ........ ........ */
-            /* ../target/loongarch/insns.decode:2068 */
+            /* ./insns.decode:2186 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_xvextrins_h(ctx, &u.f_vv_i)) return true;
             break;
         case 0xe3:
             /* 01110111 100011.. ........ ........ */
-            /* ../target/loongarch/insns.decode:2069 */
+            /* ./insns.decode:2187 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_xvextrins_b(ctx, &u.f_vv_i)) return true;
             break;
         case 0xe4:
             /* 01110111 100100.. ........ ........ */
-            /* ../target/loongarch/insns.decode:2057 */
+            /* ./insns.decode:2175 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_xvshuf4i_b(ctx, &u.f_vv_i)) return true;
             break;
         case 0xe5:
             /* 01110111 100101.. ........ ........ */
-            /* ../target/loongarch/insns.decode:2058 */
+            /* ./insns.decode:2176 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_xvshuf4i_h(ctx, &u.f_vv_i)) return true;
             break;
         case 0xe6:
             /* 01110111 100110.. ........ ........ */
-            /* ../target/loongarch/insns.decode:2059 */
+            /* ./insns.decode:2177 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_xvshuf4i_w(ctx, &u.f_vv_i)) return true;
             break;
         case 0xe7:
             /* 01110111 100111.. ........ ........ */
-            /* ../target/loongarch/insns.decode:2060 */
+            /* ./insns.decode:2178 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_xvshuf4i_d(ctx, &u.f_vv_i)) return true;
             break;
         case 0xf1:
             /* 01110111 110001.. ........ ........ */
-            /* ../target/loongarch/insns.decode:1973 */
+            /* ./insns.decode:2091 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_xvbitseli_b(ctx, &u.f_vv_i)) return true;
             break;
         case 0xf4:
             /* 01110111 110100.. ........ ........ */
-            /* ../target/loongarch/insns.decode:1624 */
+            /* ./insns.decode:1726 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_xvandi_b(ctx, &u.f_vv_i)) return true;
             break;
         case 0xf5:
             /* 01110111 110101.. ........ ........ */
-            /* ../target/loongarch/insns.decode:1625 */
+            /* ./insns.decode:1727 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_xvori_b(ctx, &u.f_vv_i)) return true;
             break;
         case 0xf6:
             /* 01110111 110110.. ........ ........ */
-            /* ../target/loongarch/insns.decode:1626 */
+            /* ./insns.decode:1728 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_xvxori_b(ctx, &u.f_vv_i)) return true;
             break;
         case 0xf7:
             /* 01110111 110111.. ........ ........ */
-            /* ../target/loongarch/insns.decode:1627 */
+            /* ./insns.decode:1729 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_xvnori_b(ctx, &u.f_vv_i)) return true;
             break;
         case 0xf8:
             /* 01110111 111000.. ........ ........ */
-            /* ../target/loongarch/insns.decode:1615 */
+            /* ./insns.decode:1717 */
             decode_extract_v_i13(ctx, &u.f_v_i, insn);
             if (trans_xvldi(ctx, &u.f_v_i)) return true;
             break;
         case 0xf9:
             /* 01110111 111001.. ........ ........ */
-            /* ../target/loongarch/insns.decode:2062 */
+            /* ./insns.decode:2180 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_xvpermi_w(ctx, &u.f_vv_i)) return true;
             break;
         case 0xfa:
             /* 01110111 111010.. ........ ........ */
-            /* ../target/loongarch/insns.decode:2063 */
+            /* ./insns.decode:2181 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_xvpermi_d(ctx, &u.f_vv_i)) return true;
             break;
         case 0xfb:
             /* 01110111 111011.. ........ ........ */
-            /* ../target/loongarch/insns.decode:2064 */
+            /* ./insns.decode:2182 */
             decode_extract_vv_ui8(ctx, &u.f_vv_i, insn);
             if (trans_xvpermi_q(ctx, &u.f_vv_i)) return true;
             break;

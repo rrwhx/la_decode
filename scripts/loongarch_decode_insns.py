@@ -16,6 +16,7 @@ enum LA_OP_TYPE {
     LA_OP_VR,
     LA_OP_XR,
     LA_OP_FCC,
+    LA_OP_SCR,
     LA_OP_FCSR,
     LA_OP_CSR,
     LA_OP_IMM,
@@ -27,6 +28,7 @@ const char* la_op_type_name[] = {
     [LA_OP_VR] = "vr",
     [LA_OP_XR] = "xr",
     [LA_OP_FCC] = "fcc",
+    [LA_OP_SCR] = "scr",
     [LA_OP_FCSR] = "fcsr",
     [LA_OP_CSR] = "csr",
     [LA_OP_IMM] = "",
@@ -561,6 +563,95 @@ static int handle_arg_vvvv(LA_DECODE* la_decode, arg_vvvv* a, int id) {
     la_decode->op[1].type = LA_OP_VR; la_decode->op[1].val = a->vj;
     la_decode->op[2].type = LA_OP_VR; la_decode->op[2].val = a->vk;
     la_decode->op[3].type = LA_OP_VR; la_decode->op[3].val = a->va;
+    return true;
+}
+
+
+static int handle_arg_d_ui4(LA_DECODE* la_decode, arg_d_ui4* a, int id) {
+    la_decode->id = id; la_decode->opcnt = 2;
+    la_decode->op[0].type = LA_OP_GPR; la_decode->op[0].val = a->rd;
+    la_decode->op[1].type = LA_OP_IMM; la_decode->op[1].val = a->imm;
+    return true;
+}
+static int handle_arg_d_ui8(LA_DECODE* la_decode, arg_d_ui8* a, int id) {
+    la_decode->id = id; la_decode->opcnt = 2;
+    la_decode->op[0].type = LA_OP_GPR; la_decode->op[0].val = a->rd;
+    la_decode->op[1].type = LA_OP_IMM; la_decode->op[1].val = a->imm;
+    return true;
+}
+static int handle_arg_f_i(LA_DECODE* la_decode, arg_f_i* a, int id) {
+    la_decode->id = id; la_decode->opcnt = 2;
+    la_decode->op[0].type = LA_OP_FR; la_decode->op[0].val = a->fd;
+    la_decode->op[1].type = LA_OP_IMM; la_decode->op[1].val = a->imm;
+    return true;
+}
+static int handle_arg_fmt_offs21(LA_DECODE* la_decode, arg_fmt_offs21* a, int id) {
+    la_decode->id = id; la_decode->opcnt = 1;
+    la_decode->op[0].type = LA_OP_IMM; la_decode->op[0].val = a->offs;
+    return true;
+}
+static int handle_arg_fmt_ptr(LA_DECODE* la_decode, arg_fmt_ptr* a, int id) {
+    la_decode->id = id; la_decode->opcnt = 1;
+    la_decode->op[0].type = LA_OP_IMM; la_decode->op[0].val = a->ptr;
+    return true;
+}
+static int handle_arg_fmt_rdrjsi5(LA_DECODE* la_decode, arg_fmt_rdrjsi5* a, int id) {
+    la_decode->id = id; la_decode->opcnt = 3;
+    la_decode->op[0].type = LA_OP_GPR; la_decode->op[0].val = a->rd;
+    la_decode->op[1].type = LA_OP_GPR; la_decode->op[1].val = a->rj;
+    la_decode->op[2].type = LA_OP_IMM; la_decode->op[2].val = a->si5;
+    return true;
+}
+static int handle_arg_fmt_rdui8(LA_DECODE* la_decode, arg_fmt_rdui8* a, int id) {
+    la_decode->id = id; la_decode->opcnt = 2;
+    la_decode->op[0].type = LA_OP_GPR; la_decode->op[0].val = a->rd;
+    la_decode->op[1].type = LA_OP_IMM; la_decode->op[1].val = a->imm;
+    return true;
+}
+static int handle_arg_j_ui3(LA_DECODE* la_decode, arg_j_ui3* a, int id) {
+    la_decode->id = id; la_decode->opcnt = 2;
+    la_decode->op[0].type = LA_OP_GPR; la_decode->op[0].val = a->rj;
+    la_decode->op[1].type = LA_OP_IMM; la_decode->op[1].val = a->imm;
+    return true;
+}
+static int handle_arg_j_ui4(LA_DECODE* la_decode, arg_j_ui4* a, int id) {
+    la_decode->id = id; la_decode->opcnt = 2;
+    la_decode->op[0].type = LA_OP_GPR; la_decode->op[0].val = a->rj;
+    la_decode->op[1].type = LA_OP_IMM; la_decode->op[1].val = a->imm;
+    return true;
+}
+static int handle_arg_j_ui5(LA_DECODE* la_decode, arg_j_ui5* a, int id) {
+    la_decode->id = id; la_decode->opcnt = 2;
+    la_decode->op[0].type = LA_OP_GPR; la_decode->op[0].val = a->rj;
+    la_decode->op[1].type = LA_OP_IMM; la_decode->op[1].val = a->imm;
+    return true;
+}
+static int handle_arg_j_ui6(LA_DECODE* la_decode, arg_j_ui6* a, int id) {
+    la_decode->id = id; la_decode->opcnt = 2;
+    la_decode->op[0].type = LA_OP_GPR; la_decode->op[0].val = a->rj;
+    la_decode->op[1].type = LA_OP_IMM; la_decode->op[1].val = a->imm;
+    return true;
+}
+static int handle_arg_r_d(LA_DECODE* la_decode, arg_r_d* a, int id) {
+    la_decode->id = id; la_decode->opcnt = 1;
+    la_decode->op[0].type = LA_OP_GPR; la_decode->op[0].val = a->rd;
+    return true;
+}
+static int handle_arg_r_j(LA_DECODE* la_decode, arg_r_j* a, int id) {
+    la_decode->id = id; la_decode->opcnt = 1;
+    la_decode->op[0].type = LA_OP_GPR; la_decode->op[0].val = a->rj;
+    return true;
+}
+static int handle_arg_r_s(LA_DECODE* la_decode, arg_r_s* a, int id) {
+    la_decode->id = id; la_decode->opcnt = 2;
+    la_decode->op[0].type = LA_OP_GPR; la_decode->op[0].val = a->rd;
+    la_decode->op[1].type = LA_OP_SCR; la_decode->op[1].val = a->sj;
+    return true;
+}
+static int handle_arg_s_r(LA_DECODE* la_decode, arg_s_r* a, int id) {
+    la_decode->id = id; la_decode->opcnt = 2;
+    la_decode->op[0].type = LA_OP_SCR; la_decode->op[0].val = a->sd;
+    la_decode->op[1].type = LA_OP_GPR; la_decode->op[1].val = a->rj;
     return true;
 }
 
