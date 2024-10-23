@@ -875,9 +875,13 @@ for line in lines:
         # print(s)
         line = line[0:r.span()[0]] + s + line[r.span()[1]:]
         inst.add("LA_INST_" + r.group(1).upper())
+    if "return false" in line:
+        body.append("ctx->id = LA_INST_ILL; ctx->opcnt = 0;\n")
     body.append(line)
 
 inst = sorted(inst)
+
+inst.append("LA_INST_ILL")
 
 print("enum {")
 print("    LA_INST_BEGIN,")
